@@ -1,11 +1,10 @@
-
 /* Top bar */
 .TopBar-box{
     z-index: 1;
-    height: 75px;
+    height: var(--size-top-bar);
     user-select: none;
-    width: calc(100vw - 325px);
-    margin-left: 325px;
+    width: calc(100vw - var(--size-menu));
+    margin-left: var(--size-menu);
     background-color: rgb(var(--primary-color));
     box-shadow: 0px 3px 10px var(--shadow-color);
     position: fixed;
@@ -61,7 +60,7 @@
   .results-container {
     background-color: rgba(var(--primary-color), 0.6);
     right: 85px;
-    top:75px;
+    top:var(--size-top-bar);
     position: fixed;
     flex-direction: column;
     border-radius: 8px;
