@@ -1,0 +1,157 @@
+@import url('main.css');
+
+/*css du menu bar*/
+.MenuBar-box {
+    user-select: none;
+    width: 325px;
+    height: 100%;
+    background-color: var(--background-color);
+    border-right: 1px solid var(--separation-color);
+    margin-top: 0;
+    position: fixed;
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+
+}
+.logo {
+    width: 220px;
+    height: auto;
+    margin: 35px;
+    padding-bottom: 35px;
+    border-bottom: 1px solid var(--separation-color);
+}
+.Onglet-box a {
+    width: 100%;
+    display: flex;
+    text-decoration: none; 
+    height: 100%;
+    align-items: center;
+}
+.Onglet-box-select{
+    background-color: var(--secondary-color);
+    border-radius: 7px;
+    box-shadow: 0px 0px 10px var(--shadow-color);
+}
+.Onglet-box-select,
+.Onglet-box{
+    width: 285px;
+    margin-bottom: 15px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+}
+.Onglet-box-select p,
+.Onglet-box p {
+    padding-left: 30px;
+    color: var(--primary-text);
+    font-size: 20px;
+    font-weight: bold;
+    font-family: "Montserrat", sans-serif;
+}
+.Onglet-box-select img,
+.Onglet-box img {
+    width: 35px;
+}
+
+.CategorieTitleHome {
+    margin-left: 80px;
+    margin-bottom: 30px;
+    font-family: "Montserrat", sans-serif;
+    color:var(--primary-text);
+    text-transform: uppercase;
+    font-size: 25px;
+    font-weight: bold;
+
+}
+/* liste des nouveaux épisodes  */
+.LatestEpisodes {
+    user-select: none;
+    margin: 0 50px;
+    border-radius: 7px;
+    display: flex;
+    gap: 50px;
+    padding: 70px 40px;
+    background-color: var(--secondary-color);
+    overflow-x: auto; 
+}
+.LatestEpisodes-item{
+    cursor: pointer;
+    border-radius: 10px;
+    height: 325px;
+    background-color: var(--background-color);
+    border: 2px solid var(--logo-color);
+    box-shadow: -2px 5px 10px var(--shadow-color);
+}
+.LatestEpisodes-cover{
+    display: flex;
+    width: 250px;
+    height: 150px;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background-color: var(--secondary-color);
+    border-radius: 7px 7px 0 0;
+}
+.LatestEpisodes-cover h3 {
+    color: var(--primary-text);
+    position: absolute;
+    font-size: 15px;
+    text-transform: uppercase;
+    font-weight: bold;
+    text-align: center;
+    font-family: "Montserrat", sans-serif;
+}
+.LatestEpisodes-cover img {
+    box-shadow: 0px 5px 10px var(--shadow-color);
+    width: 100%;
+    border-radius: 7px 7px 0 0;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.5;
+}
+.LatestEpisodes-info{
+    color: var(--primary-text);
+    font-family: "Montserrat", sans-serif;
+    text-align: center;
+    
+}
+.LatestEpisodes-info div {
+    width: 150px;
+    margin: 0 auto;
+    margin-bottom: 30px;
+    border-bottom: 2px groove var(--separation-color);
+}
+.LatestEpisodes-info h1 {
+    margin: 0 20px;
+    height: 80px;
+    text-align: center;
+    font-size: 17px;
+    border-bottom: 1px 20px solid var(--separation-color);
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+}
+.LatestEpisodes-info p{
+    background-color: var(--logo-color);
+    margin: 0 80px ;
+    text-transform: uppercase;
+    font-size: 16px;
+    padding: 10px 0px ;
+    border-radius: 5px;
+}
+.LatestEpisodes::-webkit-scrollbar {
+    height: 12px; 
+}
+.LatestEpisodes::-webkit-scrollbar-track {
+    background-color: rgba(var(--primary-color), 0.8);
+    border-radius:  0 0 7px 7px;
+}
+.LatestEpisodes::-webkit-scrollbar-thumb {
+    background-color: var(--logo-color); 
+    border-radius: 7px;
+    border: 2px solid var(--secondary-color); 
+}
+.LatestEpisodes::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(153, 110, 53, 0.75); 
+}  
