@@ -84,8 +84,8 @@ app.whenReady().then(() => {
   });
   ipcMain.handle("get-episodes", async (event, query)=> {
     try {
-      // return await scraper.getEmbed(query, ["sibnet","vidmoly"]);
-      return await scraper.getEmbed(query, ["vidmoly", "sibnet"]);
+      return await scraper.getEmbed(query, ["sibnet","vidmoly"]);
+      // return await scraper.getEmbed(query, ["vidmoly", "sibnet"]);
       // return await scraper.getEmbed(query, ["senvid", "vidmoly", "sibnet"]);
     } catch (error){
       console.error('Erreur dans le main process:', error);

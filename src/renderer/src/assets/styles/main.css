@@ -7,6 +7,8 @@
     --separation-color:#424242;
     --primary-text:#D1D7E0 ;
     --shadow-color:#05060A ;
+    --size-menu:325px;
+    --size-top-bar:75px;
   }
 * {
     margin: 0;
@@ -27,10 +29,10 @@
 
 .MainPage {
   overflow-y: auto; 
-  margin-left:325px; 
-  margin-top: 75px;
-  width:calc(100vw - 325px);
-  height: calc(100vh - 75px); 
+  margin-left:var(--size-menu); 
+  margin-top: var(--size-top-bar);
+  width:calc(100vw - var(--size-menu));
+  height: calc(100vh - var(--size-top-bar)); 
   position: fixed;
 }
 
@@ -120,8 +122,4 @@
   margin-bottom: 10px;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
+
