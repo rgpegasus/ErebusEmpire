@@ -1,101 +1,121 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Loader from '../components/loader';
 
 const SeasonsPage = () => {
-  const { animeId } = useParams();
-  const animeUrl = decodeURIComponent(animeId);
-  const location = useLocation();
-  const [animeInfo, setAnimeInfo] = useState(null); // État pour info de l'anime
-
-  const [loadingSeasons, setLoadingSeasons] = useState(true);
-  const [loadingEpisode, setLoadingEpisode] = useState(false);
-
+  const { animeId, seasonId } = useParams();
+  const navigate = useNavigate();
+  const animeUrl = `https://anime-sama.fr/catalogue/${animeId}`;
+  const [animeInfo, setAnimeInfo] = useState(null);
   const [seasons, setSeasons] = useState([]);
   const [selectedSeason, setSelectedSeason] = useState("");
-  const [currentEpisodeIndex, setCurrentEpisodeIndex] = useState(0);
-  const [currentEpisodeUrl, setCurrentEpisodeUrl] = useState(null);
+  const [episodes, setEpisodes] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Récupérer les informations de l'anime
   useEffect(() => {
     const fetchAnimeInfo = async () => {
       try {
-        const info = await window.electron.ipcRenderer.invoke('info-anime', animeUrl); // Récupérer l'info
+        setLoading(true);
+        const info = await window.electron.ipcRenderer.invoke('info-anime', animeUrl);
         setAnimeInfo(info);
       } catch (error) {
         console.error("Erreur lors de la récupération des informations de l'anime :", error);
-      }
+      } 
     };
     fetchAnimeInfo();
   }, [animeUrl]);
 
-  // Réinitialisation quand l'anime change
-  useEffect(() => {
-    setSeasons([]);
-    setSelectedSeason("");
-    setCurrentEpisodeIndex(0);
-    setCurrentEpisodeUrl(null);
-  }, [animeUrl]);
-
-  // Récupérer les saisons
+  // Récupérer les saisons et réinitialiser les épisodes à chaque changement d'anime
   useEffect(() => {
     const fetchSeasons = async () => {
       try {
-        setLoadingSeasons(true);
+        setLoading(true);
         const fetchedSeasons = await window.electron.ipcRenderer.invoke('get-seasons', animeUrl);
         setSeasons(fetchedSeasons);
         if (fetchedSeasons.length > 0) {
-          setSelectedSeason(fetchedSeasons[0].url);
+          const seasonId = fetchedSeasons[0].title
+            .toLowerCase()
+            .replace(/\s+/g, '-')         
+            .replace(/[()]/g, '')        
+            .replace(/[^a-z0-9-]/g, '');  
+        
+          navigate(`/erebus-empire/anime/${animeId}/${seasonId}`, { replace: true });
+          setSelectedSeason(fetchedSeasons[0].url); 
         }
       } catch (error) {
         console.error("Erreur lors de la récupération des saisons :", error);
-      } finally {
-        setLoadingSeasons(false);
       }
     };
-
     fetchSeasons();
   }, [animeUrl]);
 
-  // Charger un épisode à la fois
-  const fetchCurrentEpisode = async (seasonUrl, index) => {
-    try {
-      setLoadingEpisode(true);
-      const episodeLinks = await window.electron.ipcRenderer.invoke('get-episodes', seasonUrl);
-      const embedUrl = episodeLinks[index];
-      const realUrl = await window.electron.ipcRenderer.invoke('get-url', embedUrl);
-      setCurrentEpisodeUrl(realUrl || embedUrl);
-    } catch (error) {
-      console.error("Erreur lors du chargement de l'épisode :", error);
-    } finally {
-      setLoadingEpisode(false);
-    }
-  };
-
-  // Charger l'épisode quand la saison ou l'index change
+  // Récupérer les épisodes en fonction de la saison sélectionnée
   useEffect(() => {
-    if (selectedSeason) {
-      fetchCurrentEpisode(selectedSeason, currentEpisodeIndex);
-    }
-  }, [selectedSeason, currentEpisodeIndex]);
+    const fetchEpisodes = async () => {
+      if (!selectedSeason) return;
+      try {
+        setLoading(true);
+        const episodeLinks = await window.electron.ipcRenderer.invoke('get-episodes', selectedSeason);
+        setEpisodes(episodeLinks);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des épisodes :", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchEpisodes();
+  }, [selectedSeason]);
 
   const handleSelectChange = (event) => {
-    setSelectedSeason(event.target.value);
-    setCurrentEpisodeIndex(0); // Réinitialiser l'épisode
+    const newSeasonUrl = event.target.value;
+    setSelectedSeason(newSeasonUrl);
+  
+    // Trouver la saison sélectionnée
+    const selected = seasons.find(season => season.url === newSeasonUrl);
+    
+    if (selected) {
+      const seasonId = selected.title
+        .toLowerCase()
+        .replace(/\s+/g, '-')         
+        .replace(/[()]/g, '')     
+        .replace(/[^a-z0-9-]/g, '');  
+  
+      navigate(`/erebus-empire/anime/${animeId}/${seasonId}`, { replace: true });
+    }
   };
 
-  const handlePreviousEpisode = () => {
-    setCurrentEpisodeIndex((prev) => Math.max(prev - 1, 0));
+  const handleEpisodeClick = (episode) => {
+    const episodeId = episode.title
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+      const selected = seasons.find(season => season.url === selectedSeason);
+      const path = `/erebus-empire/anime/${animeId}/${seasonId}/${episodeId}`
+    navigate(path, { 
+      state: { 
+        url: episode.url, 
+        episodeTitle: episode.title, 
+        episodes: episodes, 
+        animeId : animeId, 
+        seasonId : seasonId, 
+        animeTitle:animeInfo.title, 
+        seasonTitle:selected.title,
+        animeCover:animeInfo.cover
+      }
+    });
   };
 
-  const handleNextEpisode = () => {
-    setCurrentEpisodeIndex((prev) => prev + 1); // On laisse l'utilisateur cliquer suivant sans limiter (peut gérer dynamiquement)
-  };
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
     <div className="MainPage">
-      {/* Affichage de l'info de l'anime */}
-      {animeInfo ? (
+      {/* Cover Anime */}
+      {animeInfo && (
         <div className="AnimeCover">
           <h2>{animeInfo.title}</h2>
           {animeInfo.cover && (
@@ -107,63 +127,76 @@ const SeasonsPage = () => {
             />
           )}
         </div>
-      ) : (
-        <Loader />
       )}
-
+      {/* Information de l'animé */}
+      <div className='AnimeInfoText'>
+        <h1>{animeInfo.altTitles.join(', ')}</h1>
+      </div>
       {/* Sélecteur de saison */}
-      {loadingSeasons ? (
-        <Loader />
-      ) : seasons.length > 0 ? (
-        <select
-          id="saison"
-          name="saison"
-          value={selectedSeason}
-          onChange={handleSelectChange}
-          className="SelectSeason"
-        >
-          {seasons.map((season, index) => (
-            <option key={index} value={season.url} className="OptionStyle">
-              {season.title}
-            </option>
-          ))}
-        </select>
-      ) : (
-        <p>Aucune saison disponible</p>
-      )}
-
-      {/* Vidéo et navigation */}
-      {loadingEpisode ? (
-        <Loader />
-      ) : currentEpisodeUrl && (
-        <div className="VideoPlayer">
-          <iframe
-            src={currentEpisodeUrl}
-            width="100%"
-            height="500px"
-            frameBorder="0"
-            allowFullScreen
-            title="Video Player"
-          ></iframe>
-          <div className="EpisodeNavigation">
-            <button
-              onClick={handlePreviousEpisode}
-              disabled={currentEpisodeIndex === 0}
-              className="NavigationButton"
+      {seasons.length > 0 && (
+        <div>
+          {seasons.length > 1 ? (
+            <select
+              id="saison"
+              name="saison"
+              value={selectedSeason}
+              onChange={handleSelectChange}
+              className="SelectSeason"
             >
-              Précédent
-            </button>
-            <button
-              onClick={handleNextEpisode}
-              className="NavigationButton"
-            >
-              Suivant
-            </button>
-          </div>
+              {seasons.map((season) => (
+                <option key={season.url} value={season.url} className="OptionStyle">
+                  {season.title + "⠀⠀"}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <p className="SingleSeasonTitle">{seasons[0].title}</p>
+          )}
         </div>
       )}
+      <div className='Space'></div>
+      {/* Affichage des épisodes */}
+      <div>
+        <div className="CategorieTitle">Episodes :</div>
+        {episodes.length > 0 ? (
+          <div className="EpisodesList">
+            {episodes.map((episode) => (
+              <div
+                key={episode.id}
+                className="EpisodeItem"
+                draggable="false"
+                onClick={() => handleEpisodeClick(episode)}
+              >
+                <h2>{episode.title}</h2>
+                {animeInfo.cover && (
+                  <img
+                    src={animeInfo.cover}
+                    alt={episode.title}
+                    className="EpisodeItem-img"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="NoEpisodes">Aucun épisode disponible</p>
+        )}
+      </div>
+      <div className='Space'></div>
+      <div className='AnimeInfoText'>
+        <div className="CategorieTitle">Synopsis :</div>
+        <div className='InfoBox'>
+          <h2>{animeInfo.synopsis}</h2>
+        </div>
+        <div className='Space'></div>
+        <div className="CategorieTitle">Genres :</div>
+        <div className='InfoBox'>
+          <h3>{animeInfo.genres.join(', ')}</h3>
+        </div>
+        <div className='Space'></div>
+      </div>
     </div>
   );
 };
 
-export default SeasonsPage;
+export default SeasonsPage; 

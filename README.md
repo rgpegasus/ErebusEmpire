@@ -1,34 +1,56 @@
-# erebus-empire
+# ErebusEmpire - Streaming App
 
-An Electron application with React
+**ErebusEmpire** is a modern and stylish desktop app built with Electron and React that lets you stream and download anime episodes with a clean and powerful interface.
 
-## Recommended IDE Setup
+## 💻 Features
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+- Browse and search anime from Anime-sama
+- View anime information, synopsis, genres, and covers
+- View all available seasons for an anime
+- Select a season and list all episodes
+- Click an episode to open a dedicated page with video streaming
+- Automatically updates episodes from the web
+- Offline download support
 
-## Project Setup
+### 🧪 Prerequisites
 
-### Install
+- Node.js (v18+ recommended)
+- npm 
+- Git
 
-```bash
-$ npm install
-```
+## ⚙️ Tech Stack
 
-### Development
+- **Electron** — for building the desktop app
+- **React** — for the frontend
+- **Node.js** — for background logic
+- **better-ani-scraped** — for scraping anime data
 
-```bash
-$ npm run dev
-```
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/ErebusEmpire.git
+   cd ErebusEmpire
+   ```
 
-### Build
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-```bash
-# For windows
-$ npm run build:win
+3. Run the app in development mode:
+   ```bash
+   npm run dev
+   ```
 
-# For macOS
-$ npm run build:mac
+4. Build the app for production:
+   ```bash
+   npm run build
+   ```
 
-# For Linux
-$ npm run build:linux
-```
+## 📜 License
+
+This project is for educational purposes only. All streaming sources belong to their respective owners.
+
+
+
+> *"The empire will not fall as long as the code lives."*   
+> — **Skibidi Sigma**

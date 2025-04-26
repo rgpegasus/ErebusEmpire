@@ -23,5 +23,7 @@ if (process.contextIsolated) {
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
     invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args),
+    send: ipcRenderer.send,
+    on: ipcRenderer.on,
   }
 });

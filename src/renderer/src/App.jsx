@@ -1,5 +1,5 @@
-import React from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom'; // Importer Routes et Route
+import React, { useEffect } from 'react';
+import { HashRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import MenuBar from "./components/menu-bar";
 import CatalogPage from './pages/CatalogPage';
 import HomePage from './pages/HomePage';
@@ -9,19 +9,33 @@ import TopBar from './components/top-bar';
 import SeasonsPage from './pages/SeasonPage';
 import EpisodePage from './pages/EpisodePage.jsx';
 
+const Logger = () => {
+  const location = useLocation();
+  // console.log("🧭 Chemin actuel :", location.pathname);
+  return null;
+};
+
 const App = () => {
+  useEffect(() => {
+    window.electron.ipcRenderer.on('log-from-main', (_, msg) => {
+      console.log('[FROM MAIN]', msg);
+    });
+  }, []);
+  
   return (
     <Router>
-      <MenuBar/>
+      <Logger />
+      <MenuBar />
       <div>
-        <TopBar/>
+        <TopBar />
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/catalogue" element={<CatalogPage />} />
-          <Route path="/downloads" element={<DownloadPage />} />
-          <Route path="/favorites" element={<FavoritesPage />} />
-          <Route path="/seasons/:animeId" element = {<SeasonsPage/>} />
-          <Route path="/episode/:episodeId" element={<EpisodePage />} />
+          <Route path="/" element={<Navigate to="/erebus-empire/home" />} />
+          <Route path="/erebus-empire/home" element={<HomePage/>} />
+          <Route path="/erebus-empire/catalogue" element={<CatalogPage/>} />
+          <Route path="/erebus-empire/downloads" element={<DownloadPage/>} />
+          <Route path="/erebus-empire/favorites" element={<FavoritesPage/>} />
+          <Route path="/erebus-empire/anime/:animeId/:seasonId?" element={<SeasonsPage/>} />
+          <Route path="/erebus-empire/anime/:animeId/:seasonId/:episodeId" element={<EpisodePage/>} />
         </Routes>
       </div>
     </Router>

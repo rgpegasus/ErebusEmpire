@@ -1,0 +1,109 @@
+/*css du menu bar*/
+.MenuBar-box {
+    width: var(--size-menu);
+    height: 100%;
+    background-color: var(--background-color);
+    border-right: 1px solid var(--separation-color);
+    margin-top: 0;
+    position: fixed;
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+
+}
+.logo {
+    width: 220px;
+    height: 240px;
+    margin: 5vh 0;
+    display: flex;
+    align-items: center;
+    padding-bottom: 5vh;
+    border-bottom: 1px solid var(--separation-color);
+}
+
+.logo img {
+    width: 220px;
+    height: auto;
+}
+.Onglet-box-select a,
+.Onglet-box a {
+    width: 100%;
+    display: flex;
+    text-decoration: none; 
+    height: 100%;
+    align-items: center;
+}
+.Onglet-box-select{
+    background-color: var(--secondary-color);
+    border-radius: 7px;
+    box-shadow: 0px 0px 10px var(--shadow-color);
+}
+.Onglet-box-select,
+.Onglet-box{
+    width: 285px;
+    margin-bottom: 4vh;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+}
+.Onglet-box-select p,
+.Onglet-box p {
+    padding-left: 30px;
+    color: var(--primary-text);
+    font-size: 20px;
+    font-weight: var(--main-title-weight);
+    font-family: var(--font-main);
+}
+.Onglet-box-select img,
+.Onglet-box img {
+    width: 35px;
+}
+
+/* Compact Mode */
+body.menu-compact {
+    --size-menu: 0px;
+  }
+  
+  body.menu-compact .Onglet-box,
+  body.menu-compact .Onglet-box-select {
+    width: 0px;
+    padding:0;
+  }
+  
+  body.menu-compact .Onglet-box p,
+  body.menu-compact .Onglet-box-select p {
+    font-size: 0;
+    padding-left: 0;
+  }
+  body.menu-compact .Onglet-box img,
+  body.menu-compact .Onglet-box-select img {
+    width: 0;
+  }
+
+  body.menu-compact .logo,
+  body.menu-compact .logo img {
+    width: 0px;
+  }
+
+
+  
+/* Extended Mode */
+body.menu-extended {
+    --size-menu: 250px; 
+}
+
+body.menu-extended .Onglet-box,
+body.menu-extended .Onglet-box-select {
+  width: 210px;
+}
+
+body.menu-extended .Onglet-box p,
+body.menu-extended .Onglet-box-select p {
+  font-size: 15px;
+  padding-left: 10px;
+}
+
+body.menu-extended .logo,
+body.menu-extended .logo img {
+  width: 175px;
+}
