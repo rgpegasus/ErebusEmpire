@@ -27,7 +27,7 @@
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/ErebusEmpire.git
+   git clone https://github.com/rgpegasus/ErebusEmpire.git
    cd ErebusEmpire
    ```
 

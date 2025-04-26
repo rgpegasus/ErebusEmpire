@@ -8,9 +8,8 @@ function TopBar() {
   const [results, setResults] = useState([]);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const navigate = useNavigate();
-  const menuRef = useRef(null);  // Référence pour le menu
+  const menuRef = useRef(null); 
   const toogleWidth = 1200
-  // Fonction pour fermer le menu si un clic en dehors est détecté
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (windowWidth <= toogleWidth && menuRef.current && !menuRef.current.contains(event.target)) {
@@ -18,11 +17,17 @@ function TopBar() {
         body.classList.remove('menu-extended');
         body.classList.add('menu-compact');
       }
+      
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setInputValue(''); 
+        setResults([]);   
+      }
     };
+    
 
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
-  }, [windowWidth]);  // Dépendance ajoutée pour réagir à la largeur de la fenêtre
+  }, [windowWidth]);  
 
   useEffect(() => {
     const handleResize = () => {
@@ -70,6 +75,13 @@ function TopBar() {
       return "";
     }
   };
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' && results.length > 0) {
+      handleCardClick(results[0]); // Clique sur le premier résultat
+    }
+  };
+
+  
 
   const handleCardClick = (anime) => {
     setInputValue('');
@@ -88,9 +100,10 @@ function TopBar() {
           type="text"
           value={inputValue}
           onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
           placeholder="RECHERCHER..."
           className="search-bar"
-        />
+        />    
       </div>
 
       {inputValue && (
@@ -100,7 +113,7 @@ function TopBar() {
               {anime.cover ? (
                 <img draggable="false" src={anime.cover} alt={`Bannière de ${anime.title}`} className="cover-img" />
               ) : (
-                <p>Aucune image disponible</p>
+                <p>Image indisponible</p>
               )}
               <div>
                 <h3>{anime.title}</h3>

@@ -16,8 +16,7 @@ const chromePath = isDev
   ? join(__dirname, '..', '..', 'puppeteer', 'chrome', 'win64-135.0.7049.95', 'chrome-win64', 'chrome.exe')
   : join(process.resourcesPath, 'app.asar.unpacked', 'puppeteer', 'chrome', 'win64-135.0.7049.95', 'chrome-win64', 'chrome.exe');
 
-console.log(chromePath); // Pour déboguer et voir quel chemin est généré
-
+console.log(chromePath); 
 if (!fs.existsSync(logFolderPath)) {
   fs.mkdirSync(logFolderPath, { recursive: true });
 }
@@ -135,27 +134,13 @@ app.whenReady().then(() => {
     try {
       logToFile("URL de la saison:", query)
       
-      const episodes_list = await scraper.getEmbed(query, ["sibnet","vidmoly"], chromePath);
-      logToFile("Liste des épisodes :", episodes_list)
-      return episodes_list
+      return await scraper.getEmbed(query, ["sibnet","vidmoly"], chromePath);
+       
       // return await scraper.getEmbed(query, ["vidmoly", "sibnet"]);
       // return await scraper.getEmbed(query, ["senvid", "vidmoly", "sibnet"]);
     } catch (error){
       logToFile('Erreur dans le main process:', error)
       console.error('Erreur dans le main process:', error);
-      return null;
-    }
-  });
-  ipcMain.handle("get-titles", async (event, query)=> {
-    try {
-      // logToFile("URL de la saison:", query)
-      
-      const titles_list = await scraper.getEpisodeTitles(query, chromePath);
-      
-      // logToFile("Liste des titres :", titles_list)
-      return titles_list
-    } catch (error){
-      logToFile('Erreur dans le main process:', error)
       return null;
     }
   });
@@ -169,9 +154,7 @@ app.whenReady().then(() => {
   });
   ipcMain.handle("get-latest-episode", async (event)=> {
     try {
-      const latestEpisodes_list = await scraper.getLatestEpisodes(["vostfr"]);
-      // logToFile("Liste des derniers épisodes:", latestEpisodes_list)
-      return latestEpisodes_list
+      return await scraper.getLatestEpisodes(["vostfr"]); 
     } catch (error){
       console.error('Erreur dans le main process:', error);
       return null;
@@ -330,7 +313,60 @@ app.whenReady().then(() => {
       return [];
     }
   });
-  
+
+ipcMain.handle('delete-episode', async (event, filePath) => {
+  try {
+    await fs.promises.unlink(filePath);
+
+    // Trouver les chemins
+    const seasonDir = path.dirname(filePath);
+    const animeDir = path.dirname(seasonDir);
+    const dataJsonPath = path.join(animeDir, 'data.json');
+
+    // Modifier data.json
+    if (fs.existsSync(dataJsonPath)) {
+      const data = JSON.parse(await fs.promises.readFile(dataJsonPath, 'utf-8'));
+
+      const seasonName = path.basename(seasonDir);
+      const episodeName = path.basename(filePath, path.extname(filePath));
+
+      if (data.season?.[seasonName]?.[episodeName]) {
+        delete data.season[seasonName][episodeName];
+        if (Object.keys(data.season[seasonName]).length === 0) {
+          delete data.season[seasonName];
+        }
+        
+        await fs.promises.writeFile(dataJsonPath, JSON.stringify(data, null, 2), 'utf-8');
+        console.log(`Mise à jour de data.json : ${episodeName} supprimé`);
+      } else {
+        console.warn(`Épisode ${episodeName} non trouvé dans data.json`);
+      }
+    } else {
+      console.warn(`data.json introuvable pour ${animeDir}`);
+    }
+
+
+    const seasonFiles = await fs.promises.readdir(seasonDir);
+    if (seasonFiles.length === 0) {
+      await fs.promises.rmdir(seasonDir);
+      console.log(`Dossier saison supprimé: ${seasonDir}`);
+      const animeFiles = await fs.promises.readdir(animeDir);
+      if (animeFiles.length === 2 && animeFiles.includes('cover.jpg') && animeFiles.includes('data.json')) {
+        for (const file of animeFiles) {
+          await fs.promises.unlink(path.join(animeDir, file));
+          console.log(`Fichier supprimé: ${file}`);
+        }
+        await fs.promises.rmdir(animeDir);
+        console.log(`Dossier anime supprimé: ${animeDir}`);
+      }
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Erreur lors de la suppression:', error);
+    throw error;
+  }
+});
   createWindow()
   // mainWindow.webContents.openDevTools(); // Force l'ouverture des DevTools
 

@@ -77,38 +77,39 @@ const WatchHistory = () => {
 
   return (
     <div>
-      <div className="CategorieTitle">Reprendre la lecture :</div>
-
-      {watchedEpisodes.length > 0 ? (
-        <div className="LatestEpisodes">
-          {watchedEpisodes.map((episode, index) => (
-            <div
-              key={episode.key || index}
-              className={`LatestEpisodes-item ${shiftPressed ? 'shift-delete' : ''}`}
-              onClick={(e) => handleEpisodeClick(episode, e)}
-            >
-              <div className="LatestEpisodes-cover">
-                <h3>{episode.animeTitle}</h3>
-                <img
-                  src={episode.animeCover}
-                  draggable="false"
-                  alt={episode.episodeTitle}
-                  className="EpisodeCover"
-                />
-              </div>
-              <div className='LatestEpisodes-info'>
+      {watchedEpisodes.length > 0 && (
+        <div>
+          <div className="CategorieTitle">Reprendre la lecture :</div>
+          <div className="LatestEpisodes">
+            {watchedEpisodes.map((episode, index) => (
+              <div
+                key={episode.key || index}
+                className={`LatestEpisodes-item ${shiftPressed ? 'shift-delete' : ''}`}
+                onClick={(e) => handleEpisodeClick(episode, e)}
+              >
+                <div className="LatestEpisodes-cover">
+                  <h3>{episode.animeTitle}</h3>
+                  <img
+                    src={episode.animeCover}
+                    draggable="false"
+                    alt={episode.episodeTitle}
+                    className="EpisodeCover"
+                  />
+                </div>
+                <div className="LatestEpisodes-info">
                   <EpisodeTitle title={`${episode.seasonTitle} ${episode.episodeTitle}`} />
-                  <div className='Separation'></div>
+                  <div className="Separation"></div>
                   <p>VOSTFR</p>
                 </div>
-            </div>
-          ))}
+              </div>
+            ))}
+          </div>
+          <div className='Space'></div><div className='Space'></div><div className='Space'></div>
         </div>
-      ) : (
-        <p>Aucun épisode disponible</p>
       )}
     </div>
   );
+  
 };
 
 export default WatchHistory;

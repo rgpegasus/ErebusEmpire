@@ -1,20 +1,71 @@
 import React, { useEffect, useState } from 'react';
 import { VideoPlayer } from '../components/video-player/src';
 
-// Fonction de tri "naturel"
-const naturalSort = (a, b) => {
-  return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
-};
+const naturalSort = (a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
 
 const DownloadPage = () => {
   const [groupedData, setGroupedData] = useState([]);
+  const [downloadingData, setDownloadingData] = useState([]);
   const [selectedEpisode, setSelectedEpisode] = useState(null);
   const [selectedSeasons, setSelectedSeasons] = useState({});
   const [downloadProgress, setDownloadProgress] = useState({});
+  const [shiftPressed, setShiftPressed] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-  const handleSeasonChange = (animeTitle, seasonTitle) => {
-    setSelectedSeasons(prev => ({ ...prev, [animeTitle]: seasonTitle }));
-  };
+  useEffect(() => {
+    const handleKeyDown = (e) => e.key === 'Shift' && setShiftPressed(true);
+    const handleKeyUp = (e) => e.key === 'Shift' && setShiftPressed(false);
+    const handleResize = () => setWindowWidth(window.innerWidth);
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    const fetchDownloads = async () => {
+      try {
+        const { episodes } = await window.electron.ipcRenderer.invoke('get-downloads');
+        const downloadingEpisodes = [];
+        const animeMap = {};
+
+        episodes.forEach(({ metadata, path, cover }) => {
+          const { animeTitle, seasonTitle, downloadedAt, state } = metadata;
+        
+          if (state === "downloading") {
+            downloadingEpisodes.push({ metadata, path, cover });
+            return;
+          }
+        
+          if (!animeMap[animeTitle]) {
+            animeMap[animeTitle] = { cover, seasons: {}, latestDownload: new Date(downloadedAt) };
+          }
+          if (new Date(downloadedAt) > animeMap[animeTitle].latestDownload) {
+            animeMap[animeTitle].latestDownload = new Date(downloadedAt);
+          }
+          animeMap[animeTitle].seasons[seasonTitle] = animeMap[animeTitle].seasons[seasonTitle] || [];
+          animeMap[animeTitle].seasons[seasonTitle].push({ metadata, path });
+        });
+
+        const sortedAnimes = Object.entries(animeMap)
+          .map(([title, data]) => ({ title, ...data }))
+          .sort((a, b) => b.latestDownload - a.latestDownload);
+
+        setGroupedData(sortedAnimes);
+        setDownloadingData(downloadingEpisodes);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des fichiers:', error);
+      }
+    };
+
+    fetchDownloads();
+  }, []);
 
   useEffect(() => {
     const handler = (_event, data) => {
@@ -24,195 +75,122 @@ const DownloadPage = () => {
         [key]: {
           percent: data.percent,
           eta: data.eta,
-          videoUrl: data.videoUrlo
+          videoUrl: data.videoUrl
         }
       }));
     };
-  
+
     window.electron.ipcRenderer.on('download-progress', handler);
     return () => window.electron.ipcRenderer.removeListener('download-progress', handler);
-  }, []);
-  
-  useEffect(() => {
-    const fetchDownloads = async () => {
-      try {
-        const { episodes } = await window.electron.ipcRenderer.invoke('get-downloads');
-
-        const animeMap = {};
-
-        episodes.forEach(episode => {
-          const { animeTitle, seasonTitle, state} = episode.metadata;
-          const downloadedAt = new Date(episode.metadata.downloadedAt);
-          if (!animeMap[animeTitle]) {
-            animeMap[animeTitle] = {
-              cover: episode.cover,
-              seasons: {},
-              latestDownload: downloadedAt,
-            };
-          } else {
-            if (downloadedAt > animeMap[animeTitle].latestDownload) {
-              animeMap[animeTitle].latestDownload = downloadedAt;
-            }
-          }
-
-          if (!animeMap[animeTitle].seasons[seasonTitle]) {
-            animeMap[animeTitle].seasons[seasonTitle] = [];
-          }
-
-          animeMap[animeTitle].seasons[seasonTitle].push(episode);}
-        );
-
-        const sortedAnimes = Object.entries(animeMap)
-          .map(([title, data]) => ({ title, ...data }))
-          .sort((a, b) => b.latestDownload - a.latestDownload); // Plus récents en haut
-
-        setGroupedData(sortedAnimes);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des fichiers:', error);
-      }
-    };
-
-    fetchDownloads();
-  }, []);
-
-  const handleVideoClick = (episode) => {
-    const filePath = `file://${episode.path.replace(/\\/g, '/')}`;
-    const { animeTitle, seasonTitle, episodeTitle, animeCover } = episode.metadata;
-    setSelectedEpisode({ animeTitle, seasonTitle, episodeTitle, animeCover, filePath });
-  };
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-
-
-  const playVideoClick = async () => {
-    const { animeTitle, seasonTitle, episodeTitle, animeCover } = episode.metadata;
-  
-    // Récupérer les informations de progression du téléchargement à partir de l'état `downloadProgress`
-    const progressData = downloadProgress[`${animeTitle}-${seasonTitle}-${episodeTitle}`];
-  
-    if (progressData) {
-      const { videoUrl, percent, eta } = progressData;
-      
-      console.log(`Progression pour ${animeTitle} - ${episodeTitle}: ${percent}%`);
-      console.log(`Temps restant estimé: ${eta}`);
-  
-      try {
-        // Envoie la commande pour démarrer ou mettre en pause le téléchargement avec les informations
-        await window.electron.ipcRenderer.invoke('download-video', videoUrl, {
-          episodeTitle,
-          seasonTitle,
-          animeTitle,
-          animeCover
-        });
-      } catch (error) {
-        console.error("Erreur lors du téléchargement de la vidéo :", error);
-      }
-    } else {
-      console.error("Aucune information de progression disponible pour cet épisode.");
-    }
-  };
-  
-
-
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
-
-    // Ajoute l'écouteur
-    window.addEventListener('resize', handleResize);
-
-    // Clean up
-    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   useEffect(() => {
     const episodeLists = document.querySelectorAll('.DownloadAnime-episode-list');
     const titles = document.querySelectorAll('.DownloadAnime-info h2');
-  
-    if (!episodeLists.length || !titles.length) return;
-  
-    episodeLists.forEach((episodeList, index) => {
-      const title = titles[index]; // Récupère le titre correspondant à chaque liste d'épisodes
-      const hasScroll = episodeList.scrollWidth > episodeList.clientWidth;
-  
-      title.classList.remove('padding-scroll-on', 'padding-scroll-off');
-      title.classList.add(hasScroll ? 'padding-scroll-on' : 'padding-scroll-off');
+
+    episodeLists.forEach((list, idx) => {
+      const hasScroll = list.scrollWidth > list.clientWidth;
+      titles[idx]?.classList.toggle('padding-scroll-on', hasScroll);
+      titles[idx]?.classList.toggle('padding-scroll-off', !hasScroll);
     });
-  }, [groupedData, windowWidth, selectedSeasons]); 
-  
+  }, [groupedData, windowWidth, selectedSeasons]);
+
+  const handleSeasonChange = (animeTitle, seasonTitle) => {
+    setSelectedSeasons(prev => ({ ...prev, [animeTitle]: seasonTitle }));
+  };
+
+  const handleEpisodeClick = async (episode, event) => {
+    if (event.shiftKey) {
+      try {
+        await window.electron.ipcRenderer.invoke('delete-episode', episode.path);
+        setGroupedData(prevData =>
+          prevData
+            .map(anime => {
+              const updatedSeasons = {};
+              for (const [seasonTitle, episodes] of Object.entries(anime.seasons)) {
+                const remaining = episodes.filter(ep => ep.path !== episode.path);
+                if (remaining.length) updatedSeasons[seasonTitle] = remaining;
+              }
+              return Object.keys(updatedSeasons).length ? { ...anime, seasons: updatedSeasons } : null;
+            })
+            .filter(Boolean)
+        );
+      } catch (error) {
+        console.error('Erreur lors de la suppression du fichier:', error);
+      }
+    } else {
+      const { animeTitle, seasonTitle, episodeTitle, animeCover } = episode.metadata;
+      const filePath = `file://${episode.path.replace(/\\/g, '/')}`;
+      setSelectedEpisode({ animeTitle, seasonTitle, episodeTitle, animeCover, filePath });
+    }
+  };
+
   return (
     <div className="MainPage">
-      <div className='Space'></div>
-  
+      <div className="Space" />
+
       {/* Téléchargements en cours */}
-      {groupedData.some(anime =>
-        Object.values(anime.seasons).some(season =>
-          season.some(episode => episode.metadata.state === 'downloading')
-        )
-      ) && (
+      {downloadingData.length > 0 && (
         <>
           <div className="CategorieTitle">Téléchargement en cours :</div>
-          
           <div>
-            {groupedData.map(anime =>
-              Object.entries(anime.seasons).map(([seasonTitle, episodes]) =>
-                episodes
-                  .filter(ep => ep.metadata.state === "downloading")
-                  .sort((a, b) => naturalSort(a.metadata.episodeTitle, b.metadata.episodeTitle))
-                  .map((episode, idx) => {
-                    const { episodeTitle } = episode.metadata;
-                    const progressKey = `${anime.title}-${seasonTitle}-${episodeTitle}`;
-                    const progress = downloadProgress[progressKey];
-                    const seasonEntries = Object.entries(anime.seasons);
-                    return (
-                      <div key={anime.title} className="DownloadAnime-box">
-                        <div className="DownloadAnime-item">
-                          <img src={`file://${anime.cover.replace(/\\/g, '/')}`} alt={`${anime.title} cover`} />
-                          <div className='DownloadAnime-info'>
-                            <h2>{anime.title}</h2>
-                            <h3 className='DownloadAnime-season'>{seasonEntries[0][0]}</h3>
-                            {progress && (
-                              <div className="DownloadProgress">
-                                <div className="ProgressBar" style={{ width: `${progress.percent}%` }}></div>
-                                <div className="ProgressText">
-                                  {progress.percent.toFixed(1)}% - Temps restant : {progress.eta || '...'}
-                                </div>
-                              </div>
-                            )}
-                            {/* <button onClick={playVideoClick}>Play</button> */}
+            {downloadingData
+              .sort((a, b) => naturalSort(a.metadata.episodeTitle, b.metadata.episodeTitle))
+              .map(episode => {
+                const { animeTitle, seasonTitle, episodeTitle } = episode.metadata;
+                const progressKey = `${animeTitle}-${seasonTitle}-${episodeTitle}`;
+                const progress = downloadProgress[progressKey];
+
+                return (
+                  <div key={episode.path} className="DownloadAnime-box">
+                    <div className="DownloadAnime-item">
+                      <img src={`file://${episode.cover.replace(/\\/g, '/')}`} alt={`${animeTitle} cover`} />
+                      <div className="DownloadAnime-info">
+                        <h2>{animeTitle}</h2>
+                        <h3 className="DownloadAnime-season">{seasonTitle}</h3>
+                        {progress && (
+                          <div className="DownloadProgress">
+                            <div className="ProgressBar" style={{ width: `${progress.percent}%` }} />
+                            <div className="ProgressText">
+                              {progress.percent.toFixed(1)}% - Temps restant : {progress.eta || '...' }
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </div>
-                    );
-                  })
-              )
-            )}
+                    </div>
+                  </div>
+                );
+              })}
           </div>
         </>
       )}
-  
+
+
       {/* Episodes téléchargés */}
       <div className="CategorieTitle">Episodes téléchargés :</div>
       {groupedData.map(anime => {
         const seasonEntries = Object.entries(anime.seasons).sort(([a], [b]) => naturalSort(a, b));
-        const hasMultipleSeasons = seasonEntries.length > 1;
         const selectedSeason = selectedSeasons[anime.title] || seasonEntries[0][0];
-        const episodes = anime.seasons[selectedSeason] || [];
-        const downloadedEpisodes = episodes.filter(ep => ep.metadata.state === "downloaded");
-  
-        if (downloadedEpisodes.length === 0) return null;
-  
+        const episodes = anime.seasons[selectedSeason]?.filter(ep => ep.metadata.state === "downloaded") || [];
+
+        const hasDownloadedEpisodes = Object.values(anime.seasons)
+          .flat()
+          .some(ep => ep.metadata.state === "downloaded");
+              
+        if (!hasDownloadedEpisodes) return null;
+              
+
         return (
           <div key={anime.title} className="DownloadAnime-box">
             <div className="DownloadAnime-item">
               <img src={`file://${anime.cover.replace(/\\/g, '/')}`} alt={`${anime.title} cover`} />
-              <div className='DownloadAnime-info'>
+              <div className="DownloadAnime-info">
                 <h2>{anime.title}</h2>
-                {hasMultipleSeasons ? (
+                {seasonEntries.length > 1 ? (
                   <select
                     value={selectedSeason}
-                    onChange={(e) => handleSeasonChange(anime.title, e.target.value)}
-                    className='DownloadAnime-select'
+                    onChange={e => handleSeasonChange(anime.title, e.target.value)}
+                    className="DownloadAnime-select"
                   >
                     {seasonEntries.map(([seasonTitle]) => (
                       <option key={seasonTitle} value={seasonTitle}>
@@ -221,17 +199,16 @@ const DownloadPage = () => {
                     ))}
                   </select>
                 ) : (
-                  <h3 className='DownloadAnime-season'>{seasonEntries[0][0]}</h3>
+                  <h3 className="DownloadAnime-season">{selectedSeason}</h3>
                 )}
-  
                 <div className="DownloadAnime-episode-list">
-                  {downloadedEpisodes
+                  {episodes
                     .sort((a, b) => naturalSort(a.metadata.episodeTitle, b.metadata.episodeTitle))
-                    .map((episode, index) => (
+                    .map(episode => (
                       <div
-                        key={index}
-                        onClick={() => handleVideoClick(episode)}
-                        className="DownloadAnime-episode-item"
+                        key={episode.path}
+                        onClick={e => handleEpisodeClick(episode, e)}
+                        className={`DownloadAnime-episode-item ${shiftPressed ? 'shift-delete' : ''}`}
                       >
                         <h4>{episode.metadata.episodeTitle}</h4>
                       </div>
@@ -242,20 +219,20 @@ const DownloadPage = () => {
           </div>
         );
       })}
-  
+
       {/* Lecteur vidéo */}
       {selectedEpisode && (
         <div className="video-player mt-6">
           <VideoPlayer
             src={selectedEpisode.filePath}
-            overlayEnabled={true}
+            overlayEnabled
             title={selectedEpisode.animeTitle}
             subTitle={`${selectedEpisode.seasonTitle} - ${selectedEpisode.episodeTitle}`}
             titleMedia={`${selectedEpisode.animeTitle} - ${selectedEpisode.seasonTitle} : ${selectedEpisode.episodeTitle}`}
-            autoControllCloseEnabled={true}
+            autoControllCloseEnabled
             fullPlayer={false}
             playerLanguage="fr"
-            autoPlay={true}
+            autoPlay
             playbackRateEnable={false}
             primaryColor="#996e35"
           />
@@ -263,7 +240,6 @@ const DownloadPage = () => {
       )}
     </div>
   );
-  
 };
 
 export default DownloadPage;

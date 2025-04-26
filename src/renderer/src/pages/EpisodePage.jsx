@@ -36,7 +36,9 @@ const EpisodePage = () => {
   const fetchEpisode = async (url) => {
     try {
       setLoadingEpisode(true);
+
       const realUrl = await window.electron.ipcRenderer.invoke('get-url', url);
+      console.log(realUrl, url)
       setEpisodeUrl(realUrl || url);
     } catch (error) {
       console.error("Erreur lors du chargement de l'épisode :", error);
@@ -95,7 +97,6 @@ const EpisodePage = () => {
     if (location.state?.skipFrom) {
       localStorage.removeItem(location.state.skipFrom);
     }
-    // Enregistre le dernier épisode vu pour cet anime + saison
     if (animeId && seasonId && episodeTitle) {
       const historyKey = `lastWatched_${animeId}_${seasonId}`;
       localStorage.setItem(historyKey, JSON.stringify({

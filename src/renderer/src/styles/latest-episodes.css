@@ -1,3 +1,21 @@
+.AFK {
+  margin: 0 50px;
+  border-radius: 7px;
+  padding: 70px 40px;
+  background-color: var(--secondary-color);
+  height: 325px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.AFK p {
+  color: var(--primary-text);
+  text-transform: uppercase;
+  font-family: var(--font-main);
+  font-size: 30px;
+  font-weight: var(--title-weight);
+}
+
 .LatestEpisodes {
   margin: 0 50px;
   border-radius: 7px;
@@ -85,7 +103,6 @@
   font-size: 17px;
   font-weight: var(--title-weight);
   color: var(--primary-text);
-  padding-left: 10px;
   transform: translateX(0%);
 }
 
@@ -139,18 +156,17 @@
   border-radius: 7px;
   cursor: grab;
   border: 2px solid var(--secondary-color);
-}
+} 
 .LatestEpisodes::-webkit-scrollbar-thumb:hover {
   background-color: rgba(153, 110, 53, 0.75);
 }
 .LatestEpisodes-item.shift-delete {
   background-color: rgba(255, 0, 0, 0.2);
   border: 2px solid red;
-  transform: scale(1.02);
   transition: 0.2s ease;
   cursor: not-allowed;
 }
-
 .LatestEpisodes-item.shift-delete:hover {
+  transform: scale(1.02);
   background-color: rgba(255, 0, 0, 0.4);
 }
