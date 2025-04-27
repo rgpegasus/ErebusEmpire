@@ -24,7 +24,20 @@ const EpisodePage = () => {
   const nextEpisode = episodes[episodeIndex + 1];
   const [EpisodeUrl, setEpisodeUrl] = useState(url);
   const [videoTime, setVideoTime] = useState(0);
+  
 
+  function updatePresence(animeTitle, episodeNumber) {
+    window.electron.ipcRenderer.send('update-rich-presence', {
+        anime: animeTitle,
+        episode: episodeNumber,
+    });
+}
+
+useEffect(() => {
+  return () => {
+    window.electron.ipcRenderer.send('defaul-rich-presence');
+  };
+}, []); 
 
 
   useEffect(() => {
@@ -40,6 +53,8 @@ const EpisodePage = () => {
       const realUrl = await window.electron.ipcRenderer.invoke('get-url', url);
       console.log(realUrl, url)
       setEpisodeUrl(realUrl || url);
+      const seasonEpisode = `${seasonTitle} - ${episodeTitle}`
+      updatePresence(animeTitle, seasonEpisode)
     } catch (error) {
       console.error("Erreur lors du chargement de l'épisode :", error);
       setEpisodeUrl(url);

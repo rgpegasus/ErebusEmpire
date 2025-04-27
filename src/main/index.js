@@ -6,6 +6,33 @@ import {AnimeScraper, getVideoUrlFromEmbed} from 'better-ani-scraped';
 import { exec } from 'child_process';
 import fs from 'fs';
 import isDev from 'electron-is-dev';
+import RPC from 'discord-rpc';
+const clientId = '1366193765701783604';
+const rpc = new RPC.Client({ transport: 'ipc' });
+let startTimestamp = null;
+
+async function setActivity(details = 'En train de mater des animés', state = 'Sur Erebus Empire') {
+    if (!rpc) return;
+    if (!startTimestamp) {
+      startTimestamp = new Date();
+  }
+    rpc.setActivity({
+        details,
+        state,
+        startTimestamp: new Date(),
+        largeImageKey: 'icon',
+        largeImageText: 'Erebus Empire',
+        instance: false,
+    });
+}
+
+rpc.on('ready', () => {
+    setActivity();
+});
+
+rpc.login({ clientId }).catch(console.error);
+
+
 
 
 const scraper = new AnimeScraper("animesama");
@@ -86,17 +113,45 @@ module.exports = {
   getMainWindow: () => mainWindow
 };
 
-// Désactive la sécurité web pour éviter les CORS ou autres protections
-app.commandLine.appendSwitch("disable-web-security");
-app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors");
-
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.electron')
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
   
+  ipcMain.on('update-rich-presence', (event, { anime, episode}) => {
+    if (!rpc) return;
+    
+    if (!startTimestamp) {
+        startTimestamp = new Date();
+    }
+    
+    rpc.setActivity({
+        details: `Regarde ${anime}`,
+        state: `${episode}`,
+        startTimestamp: startTimestamp,
+        largeImageKey: 'icon',
+        largeImageText: 'Erebus Empire',
+        smallImageKey: 'play',
+        instance: false,
+    });
+});
+ipcMain.on('defaul-rich-presence', () => {
+  if (!rpc) return;
 
+  if (!startTimestamp) {
+    startTimestamp = new Date();
+  }
+
+  rpc.setActivity({
+    details: 'En train de mater des animés',
+    state: 'Sur Erebus Empire',
+    startTimestamp: startTimestamp,
+    largeImageKey: 'icon',
+    largeImageText: 'Erebus Empire',
+    instance: false,
+  });
+});
   ipcMain.handle('search-anime', async (event, query) => {
     try {
       return await scraper.searchAnime(query, 5);

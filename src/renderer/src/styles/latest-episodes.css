@@ -17,7 +17,7 @@
 }
 
 .LatestEpisodes {
-  margin: 0 50px;
+  margin: 0 50px; 
   border-radius: 7px;
   display: flex;
   gap: 50px;
@@ -169,4 +169,97 @@
 .LatestEpisodes-item.shift-delete:hover {
   transform: scale(1.02);
   background-color: rgba(255, 0, 0, 0.4);
+}
+@media (max-width: 1600px) {
+  .Separation {
+    margin: 0 auto 25px auto;
+  }
+  .LatestEpisodes-title-wrapper {
+    height: 70px;
+  }
+  .AFK {
+    padding: 50px 30px;
+    height: 280px;
+  }
+  .AFK p {
+    font-size: 26px;
+  }
+  
+  .LatestEpisodes {
+    padding: 50px 30px;
+    gap: 30px;
+  }
+  
+  .LatestEpisodes-item {
+    height: 280px;
+  }
+  
+  .LatestEpisodes-cover {
+    width: 200px;
+    height: 120px;
+  }
+  
+  .LatestEpisodes-cover h3 {
+    font-size: 18px;
+  }
+  
+  .LatestEpisodes-info {
+    width: 200px;
+  }
+  
+  .LatestEpisodes-info p {
+    margin: 0 50px;
+    font-size: 14px;
+  }
+  
+  .LatestEpisodes-title-wrapper h2 {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .Separation {
+    margin: 0 auto 20px auto;
+  }
+  .LatestEpisodes-title-wrapper {
+    height: 60px;
+  }
+  .AFK {
+    padding: 40px 20px;
+    height: 250px;
+  }
+  .AFK p {
+    font-size: 22px;
+  }
+
+  .LatestEpisodes {
+    padding: 40px 20px;
+    gap: 20px;
+  }
+
+  .LatestEpisodes-item {
+    height: 250px;
+  }
+
+  .LatestEpisodes-cover {
+    width: 180px;
+    height: 100px;
+  }
+
+  .LatestEpisodes-cover h3 {
+    font-size: 16px;
+  }
+
+  .LatestEpisodes-info {
+    width: 180px;
+  }
+
+  .LatestEpisodes-info p {
+    margin: 0 40px;
+    font-size: 12px;
+  }
+
+  .LatestEpisodes-title-wrapper h2 {
+    font-size: 14px;
+  }
 }

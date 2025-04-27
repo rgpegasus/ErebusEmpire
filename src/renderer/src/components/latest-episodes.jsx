@@ -153,7 +153,7 @@ const LatestEpisodes = ({ episodes }) => {
                 <EpisodeTitle title={episode.episode} />
                 <div className='Separation'></div>
                 <p>{episode.language}</p>
-              </div>
+              </div> 
             </div>
           ))}
         </div>
