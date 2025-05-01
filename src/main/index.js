@@ -11,20 +11,7 @@ const clientId = '1366193765701783604';
 const rpc = new RPC.Client({ transport: 'ipc' });
 let startTimestamp = null;
 
-async function setActivity(details = 'En train de mater des animés', state = 'Sur Erebus Empire') {
-    if (!rpc) return;
-    if (!startTimestamp) {
-      startTimestamp = new Date();
-  }
-    rpc.setActivity({
-        details,
-        state,
-        startTimestamp: new Date(),
-        largeImageKey: 'icon',
-        largeImageText: 'Erebus Empire',
-        instance: false,
-    });
-}
+ 
 
 rpc.on('ready', () => {
     setActivity();
@@ -144,7 +131,7 @@ ipcMain.on('defaul-rich-presence', () => {
   }
 
   rpc.setActivity({
-    details: 'En train de mater des animés',
+    details: "Se promène dans la liste d'animés",
     state: 'Sur Erebus Empire',
     startTimestamp: startTimestamp,
     largeImageKey: 'icon',
@@ -154,7 +141,7 @@ ipcMain.on('defaul-rich-presence', () => {
 });
   ipcMain.handle('search-anime', async (event, query) => {
     try {
-      return await scraper.searchAnime(query, 5);
+      return await scraper.searchAnime(query, 5, ["vostfr"], ["Anime", "Film"]);
     } catch (error) {
       console.error('Erreur dans le main process:', error);
       return [];
@@ -162,7 +149,7 @@ ipcMain.on('defaul-rich-presence', () => {
   });
   ipcMain.handle("random-anime", async (event)=> {
     try {
-      return await scraper.getRandomAnime();
+      return await scraper.getRandomAnime(["vostfr"], ["Anime", "Film"]);
        
     } catch (error){
       console.error('Erreur dans le main process:', error);
@@ -215,9 +202,9 @@ ipcMain.on('defaul-rich-presence', () => {
       return null;
     }
   });
-  ipcMain.handle("get-all-anime", async (event)=> {
+  ipcMain.handle("get-all-anime", async (event, page = null)=> {
     try {
-      return await scraper.getAllAnime();
+      return await scraper.getAllAnime(["vostfr"], ["Anime", "Film"], page);
     } catch (error){
       console.error('Erreur dans le main process:', error);
       return null;
@@ -368,7 +355,6 @@ ipcMain.on('defaul-rich-presence', () => {
       return [];
     }
   });
-
 ipcMain.handle('delete-episode', async (event, filePath) => {
   try {
     await fs.promises.unlink(filePath);

@@ -24,7 +24,7 @@
   padding: 0;
   box-sizing: border-box;
 }
-body {
+body { 
   user-select: none;
   background-color: var(--background-color);                    
 }

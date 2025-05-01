@@ -169,7 +169,7 @@ useEffect(() => {
     return <Loader />;
   }
 
-  return (
+  return ( 
     <div className="MainPage">
       <VideoPlayer
         src={EpisodeUrl}

@@ -44,10 +44,10 @@ export const Container = styled.div<IContainerProps>`
   overflow: hidden;
 
   video {
-    height: 100% !important;
-    max-height: 100% !important;
-    width: 100% !important;
-    max-width: 100% !important;
+    height: 100% ;
+    max-height: 100% ;
+    width: 100% ;
+    max-width: 100%;
     cursor: none;
     opacity: ${props => (props.hideVideo ? 0 : 1)};
 

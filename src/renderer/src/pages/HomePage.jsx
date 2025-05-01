@@ -63,7 +63,7 @@ const HomePage = () => {
             draggable="false"
             src={anime.cover}
             alt={anime.title}
-            className='AnimeCover-img' 
+            className='AnimeCover-img'  
           />
           <div onClick={() => handleClick(anime.url)}>Regarder</div>
         </div>

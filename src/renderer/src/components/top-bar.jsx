@@ -81,7 +81,7 @@ function TopBar() {
     }
   };
 
-  
+   
 
   const handleCardClick = (anime) => {
     setInputValue('');

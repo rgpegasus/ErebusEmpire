@@ -8,7 +8,7 @@ import logo_favoris from "../../../../resources/pictures/logo_favoris.png";
 
 const menuItems = [
   { to: "/erebus-empire/home", imgSrc: logo_acceuil, alt: "Logo Accueil", text: "Accueil" },
-  /*{ to: "/erebus-empire/catalogue", imgSrc: logo_catalogue, alt: "Logo Catalogue", text: "Catalogue" },*/
+  { to: "/erebus-empire/catalogue", imgSrc: logo_catalogue, alt: "Logo Catalogue", text: "Catalogue" },
   { to: "/erebus-empire/downloads", imgSrc: logo_telecharhgement, alt: "Logo Téléchargement", text: "Téléchargements" },
  /* { to: "/erebus-empire/favorites", imgSrc: logo_favoris, alt: "Logo Favoris", text: "Favoris" }}*/
 ];
