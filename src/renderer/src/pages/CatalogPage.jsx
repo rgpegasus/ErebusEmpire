@@ -10,32 +10,39 @@ const CatalogPage = () => {
   const navigate = useNavigate();
 
   const fetchAnime = async (p) => {
-    setLoading(true);
-    try {
-      const [current, next] = await Promise.all([
-        window.electron.ipcRenderer.invoke("get-all-anime", p),
-        window.electron.ipcRenderer.invoke("get-all-anime", p + 1)
-      ]);
-      setPage(p);
-      setHasNext(next?.length > 0);
-  
-      const imagePromises = (current || []).map(anime =>
-        new Promise(resolve => {
-          const img = new Image();
-          img.src = anime.cover;
-          img.onload = resolve;
-          img.onerror = resolve;
-        })
-      );
-      await Promise.all(imagePromises);
-  
-      setAnimeList(current || []);
-    } catch (e) {
-      console.error("Erreur chargement :", e);
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  try {
+    // Récupère 3 pages d’un coup
+    const [page1, page2, page3, next] = await Promise.all([
+      window.electron.ipcRenderer.invoke("get-all-anime", p),
+      window.electron.ipcRenderer.invoke("get-all-anime", p + 1),
+      window.electron.ipcRenderer.invoke("get-all-anime", p + 2),
+      window.electron.ipcRenderer.invoke("get-all-anime", p + 3)
+    ]);
+
+    const combined = [...(page1 || []), ...(page2 || []), ...(page3 || [])];
+    setPage(p);
+    setHasNext(next?.length > 0);
+
+    // Préchargement des images
+    const imagePromises = combined.map(anime =>
+      new Promise(resolve => {
+        const img = new Image();
+        img.src = anime.cover;
+        img.onload = resolve;
+        img.onerror = resolve;
+      })
+    );
+    await Promise.all(imagePromises);
+
+    setAnimeList(combined);
+  } catch (e) {
+    console.error("Erreur chargement :", e);
+  } finally {
+    setLoading(false);
+  }
+};
+
   
 
   useEffect(() => { fetchAnime(1); }, []);
@@ -72,8 +79,8 @@ const CatalogPage = () => {
           ))}
         </div>
         <div className="pagination-buttons">
-          <button onClick={() => fetchAnime(page - 1)} disabled={page === 1}>Précédent</button>
-          <button onClick={() => fetchAnime(page + 1)} disabled={!hasNext}>Suivant</button>
+          <button onClick={() => fetchAnime(page - 3)} disabled={page <= 1}>Précédent</button>
+          <button onClick={() => fetchAnime(page + 3)} disabled={!hasNext}>Suivant</button>
         </div>
       </div>
       <div className='Space'></div>
