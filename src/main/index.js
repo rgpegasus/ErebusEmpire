@@ -139,9 +139,9 @@ ipcMain.on('defaul-rich-presence', () => {
     instance: false,
   });
 });
-  ipcMain.handle('search-anime', async (event, query) => {
+  ipcMain.handle('search-anime', async (event, query, limit, page) => {
     try {
-      return await scraper.searchAnime(query, 5, ["vostfr"], ["Anime", "Film"]);
+      return await scraper.searchAnime(query, limit, ["vostfr"], ["Anime", "Film"], page);
     } catch (error) {
       console.error('Erreur dans le main process:', error);
       return [];

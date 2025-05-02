@@ -49,7 +49,6 @@ function TopBar() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Fonction pour basculer l'état du menu
   function toggleMenu() {
     if (windowWidth > toogleWidth) return;
     const body = document.body;
@@ -60,7 +59,7 @@ function TopBar() {
   const handleInputChange = async (event) => {
     const newValue = event.target.value;
     setInputValue(newValue);
-    const data = await window.electron.ipcRenderer.invoke('search-anime', newValue);
+    const data = await window.electron.ipcRenderer.invoke('search-anime', newValue, 5, null);
     setResults(data);
   };
 
@@ -77,7 +76,7 @@ function TopBar() {
   };
   const handleKeyDown = (event) => {
     if (event.key === 'Enter' && results.length > 0) {
-      handleCardClick(results[0]); // Clique sur le premier résultat
+      handleCardClick(results[0]); 
     }
   };
 
@@ -89,7 +88,7 @@ function TopBar() {
   };
 
   return (
-    <div className='TopBar-box' ref={menuRef}> {/* Référence au menu */}
+    <div className='TopBar-box' ref={menuRef}> 
       {windowWidth < toogleWidth && (
         <img onClick={toggleMenu} draggable="false" src={logo_app} alt="Logo Erebus Empire" className='AppLogo' />
       )}

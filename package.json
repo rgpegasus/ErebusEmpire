@@ -22,7 +22,7 @@
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^4.0.0",
     "@types/i18next": "^12.1.0",
-    "better-ani-scraped": "^1.5.1",
+    "better-ani-scraped": "^1.5.2",
     "bufferutil": "^4.0.9",
     "discord-rpc": "^4.0.1",
     "i18next": "^25.0.0",
