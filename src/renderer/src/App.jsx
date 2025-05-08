@@ -4,7 +4,6 @@ import MenuBar from "./components/menu-bar";
 import CatalogPage from './pages/CatalogPage';
 import HomePage from './pages/HomePage';
 import DownloadPage from './pages/DownloadPage';
-import FavoritesPage from './pages/FavoritesPage';
 import TopBar from './components/top-bar';
 import SeasonsPage from './pages/SeasonPage';
 import EpisodePage from './pages/EpisodePage.jsx';
@@ -33,7 +32,6 @@ const App = () => {
           <Route path="/erebus-empire/home" element={<HomePage/>} />
           <Route path="/erebus-empire/catalogue" element={<CatalogPage/>} />
           <Route path="/erebus-empire/downloads" element={<DownloadPage/>} />
-          <Route path="/erebus-empire/favorites" element={<FavoritesPage/>} />
           <Route path="/erebus-empire/anime/:animeId/:seasonId?" element={<SeasonsPage/>} />
           <Route path="/erebus-empire/anime/:animeId/:seasonId/:episodeId" element={<EpisodePage/>} />
         </Routes>

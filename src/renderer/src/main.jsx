@@ -6,6 +6,7 @@ import './styles/latest-episodes.css'
 import './styles/loader.css'
 import './styles/download-page.css'
 import './styles/catalog-page.css'
+import './styles/UtilityTopBar.css'
 
 import React from 'react'
 import ReactDOM from 'react-dom/client'

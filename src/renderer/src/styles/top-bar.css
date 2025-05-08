@@ -16,28 +16,29 @@
   
   .AppLogo {
     margin-left: 50px;
-    width: 50px;
+    width: 40px;
   }
   .SearchLogo {
-    width: 40px;
-    padding-right: 10px;
+    width: 30px;
+    margin-right: 10px;
   }
   .search-container {
     display: flex;
     align-items: center;
     align-content: center;
+    margin-right: 20px;
   }
+  
   .search-bar {
     all:unset;
     text-transform: uppercase;
     background-color: var(--primary-color);
     padding: 5px;
-    font-size: 20px;
+    font-size: 18px;
     font-family: var(--font-main);
     width: 225px; 
     border-radius: 8px;
     height: 40px;
-    margin-right: 160px;
     font-weight: var(--title-weight);
     letter-spacing: 0.5px;
     color: var(--primary-text);
@@ -104,8 +105,9 @@
   }
   
 
-  @media (max-width: 1200px) {
+  @media (max-width: 1600px) {
     .TopBar-box{
       justify-content: space-between;
     }
   }
+

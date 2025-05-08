@@ -55,15 +55,17 @@ const WatchHistory = () => {
       return;
     }
 
-    const [, animeId, seasonId] = episode.key.split('_');
+    const [animeId, seasonId] = episode.key.split('_');
     const episodeId = episode.episodeTitle
       .toLowerCase()
       .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
     navigate(`/erebus-empire/anime/${animeId}/${seasonId}/${episodeId}`, {
+      
       state: {
         url: episode.url,
+        host: episode.host,
         episodeTitle: episode.episodeTitle,
         episodes: episode.episodes,
         animeId: episode.animeId,

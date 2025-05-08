@@ -22,7 +22,6 @@ const HomePage = () => {
         sessionStorage.setItem('anime', JSON.stringify(animeData));
   
         const episodes = await window.electron.ipcRenderer.invoke('get-latest-episode');
-        console.log(episodes)
         setLatestEpisodes(episodes || []);
       } catch (err) {
         console.error('Erreur lors du chargement:', err);
@@ -42,8 +41,9 @@ const HomePage = () => {
   }, []);
 
   const getAnimeId = (url) => {
-    if (!url) return '';
-    const parts = url.split('/');
+    const cleanUrl = new URL(url);
+    const pathname = cleanUrl.pathname.replace(/\/$/, '');
+    const parts = pathname.split('/').filter(Boolean);
     return parts[parts.length - 1]; 
   };
   
@@ -65,7 +65,7 @@ const HomePage = () => {
             alt={anime.title}
             className='AnimeCover-img'  
           />
-          <div onClick={() => handleClick(anime.url)}>Regarder</div>
+          <div className='AnimeCover-button' onClick={() => handleClick(anime.url)}>Regarder</div>
         </div>
       )}
       <WatchHistory />

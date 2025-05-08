@@ -1,0 +1,383 @@
+.UtilityTopBar {
+    width: 400px;
+    padding: 20px;
+    font-family: var(--font-main);
+    color: var(--primary-text);
+    display: flex;
+  }
+  
+  .UtilityTopBar-button {
+    height: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: end;
+  }
+  .UtilityTopBar-button-item {
+    cursor: pointer;
+    font-size: 15px;
+    user-select: none;
+    color: var(--primary-text);
+    transition: color 0.2s;
+  }
+  .UtilityTopBar-button-item:hover {
+    color: var(--logo-color);
+  }
+
+  .UtilityTopBar-profil {
+    display: flex;
+    gap:20px;
+    align-items: center;
+  }
+  .UtilityTopBar-image {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2.5px solid var(--logo-color);
+  }
+  .UtilityTopBar-image-input {
+    display: none;
+  }
+
+  .UtilityTopBar-pseudo {
+    display: flex;
+    flex-direction: column;
+    gap:5px;
+    align-items: start;
+  }
+  .UtilityTopBar-name {
+    color: var(--logo-color);
+    font-family: var(--font-main);
+    font-weight: var(--little-title-weight );
+    letter-spacing: 1px;
+    font-size: 22px;
+    word-break: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
+    max-width: 100%;
+  }
+  .UtilityTopBar-image.editable,
+  .UtilityTopBar-name.editable {
+    cursor: pointer;
+  }
+
+  .UtilityTopBar-name-input {
+    background-color: transparent;
+    border: none;
+    color: var(--primary-text);
+    align-items: center;
+    text-align: center;
+    outline: none;
+  }
+  .UtilityTopBar-app {
+    display: flex;
+    gap:7px;
+    align-items: end;
+    width: 250px;
+    opacity: 0.9;
+  }
+  .UtilityTopBar-app-logo {
+    width: 15px;
+  }
+  .UtilityTopBar-app-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    font-family: var(--font-main);
+    font-weight: var(--title-weight);
+    letter-spacing: 2px;
+  }
+
+
+  .UtilityTopBar-edit {
+    position: absolute;
+    background: var(--secondary-color);
+    border-radius: 8px;
+    padding: 7px 15px;
+    z-index: 2;
+    display: flex;
+    gap:10px;
+    flex-direction: column;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.034);
+    border-left: 1px solid rgba(255, 255, 255, 0.034);
+    margin-left: -35px;
+    margin-top: -25px;
+  }
+  .UtilityTopBar-edit-option {
+    background: none;
+    padding-bottom: 7px;
+    border: none;
+    border-bottom: 1px solid var(--separation-color);
+    color: var(--primary-text);
+    text-align: center;
+    cursor: pointer;
+    font-family: var(--font-main);
+    font-weight: var(--text-weight);
+    font-size: 12px;
+    transition: color 0.2s;
+  }
+  .UtilityTopBar-edit-option:hover {
+    color:var(--logo-color);
+  }
+  .UtilityTopBar-edit-option:last-child {
+    border-bottom: none;
+    padding-bottom: 0px;
+  }
+
+  .UtilityTopBar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+  }
+  .UtilityTopBar-container {
+    background: var(--separation-color);
+    padding: 15px 40px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+  }
+
+
+  .UtilityTopBar-top {
+    display: flex;
+    justify-content: space-between;
+  }
+  .UtilityTopBar-title {
+    margin-bottom: 20px;
+    font-size: 20px;
+    display: flex;
+    justify-content: flex-start;
+    font-weight: var(--little-title-weight);
+    font-family: var(--font-main);
+    color: var(--primary-text);
+  } 
+  .UtilityTopBar-cancel {
+    cursor: pointer;
+    font-size: 20px;
+    user-select: none;
+    color: var(--primary-text);
+    transition: color 0.2s;
+  }
+  .UtilityTopBar-cancel:hover {
+    color: var(--logo-color);
+  }
+
+
+  .UtilityTopBar-cropper {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+    background-color: var(--third-color);
+    border-radius: 8px;
+    box-shadow: -2px 5px 10px rgba(0, 0, 0, 0.7);
+    margin-bottom: 20px;
+  }
+
+
+  .UtilityTopBar-zoom {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  .UtilityTopBar-zoom input[type="range"] {
+    width: 50%;
+    margin-top: 8px;
+    background: transparent; 
+    appearance: none; 
+  }
+  .UtilityTopBar-zoom input[type="range"]::-webkit-slider-runnable-track {
+    height: 5px;
+    background: var(--background-color);
+    border-radius: 3px;
+  } 
+  .UtilityTopBar-zoom input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    height: 15px;
+    width: 15px;
+    border-radius: 50%;
+    box-shadow: -1px 2px 5px rgba(0, 0, 0, 0.7);
+    background: var(--logo-color);
+    margin-top: -5.5px; 
+    cursor: pointer;
+  }
+
+
+  .UtilityTopBar-bottom {
+    display: flex;
+    justify-content: space-between;
+  }
+  .UtilityTopBar-reset {
+    color: var(--primary-text);
+    font-weight: var(--title-weight);
+    font-family: var(--font-main);
+    font-size: 14px;
+    background-color: var(--separation-color);
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .UtilityTopBar-reset:hover {
+    color: var(--logo-color);
+  }
+  .UtilityTopBar-apply {
+    color: var(--primary-text);
+    font-weight: var(--title-weight);
+    font-family: var(--font-main);
+    opacity: 0.95;
+    border-radius: 7px;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    background-color: var(--background-color);
+    cursor: pointer;
+    border: 2px solid var(--logo-color);
+    box-shadow: -2px 5px 10px rgba(0, 0, 0, 0.7);
+    padding: 10px 20px;
+  }
+  .UtilityTopBar-apply:hover {
+    opacity: 1;
+    background-color: var(--logo-color);
+  }
+  .TopBar-Categorie {
+    display: flex;
+  }
+  .TopBar-profile {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .TopBar-profile-wrapper {
+    display: flex;
+    align-items: center;
+    margin: 0 50px 0 20px;
+    cursor: pointer;
+  }
+  .TopBar-profile-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--logo-color);
+  }
+  
+  
+  .TopBar-profile-menu {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background-color: var(--secondary-color);
+    color: var(--primary-text);
+    border-bottom-left-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    z-index: 2;
+    min-width: 140px;
+  }
+  
+  .TopBar-profile-menu-item {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap:15px;
+    padding: 12px 40px;
+    cursor: pointer;
+    font-size: 17px;
+    color: var(--primary-text);
+    font-family: var(--font-main);
+    font-weight: var(--little-title-weight);
+  }
+  .TopBar-profile-menu-item img{
+    width: 25px;
+  }
+  .TopBar-profile-menu-item:last-child {
+    margin: 10px 0;
+  }
+  .TopBar-profile-menu-item:hover {
+    background-color: var(--separation-color);
+  }
+
+  .TopBar-profile-separation {
+    width: 100%;
+    margin: 10px 0;
+    border-bottom: 1px solid var(--separation-color);
+  }
+
+
+
+
+  @media (max-width: 1600px) {
+  .UtilityTopBar {
+    width: 350px;
+  }
+
+  .UtilityTopBar-image {
+    width: 65px;
+    height: 65px;
+  }
+
+  .UtilityTopBar-name {
+    font-size: 20px;
+  }
+
+  .UtilityTopBar-app {
+    width: 220px;
+  }
+
+  .UtilityTopBar-app-logo {
+    width: 13px;
+  }
+
+  .UtilityTopBar-app-title {
+    font-size: 9px;
+  }
+
+  .TopBar-profile-menu-item {
+    font-size: 15px;
+  }
+
+  .TopBar-profile-menu-item img {
+    width: 22px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .UtilityTopBar {
+    width: 300px;
+  }
+
+  .UtilityTopBar-image {
+    width: 55px;
+    height: 55px;
+  }
+
+  .UtilityTopBar-name {
+    font-size: 18px;
+  }
+
+  .UtilityTopBar-app {
+    width: 180px;
+  }
+
+  .UtilityTopBar-app-logo {
+    width: 12px;
+  }
+
+  .UtilityTopBar-app-title {
+    font-size: 8px;
+  }
+
+  .TopBar-profile-menu-item {
+    font-size: 14px;
+  }
+
+  .TopBar-profile-menu-item img {
+    width: 18px;
+  }
+}

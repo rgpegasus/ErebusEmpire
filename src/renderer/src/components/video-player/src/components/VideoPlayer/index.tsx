@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef, SyntheticEvent } from 'react';
 import i18n from 'i18next';
 import { MdPictureInPictureAlt } from 'react-icons/md';
 import { useTranslation, initReactI18next } from 'react-i18next';
+import Hls from 'hls.js';
+
 import {
   FaUndoAlt,
   FaPlay,
@@ -567,7 +569,32 @@ export default function VideoPlayertflixPlayer({
   useEffect(() => {
     setStateFullScreen();
   }, [document.fullscreenElement]);
-
+  useEffect(() => {
+    if (videoComponent.current && src) {
+      const isHLS = src.includes(".m3u8");
+  
+      if (isHLS) {
+        if (Hls.isSupported()) {
+          const hls = new Hls();
+          hls.loadSource(src);
+          hls.attachMedia(videoComponent.current);
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            if (autoPlay) videoComponent.current?.play();
+          });
+          return () => hls.destroy();
+        } else if (videoComponent.current.canPlayType('application/vnd.apple.mpegurl')) {
+          videoComponent.current.src = src;
+          if (autoPlay) videoComponent.current.play();
+        } else {
+          setError("Format HLS non supporté par votre navigateur.");
+        }
+      } else {
+        videoComponent.current.src = src;
+        if (autoPlay) videoComponent.current.play();
+      }
+    }
+  }, [src]);
+  
   function renderLoading() {
     return (
       <Loading color={primaryColor}>

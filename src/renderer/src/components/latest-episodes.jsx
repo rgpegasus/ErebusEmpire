@@ -113,6 +113,7 @@ const LatestEpisodes = ({ episodes }) => {
         navigate(path, {
           state: {
             url: matchedEmbed.url,
+            host:matchedEmbed.host,
             episodeTitle: matchedEmbed.title,
             episodes: embedData,
             animeId,

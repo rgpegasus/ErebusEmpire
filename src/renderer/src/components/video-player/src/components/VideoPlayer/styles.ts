@@ -208,6 +208,7 @@ export const Controlls = styled.div<IControlsProps>`
   }
 
   .progress-bar {
+    cursor:pointer;
     width: 100%;
     margin-bottom: 15px;
     appearance: none;

@@ -81,7 +81,7 @@
 .Separation {
   width: 150px;
   margin: 0 auto 30px auto;
-  border-bottom: 2px groove var(--separation-color);
+  border-bottom: 1px solid var(--separation-color);
 }
 .LatestEpisodes-title-wrapper {
   margin: 0 20px;

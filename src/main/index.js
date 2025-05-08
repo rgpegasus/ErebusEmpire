@@ -11,7 +11,20 @@ const clientId = '1366193765701783604';
 const rpc = new RPC.Client({ transport: 'ipc' });
 let startTimestamp = null;
 
- 
+async function setActivity(details = 'En train de mater des animés', state = 'Sur Erebus Empire') {
+  if (!rpc) return;
+  if (!startTimestamp) {
+    startTimestamp = new Date();
+}
+  rpc.setActivity({
+      details,
+      state,
+      startTimestamp: new Date(),
+      largeImageKey: 'icon',
+      largeImageText: 'Erebus Empire',
+      instance: false,
+  });
+}
 
 rpc.on('ready', () => {
     setActivity();
@@ -30,7 +43,6 @@ const chromePath = isDev
   ? join(__dirname, '..', '..', 'puppeteer', 'chrome', 'win64-135.0.7049.95', 'chrome-win64', 'chrome.exe')
   : join(process.resourcesPath, 'app.asar.unpacked', 'puppeteer', 'chrome', 'win64-135.0.7049.95', 'chrome-win64', 'chrome.exe');
 
-console.log(chromePath); 
 if (!fs.existsSync(logFolderPath)) {
   fs.mkdirSync(logFolderPath, { recursive: true });
 }
@@ -57,8 +69,8 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1500,
     height: 1000,
-    minHeight:700,
-    minWidth:900,
+    minWidth: 1280,
+    minHeight: 720,
     show: false,
     autoHideMenuBar: false,
     frame: true,
@@ -175,20 +187,16 @@ ipcMain.on('defaul-rich-presence', () => {
   ipcMain.handle("get-episodes", async (event, query)=> {
     try {
       logToFile("URL de la saison:", query)
-      
-      return await scraper.getEmbed(query, ["sibnet","vidmoly"], chromePath);
-       
-      // return await scraper.getEmbed(query, ["vidmoly", "sibnet"]);
-      // return await scraper.getEmbed(query, ["senvid", "vidmoly", "sibnet"]);
+      return await scraper.getEmbed(query, ["oneupload", "sibnet", "sendvid"], chromePath);
     } catch (error){
       logToFile('Erreur dans le main process:', error)
       console.error('Erreur dans le main process:', error);
       return null;
     }
   });
-  ipcMain.handle("get-url", async (event, query)=> {
+  ipcMain.handle("get-url", async (event, query, host)=> {
     try {
-      return await getVideoUrlFromEmbed("sibnet", query);
+      return await getVideoUrlFromEmbed(host, query);
     } catch (error){
       console.error('Erreur dans le main process:', error);
       return null;

@@ -97,6 +97,7 @@ const SeasonsPage = () => {
     navigate(path, { 
       state: { 
         url: episode.url, 
+        host:episode.host,
         episodeTitle: episode.title, 
         episodes: episodes, 
         animeId : animeId, 
@@ -160,7 +161,9 @@ const SeasonsPage = () => {
         <div className="CategorieTitle">Episodes :</div>
         {episodes.length > 0 ? (
           <div className="EpisodesList">
-            {episodes.map((episode) => (
+            {episodes
+              .filter((episode) => episode.title != null) 
+              .map((episode) => (
               <div
                 key={episode.id}
                 className="EpisodeItem"

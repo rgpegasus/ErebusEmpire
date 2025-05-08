@@ -9,6 +9,7 @@ const EpisodePage = () => {
   const [loadingEpisode, setLoadingEpisode] = useState(false);
   const { 
     url, 
+    host,
     episodeTitle, 
     episodes, 
     animeId, 
@@ -40,18 +41,17 @@ useEffect(() => {
 }, []); 
 
 
-  useEffect(() => {
-    if (url) {
-      fetchEpisode(url);
-    }
-  }, [url]);
+  useEffect(() => { 
+  if (url && host) {
+    fetchEpisode(url, host);
+  } 
+}, [url, host]); 
+ 
 
-  const fetchEpisode = async (url) => {
-    try {
+  const fetchEpisode = async (url, host) => {
+    try {  
       setLoadingEpisode(true);
-
-      const realUrl = await window.electron.ipcRenderer.invoke('get-url', url);
-      console.log(realUrl, url)
+      const realUrl = await window.electron.ipcRenderer.invoke('get-url', url, host);
       setEpisodeUrl(realUrl || url);
       const seasonEpisode = `${seasonTitle} - ${episodeTitle}`
       updatePresence(animeTitle, seasonEpisode)
@@ -61,15 +61,16 @@ useEffect(() => {
     } finally {
       setLoadingEpisode(false);
     }
-  };
+  }; 
 
   const EndEpisodeNext = (episode) => {
     if (episode) {
       navigate(
-        `/erebus-empire/anime/${animeId}/${seasonId}/${episode.title.toLowerCase().replace(/\s+/g, '-')}`,
+        `/erebus-empire/anime/${animeId}/${seasonId}/${episode.title.toLowerCase().replace(/\s+/g, '-')}`, 
         {
           state: {
             url: episode.url,
+            host: episode.host,
             episodeTitle: episode.title,
             episodes,
             animeId,
@@ -90,6 +91,7 @@ useEffect(() => {
         `/erebus-empire/anime/${animeId}/${seasonId}/${episode.title.toLowerCase().replace(/\s+/g, '-')}`,
         { state: { 
           url: episode.url, 
+          host: episode.host,
           episodeTitle: episode.title, 
           episodes, 
           animeId, 
@@ -116,6 +118,7 @@ useEffect(() => {
       const historyKey = `lastWatched_${animeId}_${seasonId}`;
       localStorage.setItem(historyKey, JSON.stringify({
         url, 
+        host,
         episodeTitle, 
         episodes, 
         animeId, 
@@ -128,7 +131,6 @@ useEffect(() => {
     }
 
     const storedTime = localStorage.getItem(location.pathname);
-    console.log(location.pathname)
     if (storedTime) {
       setVideoTime(parseFloat(storedTime)); 
     } else {
@@ -168,9 +170,8 @@ useEffect(() => {
   if (loadingEpisode) {
     return <Loader />;
   }
-
   return ( 
-    <div className="MainPage">
+    <div className="EpisodesPage">
       <VideoPlayer
         src={EpisodeUrl}
         overlayEnabled={true}
