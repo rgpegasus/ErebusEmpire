@@ -16,9 +16,11 @@
   
   .AppLogo {
     margin-left: 50px;
+    cursor: pointer;
     width: 40px;
   }
   .SearchLogo {
+    cursor: pointer;
     width: 30px;
     margin-right: 10px;
     opacity: 1;
@@ -49,6 +51,9 @@
     color: var(--primary-text);
     box-sizing: border-box;
     border: 2px solid transparent;
+  }
+  .search-bar::placeholder {
+    color: var(--primary-text);
   }
   .search-bar:focus {
     border: 2px solid var(--logo-color); 
@@ -106,14 +111,38 @@
     height: 75px;
     object-fit: cover;
     border-radius: 8px;
-    box-shadow: -2px 4px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: -2px 5px 10px var(--shadow-color);
   }
   
 
   @media (max-width: 1600px) {
     .TopBar-box{
       justify-content: space-between;
+      box-shadow: 0px 2px 6px var(--shadow-color);
     }
+    .anime-card {
+      border-top: 2px solid var(--logo-color);
+      padding: 8px ;
+      padding-left: 16px;
+      width: 375px;
+    }
+    .anime-card h4,
+    .anime-card h3 {
+      width: 265px;
+      font-size: 15px; 
+      padding-left: 16px;
+    }
+    .anime-card h4 {
+      font-size: 13px;
+    }
+    .cover-img {
+      width: 65px;
+      height: 65px;
+      box-shadow: -1px 3px 5px var(--shadow-color);
+    }
+  }
+
+@media (max-width: 1200px) {
     .anime-card {
       border-top: 2px solid var(--logo-color);
       padding: 8px ;
@@ -134,4 +163,3 @@
       height: 65px;
     }
   }
-

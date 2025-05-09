@@ -15,6 +15,7 @@ function TopBar() {
   const logoRef = useRef(null); 
   const SearchLogo = document.querySelector('.SearchLogo');
   const toggleWidth = 1600;
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (windowWidth <= toggleWidth && menuRef.current && !menuRef.current.contains(event.target)) {
@@ -26,14 +27,16 @@ function TopBar() {
         inputRef.current && !inputRef.current.contains(event.target) &&
         logoRef.current && !logoRef.current.contains(event.target)
       ) {
-        SearchLogo.classList.remove('hide');
-        setInputValue(''); 
+        if (logoRef.current) {
+          logoRef.current.classList.remove('hide');
+        }
+        setInputValue('');
         setResults([]);
-        setSearchVisible(false); 
+        setSearchVisible(false);
       }
     };
 
-    document.addEventListener('click', handleClickOutside);
+    document.addEventListener('click', handleClickOutside); 
     return () => document.removeEventListener('click', handleClickOutside);
   }, [windowWidth]);
   
@@ -97,9 +100,13 @@ function TopBar() {
   };
 
   const toggleSearch = () => {
-    setSearchVisible(prevState => !prevState);
-    SearchLogo.classList.add('hide');
+    setSearchVisible(prev => {
+      const newVisible = !prev;
+      return newVisible;
+    });
   };
+  
+
   
   useEffect(() => {
     if (searchVisible && inputRef.current) {
@@ -119,9 +126,10 @@ function TopBar() {
           draggable="false" 
           src={logo_recherche} 
           alt="Logo Recherche" 
-          className='SearchLogo' 
+          className={`SearchLogo ${searchVisible ? 'hide' : ''}`} 
           onClick={toggleSearch} 
         />
+
         {searchVisible && (
           <div className="search-bar-container">
             <input

@@ -52,7 +52,7 @@ const SeasonsPage = () => {
 
   // Récupérer les épisodes en fonction de la saison sélectionnée
   useEffect(() => {
-    const fetchEpisodes = async () => {
+    const fetchEpisodes = async () => { 
       if (!selectedSeason) return;
       try {
         setLoading(true);
@@ -100,7 +100,7 @@ const SeasonsPage = () => {
         host:episode.host,
         episodeTitle: episode.title, 
         episodes: episodes, 
-        animeId : animeId, 
+        animeId : animeId,  
         seasonId : seasonId, 
         animeTitle:animeInfo.title, 
         seasonTitle:selected.title,
@@ -157,8 +157,8 @@ const SeasonsPage = () => {
       )}
       <div className='Space'></div>
       {/* Affichage des épisodes */}
-      <div>
-        <div className="CategorieTitle">Episodes :</div>
+      <div className="CategorieTitle">Episodes :</div>
+      <div className='EpisodeAll' >
         {episodes.length > 0 ? (
           <div className="EpisodesList">
             {episodes

@@ -32,29 +32,35 @@
     font-weight: var(--button-weight);
     color: var(--primary-text);
   }
-
+  .EpisodeAll {
+    padding: 70px 40px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    border-radius: 7px;
+    background-color: var(--secondary-color);
+    margin: 0 50px; 
+    box-shadow: -2px 5px 10px var(--shadow-color);
+  }
   .EpisodesList {
-    display: grid;
+    display: inline-grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 30px 35px;
-    max-width: calc(100vw - var(--size-menu));
-    background-color: var(--secondary-color);
-    padding: 70px 40px;
-    margin: 0 50px ;
-    border-radius: 7px;
-    align-items: start;
+    width: auto;
+    max-width: 100%;
   }
   
   .EpisodeItem {
     cursor: pointer;
     width: 200px;
     height: 125px;
-    margin-bottom: 30px;
+    margin: 0;
     border-radius: 8px;
-    padding: 5px;
+    box-shadow: -2px 5px 10px var(--shadow-color);
+    background-color: #13151C;
     border: 2px solid var(--logo-color);
-
   }
+
   .EpisodeItem h2 {
     font-size: 21px;
     display: -webkit-box;          
@@ -65,13 +71,12 @@
     white-space: normal;         
     max-width: 80%;   
   }
-  
-  
-  
-  .EpisodeItem img {
+
+
+  .EpisodeItem-img {
     -webkit-user-drag: none;
     opacity: 0.3;
-    border: 2px solid var(--logo-color);
+    
     border-radius: 7px;
   }
 
@@ -101,15 +106,60 @@
     padding: 40px;
     margin: 0 50px ;
     border-radius: 7px;
+    box-shadow: -2px 5px 10px var(--shadow-color);
   }
 
   @media (max-width: 1600px) {
-    .EpisodesList {
+    .EpisodeAll {
       padding: 50px 30px;
-      gap: 20px 25px ;
+      box-shadow: -1px 3px 5px var(--shadow-color);
+    }
+    .EpisodesList {
+      gap: 24px 28px ;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     }
     .EpisodeItem {
-      margin: 0;
+      width: 180px;
+      box-shadow: -1px 3px 5px var(--shadow-color);
+      height: 113px;
+    }
+    .EpisodeItem h2 {
+      font-size: 19px;
+    }
+    .InfoBox {
+      box-shadow: -1px 3px 5px var(--shadow-color);
+      padding: 35px;
+    }
+    .AnimeInfoText h1,
+    .AnimeInfoText h2,
+    .AnimeInfoText h3{
+      font-size: 15px;
+    }
+  }
+  @media (max-width: 1200px) {
+    .SelectSeason {
+      padding: 8px 13px;
+      width: 150px;
+      font-size: 14px;
+    }
+    .SingleSeasonTitle {
+      padding: 8px 13px;
+      font-size: 14px;
+    }
+    .EpisodeAll {
+      padding: 40px 20px;
+      
+    }
+    .EpisodesList {
+      gap: 18px 21px ;
+      grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+    }
+    .EpisodeItem {
+      width: 165px;
+      height: 104px;
+    }
+    .EpisodeItem h2 {
+      font-size: 17px;
     }
     .InfoBox {
       padding: 30px;
@@ -117,9 +167,7 @@
     .AnimeInfoText h1,
     .AnimeInfoText h2,
     .AnimeInfoText h3{
-      font-size: 15px;
+      font-size: 13px;
     }
-    .EpisodeItem h2 {
-      font-size: 19px;
-    } 
   }
+

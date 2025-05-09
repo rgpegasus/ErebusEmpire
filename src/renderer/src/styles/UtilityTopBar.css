@@ -93,11 +93,11 @@
     background: var(--secondary-color);
     border-radius: 8px;
     padding: 7px 15px;
-    z-index: 2;
+    z-index: 4;
     display: flex;
     gap:10px;
     flex-direction: column;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+    box-shadow: -2px 5px 10px var(--shadow-color);
     border-bottom: 1px solid rgba(255, 255, 255, 0.034);
     border-left: 1px solid rgba(255, 255, 255, 0.034);
     margin-left: -35px;
@@ -134,7 +134,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1;
+    z-index: 2;
   }
   .UtilityTopBar-container {
     background: var(--separation-color);
@@ -177,7 +177,7 @@
     overflow: hidden;
     background-color: var(--third-color);
     border-radius: 8px;
-    box-shadow: -2px 5px 10px rgba(0, 0, 0, 0.7);
+    box-shadow: -2px 5px 10px var(--shadow-color);
     margin-bottom: 20px;
   }
 
@@ -203,7 +203,7 @@
     height: 15px;
     width: 15px;
     border-radius: 50%;
-    box-shadow: -1px 2px 5px rgba(0, 0, 0, 0.7);
+    box-shadow: -1px 3px 5px var(--shadow-color);
     background: var(--logo-color);
     margin-top: -5.5px; 
     cursor: pointer;
@@ -271,12 +271,12 @@
   
   .TopBar-profile-menu {
     position: absolute;
-    top: 50px;
+    top: var(--size-top-bar);
     right: 0;
     background-color: var(--secondary-color);
     color: var(--primary-text);
     border-bottom-left-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    box-shadow: -2px 5px 10px var(--shadow-color);
     z-index: 2;
     min-width: 140px;
   }
@@ -316,7 +316,15 @@
   .UtilityTopBar {
     width: 350px;
   }
-
+  .UtilityTopBar-cropper {
+    box-shadow: -1px 3px 5px var(--shadow-color);
+  }
+  .UtilityTopBar-edit {
+    box-shadow: -1px 3px 5px var(--shadow-color);
+  }
+  .UtilityTopBar-apply {
+    box-shadow: -1px 3px 5px var(--shadow-color);
+  }
   .UtilityTopBar-image {
     width: 65px;
     height: 65px;
@@ -337,7 +345,9 @@
   .UtilityTopBar-app-title {
     font-size: 9px;
   }
-
+  .TopBar-profile-menu {
+    box-shadow: -1px 3px 5px var(--shadow-color);
+  }
   .TopBar-profile-menu-item {
     font-size: 15px;
   }

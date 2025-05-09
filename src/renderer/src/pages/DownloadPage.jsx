@@ -144,7 +144,7 @@ const DownloadPage = () => {
                 return (
                   <div key={episode.path} className="DownloadAnime-box">
                     <div className="DownloadAnime-item">
-                      <img src={`file://${episode.cover.replace(/\\/g, '/')}`} alt={`${animeTitle} cover`} />
+                      <div  className="DownloadAnime-item-img"><img src={`file://${episode.cover.replace(/\\/g, '/')}`} alt={`${animeTitle} cover`} /></div>
                       <div className="DownloadAnime-info">
                         <h2>{animeTitle}</h2>
                         <h3 className="DownloadAnime-season">{seasonTitle}</h3>
@@ -178,12 +178,10 @@ const DownloadPage = () => {
           .some(ep => ep.metadata.state === "downloaded");
               
         if (!hasDownloadedEpisodes) return null;
-              
-
         return (
           <div key={anime.title} className="DownloadAnime-box">
             <div className="DownloadAnime-item">
-              <img src={`file://${anime.cover.replace(/\\/g, '/')}`} alt={`${anime.title} cover`} />
+              <div  className="DownloadAnime-item-img"><img src={`file://${anime.cover.replace(/\\/g, '/')}`} alt={`${anime.title} cover`} /></div>
               <div className="DownloadAnime-info">
                 <h2>{anime.title}</h2>
                 {seasonEntries.length > 1 ? (

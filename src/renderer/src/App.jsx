@@ -28,6 +28,7 @@ const App = () => {
     });
   }, []);
   
+  
   return (
     <Router>
       <Logger />

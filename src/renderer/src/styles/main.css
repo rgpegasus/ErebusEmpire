@@ -8,7 +8,7 @@
   --third-color:#525151;
   --primary-text:#D1D7E0 ;
   --shadow-color:#05060A ;
-  --size-menu:325px; 
+  --size-menu: 325px; 
   --size-top-bar:60px;
   --font-main: "Montserrat", sans-serif;
   --main-title-weight:800;
@@ -19,12 +19,23 @@
   --text-weight: 400;
   --little-text-weight:300;
 }
+:root.light-theme {
+  --logo-color: #c08a42;
+  --primary-color: 220, 220, 230;
+  --secondary-color: #c6c9cf;
+  --background-color: #e9e3e3;
+  --separation-color: #ad9d9d;
+  --third-color: #DADADA;
+  --primary-text: #1A1A1A;
+  --shadow-color: #757070;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-body { 
+body {  
   user-select: none;
   background-color: var(--background-color);                    
 }
@@ -60,10 +71,7 @@ body {
   src: url('../../../../resources/fonts/Montserrat-Light.ttf') format('truetype');
   font-weight: 300;
 }
-.CategorieTitle {
-  color:blanc;
-  font-size: 50px;
-}
+
 
 .MainPage {
 overflow-y: auto; 
@@ -115,15 +123,19 @@ justify-content: center;
 align-items: center;
 position: relative;
 }
+.AnimeCover {
+  background-color: #0B0C10;
+}
 .EpisodeItem h2,
 .AnimeCover h2{
 position: absolute;
-color: var(--primary-text);
+color: #D1D7E0;
 text-transform: uppercase;
 font-size: 50px;
 text-align: center;
 font-weight: var(--main-title-weight);
 font-family: var(--font-main);
+max-width: 90%;
 }
 .EpisodeItem-img,
 .AnimeCover-img {
@@ -135,11 +147,14 @@ border-bottom-right-radius: 10px;
 border-bottom-left-radius: 10px;
 border-bottom: 1px solid var(--separation-color);
 }
+
+
 .AnimeCover::after {
   content: "";
   position: absolute;
   bottom: 0;
   left: 0;
+  z-index: 1;
   width: 100%;
   height: 40%; 
   background: linear-gradient(to bottom, transparent, var(--background-color));
@@ -148,8 +163,9 @@ border-bottom: 1px solid var(--separation-color);
 
 .AnimeCover-button {
   position: absolute;
-  color: var(--primary-text);
+  color: #D1D7E0;
   opacity: 0.8;
+  z-index: 2;
   font-weight: var(--main-title-weight);
   font-family: var(--font-main);
   border-radius: 10px;
@@ -162,7 +178,7 @@ border-bottom: 1px solid var(--separation-color);
 }
 .AnimeCover-button:hover {
   opacity: 1;
-  background-color: var(--logo-color);
+  background-color: #996e35;
 }
 .Space {
   height: 50px;
@@ -184,7 +200,6 @@ display: inline-block;
   .MainPage::-webkit-scrollbar {
     width: 10px;
   }
-  .EpisodeItem h2,
   .AnimeCover h2{
     font-size: 40px;
   }
@@ -195,18 +210,23 @@ display: inline-block;
   .CategorieTitle {
     font-size: 23px;
     padding: 0px 20px;
-    padding-bottom: 15px;
+    padding-bottom: 16px;
     border-bottom: 4px solid var(--logo-color);
   }
   .Space {
-    height: 40px;
+    height: 43px;
   }
 }
 @media (max-width: 1200px) {
   .MainPage::-webkit-scrollbar {
     width: 8px;
   }
-  .EpisodeItem h2,
+  .CategorieTitle {
+    font-size: 21px;
+    padding: 0px 15px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid var(--logo-color);
+  }
   .AnimeCover h2{
     font-size: 30px;
   }
@@ -215,6 +235,6 @@ display: inline-block;
     padding: 8px 18px;
   }
   .Space {
-    height: 30px;
+    height: 36px;
   }
 }

@@ -1,6 +1,7 @@
 /*css du menu bar*/
 .MenuBar-box {
     width: var(--size-menu);
+    z-index: 2;
     height: 100%;
     background-color: var(--background-color);
     border-right: 1px solid var(--separation-color);
@@ -36,7 +37,7 @@
 .Onglet-box-select{
     background-color: var(--secondary-color);
     border-radius: 7px;
-    box-shadow: 0px 0px 10px var(--shadow-color);
+    box-shadow: -2px 5px 10px var(--shadow-color);
 }
 .Onglet-box-select,
 .Onglet-box{
@@ -92,11 +93,13 @@ body.menu-extended {
     --size-menu: 250px; 
 }
 
-body.menu-extended .Onglet-box,
-body.menu-extended .Onglet-box-select {
+body.menu-extended .Onglet-box{
   width: 210px;
 }
-
+body.menu-extended .Onglet-box-select {
+  width: 210px;
+  box-shadow: -1px 3px 5px var(--shadow-color);
+}
 body.menu-extended .Onglet-box p,
 body.menu-extended .Onglet-box-select p {
   font-size: 15px;

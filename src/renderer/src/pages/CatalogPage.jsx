@@ -89,7 +89,7 @@ const CatalogPage = () => {
 
   return (
     <div className='MainPage'>
-      <div className='Space'></div>
+      <div className='Space'></div> 
       <div className="CategorieTitle">Catalogue d'animé :</div>
       <div className='CatalogAll'>
         <div className="CatalogEpisode-search-container">

@@ -6,6 +6,7 @@
     border-radius: 7px;
     background-color: var(--secondary-color);
     margin: 0 50px; 
+    box-shadow: -2px 5px 10px var(--shadow-color);
   }
   .CatalogEpisodes {
     display: inline-grid;
@@ -44,7 +45,7 @@
     text-transform: uppercase;
     font-weight: var(--main-title-weight);
     text-align: center;
-    opacity: 0.8;
+    opacity: 0.8; 
     font-family: var(--font-main);
     display: -webkit-box;          
     -webkit-line-clamp: 2;          
@@ -78,7 +79,7 @@
     background-color: var(--background-color);
     cursor: pointer;
     border: 2px solid var(--logo-color);
-    box-shadow: -2px 5px 10px rgba(0, 0, 0, 0.7)
+    box-shadow: -2px 5px 10px var(--shadow-color);
   }
   .CatalogEpisodes-button:hover {
     opacity: 1;
@@ -93,6 +94,7 @@
     display: flex;
     align-items: center;
     align-content: center;
+    padding-bottom: 20px;
   }
   .CatalogEpisode-search-bar {
     all:unset;
@@ -146,9 +148,7 @@
     transition: all 0.3s ease;
   }
   .pagination-buttons button:hover:not(:disabled) {
-    background-color: var(--gold-color);
     color: var(--logo-color);
-    box-shadow: 0 0 10px var(--gold-color);
   }
   .pagination-buttons button:disabled {
     opacity: 0.4;
@@ -157,9 +157,18 @@
   }
 
 @media (max-width: 1600px) {
+  .CatalogAll {
+    padding: 50px 30px;
+    box-shadow: -1px 3px 5px var(--shadow-color);
+  }
+  .CatalogEpisodes {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 35px 25px;
+  }
   .CatalogEpisodes-item {
-    height: 300px;
-    width: 220px;
+    height: 280px;
+    width: 200px;
+    box-shadow: -1px 3px 5px var(--shadow-color);
   }
   .CatalogEpisodes-cover h3 {
     font-size: 18px;
@@ -169,6 +178,7 @@
     margin-top: 180px;
     font-size: 18px;
     padding: 8px 35px;
+    box-shadow: -1px 3px 5px var(--shadow-color);
   }
   .CatalogEpisode-search-bar {
     font-size: 26px;
@@ -179,9 +189,16 @@
   }
 }
 @media (max-width: 1200px) {
+  .CatalogAll {
+    padding: 40px 20px
+  }
+  .CatalogEpisodes {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 30px 20px;
+  }
   .CatalogEpisodes-item {
-    height: 270px;
-    width: 200px;
+    height: 250px;
+    width: 180px;
   }
   .CatalogEpisodes-cover h3 {
     font-size: 16px;
@@ -201,3 +218,4 @@
     font-size: 20px;
   }
 }
+ 

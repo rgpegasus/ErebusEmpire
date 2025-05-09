@@ -12,6 +12,7 @@ import logo_alreadySeen from "../../../../resources/pictures/logo_alreadySeen.pn
 import logo_settings from "../../../../resources/pictures/logo_settings.png";
 import logo_switchAccount from "../../../../resources/pictures/logo_switchAccount.png";
 import logo_logOut from "../../../../resources/pictures/logo_logOut.png";
+import OverlayPortal from './OverlayPortal';
 
 
 function UtilityTopBar() {
@@ -25,8 +26,6 @@ function UtilityTopBar() {
   const [menuVisible, setMenuVisible] = useState(false);
   const [username, setUsername] = useState("User");
   const [isEditingName, setIsEditingName] = useState(false);
-  const menuRef = useRef(null);
-  const optionsRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,11 +35,11 @@ function UtilityTopBar() {
     if (savedName?.trim()) setUsername(savedName.trim());
 
     const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
+      if (!e.target.closest('.utility-portal-content')) {
         setMenuVisible(false);
-      }
-      if (optionsRef.current && !optionsRef.current.contains(e.target)) {
-        setShowOptions(false); 
+        setShowOptions(false);
+        setImageSrc(null);
+        setIsEditingName(false)
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -143,7 +142,7 @@ const handleProfileClick = () => {
     navigate(path)
   }
   return (
-    <div className="TopBar-profile" ref={menuRef}>
+    <div className="TopBar-profile">
       <div className="TopBar-profile-wrapper" onClick={CloseMenu}>
         <img src={croppedImage || logo_profil} alt="Profil" className="TopBar-profile-img" draggable="false" />
         <ChevronDown size={18} color="#996e35" style={{ marginLeft: 4 }} />
@@ -151,121 +150,125 @@ const handleProfileClick = () => {
 
       {menuVisible && (
         <div>
-            <div className="UtilityTopBar-overlay" onClick={() => setMenuVisible(!menuVisible)}></div>
-            <div className="TopBar-profile-menu">
-                <div className="UtilityTopBar">
-                <div className='UtilityTopBar-profil'>
-                    <div onClick={handleProfileClick}>
-                    <img
-                        src={croppedImage || logo_profil}
-                        alt="Profil"
-                        draggable="false"
-                        className={`UtilityTopBar-image ${editMode ? 'editable' : ''}`}
-                    />
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={onFileChange}
-                        className="UtilityTopBar-image-input"
-                        id="upload"
-                    />
-                    {editMode && showOptions && (
-                        <div className="UtilityTopBar-edit" ref={optionsRef}>
-                        <label htmlFor="upload" className="UtilityTopBar-edit-option" onClick={() => document.getElementById('upload').click()}>
-                            Modifier l’image
-                        </label>
-                        <button className="UtilityTopBar-edit-option" onClick={resetProfilePhoto}>Supprimer l’image</button>
-                        </div>
-                    )}
-                    </div>
-                    <div className='UtilityTopBar-pseudo'>
-                        <div className='UtilityTopBar-name' onClick={() => editMode && setIsEditingName(true)}>
-                            {isEditingName ? (
-                            <input
-                                className="UtilityTopBar-name-input"
-                                type="text"
-                                maxlength="16"
-                                value={username}
-                                onChange={handleUsernameChange}
-                                placeholder="Entrez un pseudo"
-                                onKeyDown={handleNameKeyDown}
-                                onBlur={() => setIsEditingName(false)}
-                                autoFocus
-                            />
-                            ) : (
-                            <div  className={`UtilityTopBar-name ${editMode ? 'editable' : ''}`}>{username}</div>
-                            )}
-                        </div>
-                        <div className='UtilityTopBar-app'>
-                            <img
-                            src={logo_app}
-                            alt="app"
-                            draggable="false"
-                            className="UtilityTopBar-app-logo"
-                            />
-                            <h1 className='UtilityTopBar-app-title'>DEV Erebus Empire</h1>
-                        </div>
-                    </div>
-                </div>
-                <div className='UtilityTopBar-button'>
-                    <span className="UtilityTopBar-button-item" onClick={toggleEditMode}>
-                        {editMode ? '✖' : '✎'}
-                    </span>
-                </div>
+            <OverlayPortal>
+              <div className="UtilityTopBar-overlay" onClick={() => setMenuVisible(!menuVisible)}></div>
+              <div className="TopBar-profile-menu utility-portal-content">
+                  <div className="UtilityTopBar">
+                  <div className='UtilityTopBar-profil'>
+                      <div onClick={handleProfileClick}>
+                      <img
+                          src={croppedImage || logo_profil}
+                          alt="Profil"
+                          draggable="false"
+                          className={`UtilityTopBar-image ${editMode ? 'editable' : ''}`}
+                      />
+                      <input
+                          type="file"
+                          accept="image/*"
+                          onChange={onFileChange}
+                          className="UtilityTopBar-image-input"
+                          id="upload"
+                      />
+                      {editMode && showOptions && (
+                          <div className="UtilityTopBar-edit">
+                          <label htmlFor="upload" className="UtilityTopBar-edit-option" onClick={() => document.getElementById('upload').click()}>
+                              Modifier l’image
+                          </label>
+                          <button className="UtilityTopBar-edit-option" onClick={resetProfilePhoto}>Supprimer l’image</button>
+                          </div>
+                      )}
+                      </div>
+                      <div className='UtilityTopBar-pseudo'>
+                          <div className='UtilityTopBar-name' onClick={() => editMode && setIsEditingName(true)}>
+                              {isEditingName ? (
+                              <input
+                                  className="UtilityTopBar-name-input"
+                                  type="text"
+                                  maxlength="16"
+                                  value={username}
+                                  onChange={handleUsernameChange}
+                                  placeholder="Entrez un pseudo"
+                                  onKeyDown={handleNameKeyDown}
+                                  onBlur={() => setIsEditingName(false)}
+                                  autoFocus
+                              />
+                              ) : (
+                              <div  className={`UtilityTopBar-name ${editMode ? 'editable' : ''}`}>{username}</div>
+                              )}
+                          </div>
+                          <div className='UtilityTopBar-app'>
+                              <img
+                              src={logo_app}
+                              alt="app"
+                              draggable="false"
+                              className="UtilityTopBar-app-logo"
+                              />
+                              <h1 className='UtilityTopBar-app-title'>Erebus Empire</h1>
+                          </div>
+                      </div>
+                  </div>
+                  <div className='UtilityTopBar-button'>
+                      <span className="UtilityTopBar-button-item" onClick={toggleEditMode}>
+                          {editMode ? '✖' : '✎'}
+                      </span>
+                  </div>
 
-                {imageSrc && (
-                    <div className="UtilityTopBar-overlay">
-                    <div className="UtilityTopBar-container">
-                        <div className="UtilityTopBar-top">
-                        <h1 className="UtilityTopBar-title">Modifier l'image</h1>
-                        <span className="UtilityTopBar-cancel" onClick={() => setImageSrc(null)}>✖</span>
+                  {imageSrc && (
+                    <OverlayPortal>
+                        <div className="UtilityTopBar-overlay">
+                          <div className="UtilityTopBar-container utility-portal-content">
+                              <div className="UtilityTopBar-top">
+                              <h1 className="UtilityTopBar-title">Modifier l'image</h1>
+                              <span className="UtilityTopBar-cancel" onClick={() => setImageSrc(null)}>✖</span>
+                              </div>
+                              <div className="UtilityTopBar-cropper">
+                              <Cropper
+                                  image={imageSrc}
+                                  crop={crop}
+                                  showGrid={false}
+                                  zoom={zoom}
+                                  aspect={1}
+                                  onCropChange={setCrop}
+                                  onZoomChange={setZoom}
+                                  onCropComplete={onCropComplete}
+                                  cropShape="round"
+                              />
+                              </div>
+                              <div className="UtilityTopBar-zoom">
+                              <input
+                                  type="range"
+                                  min={1}
+                                  max={3}
+                                  step={0.1}
+                                  value={zoom}
+                                  onChange={(e) => setZoom(e.target.value)}
+                              />
+                              </div>
+                              <div className="UtilityTopBar-bottom">
+                              <button className="UtilityTopBar-reset" onClick={() => {
+                                  setCrop({ x: 0, y: 0 });
+                                  setZoom(1);
+                              }}>Réinitialiser</button>
+                              <button className="UtilityTopBar-apply" onClick={showCroppedImage}>Appliquer</button>
+                              </div>
+                          </div>
                         </div>
-                        <div className="UtilityTopBar-cropper">
-                        <Cropper
-                            image={imageSrc}
-                            crop={crop}
-                            showGrid={false}
-                            zoom={zoom}
-                            aspect={1}
-                            onCropChange={setCrop}
-                            onZoomChange={setZoom}
-                            onCropComplete={onCropComplete}
-                            cropShape="round"
-                        />
-                        </div>
-                        <div className="UtilityTopBar-zoom">
-                        <input
-                            type="range"
-                            min={1}
-                            max={3}
-                            step={0.1}
-                            value={zoom}
-                            onChange={(e) => setZoom(e.target.value)}
-                        />
-                        </div>
-                        <div className="UtilityTopBar-bottom">
-                        <button className="UtilityTopBar-reset" onClick={() => {
-                            setCrop({ x: 0, y: 0 });
-                            setZoom(1);
-                        }}>Réinitialiser</button>
-                        <button className="UtilityTopBar-apply" onClick={showCroppedImage}>Appliquer</button>
-                        </div>
-                    </div>
-                    </div>
-                )}
-                </div>
-                <div className='TopBar-profile-separation'></div>
-                <div onClick={() => navigateProfilPage("/erebus-empire/profile/settings")} className='TopBar-profile-menu-item'><img draggable="false" src={logo_settings}/>Paramètres</div>
-                <div onClick={() => navigateProfilPage("/erebus-empire/profile/switchAccount")} className='TopBar-profile-menu-item'><img draggable="false" src={logo_switchAccount}/>Changer de profil</div>
-                <div className='TopBar-profile-separation'></div>
-                <div onClick={() => navigateProfilPage("/erebus-empire/profile/favorites")} className='TopBar-profile-menu-item'><img draggable="false" src={logo_favoris}/>Favoris</div>
-                <div onClick={() => navigateProfilPage("/erebus-empire/profile/watchlist")} className='TopBar-profile-menu-item'><img draggable="false" src={logo_watchlist}/>Watchlist</div>
-                <div onClick={() => navigateProfilPage("/erebus-empire/profile/history")} className='TopBar-profile-menu-item'><img draggable="false" src={logo_history}/>Historique</div>
-                <div onClick={() => navigateProfilPage("/erebus-empire/profile/onHold")} className='TopBar-profile-menu-item'><img draggable="false" src={logo_onHold}/>En attente</div>
-                <div onClick={() => navigateProfilPage("/erebus-empire/profile/alreadySeen")} className='TopBar-profile-menu-item'><img draggable="false" src={logo_alreadySeen}/>Déjà Vu</div>
-                <div className='TopBar-profile-separation'></div>
-                <div className='TopBar-profile-menu-item'><img draggable="false" src={logo_logOut}/>Se déconnecter</div>
-            </div>
+                      </OverlayPortal>
+                  )}
+                  </div>
+                  <div className='TopBar-profile-separation'></div>
+                  <div onClick={() => navigateProfilPage("/erebus-empire/profile/settings")} className='TopBar-profile-menu-item'><img draggable="false" src={logo_settings}/>Paramètres</div>
+                  <div onClick={() => navigateProfilPage("/erebus-empire/profile/switchAccount")} className='TopBar-profile-menu-item'><img draggable="false" src={logo_switchAccount}/>Changer de profil</div>
+                  <div className='TopBar-profile-separation'></div>
+                  <div onClick={() => navigateProfilPage("/erebus-empire/profile/favorites")} className='TopBar-profile-menu-item'><img draggable="false" src={logo_favoris}/>Favoris</div>
+                  <div onClick={() => navigateProfilPage("/erebus-empire/profile/watchlist")} className='TopBar-profile-menu-item'><img draggable="false" src={logo_watchlist}/>Watchlist</div>
+                  <div onClick={() => navigateProfilPage("/erebus-empire/profile/history")} className='TopBar-profile-menu-item'><img draggable="false" src={logo_history}/>Historique</div>
+                  <div onClick={() => navigateProfilPage("/erebus-empire/profile/onHold")} className='TopBar-profile-menu-item'><img draggable="false" src={logo_onHold}/>En attente</div>
+                  <div onClick={() => navigateProfilPage("/erebus-empire/profile/alreadySeen")} className='TopBar-profile-menu-item'><img draggable="false" src={logo_alreadySeen}/>Déjà Vu</div>
+                  <div className='TopBar-profile-separation'></div>
+                  <div className='TopBar-profile-menu-item'><img draggable="false" src={logo_logOut}/>Se déconnecter</div>
+              </div>
+            </OverlayPortal>
         </div>
         
       )}

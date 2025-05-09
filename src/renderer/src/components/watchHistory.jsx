@@ -108,7 +108,7 @@ const WatchHistory = () => {
             ))}
           </div>
           </div>
-          <div className='Space'></div><div className='Space'></div><div className='Space'></div>
+          <div className='Space'></div><div className='Space'></div>
         </div>
       )}
     </div>
