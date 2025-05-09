@@ -1,4 +1,10 @@
-# ErebusEmpire - Streaming App
+
+<h1 align="center">👑 ErebusEmpire - Streaming App</h1>
+<p align="center">
+  <a href="https://github.com/rgpegasus/ErebusEmpire/releases/"><img src="https://img.shields.io/github/v/release/rgpegasus/ErebusEmpire?style=for-the-badge&labelColor=%230B0C10&color=%23996e35"></a>
+  <a href="https://github.com/rgpegasus/ErebusEmpire/releases/"><img src="https://img.shields.io/github/downloads/rgpegasus/ErebusEmpire/total?style=for-the-badge&labelColor=%230B0C10&color=%23996e35"></a>
+  <a href="https://github.com/rgpegasus/ErebusEmpire/commits"><img src="https://img.shields.io/github/last-commit/rgpegasus/ErebusEmpire?style=for-the-badge&labelColor=%230B0C10&color=%23996e35"></a>
+</p>
 
 **ErebusEmpire** is a modern and stylish desktop app built with Electron and React that lets you stream and download anime episodes with a clean and powerful interface.
 
