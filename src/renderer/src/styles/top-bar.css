@@ -21,6 +21,11 @@
   .SearchLogo {
     width: 30px;
     margin-right: 10px;
+    opacity: 1;
+  }
+  .SearchLogo.hide {
+    opacity: 0;
+    width: 0;
   }
   .search-container {
     display: flex;
@@ -33,7 +38,7 @@
     all:unset;
     text-transform: uppercase;
     background-color: var(--primary-color);
-    padding: 5px;
+    padding: 0 8px;
     font-size: 18px;
     font-family: var(--font-main);
     width: 225px; 
@@ -101,13 +106,32 @@
     height: 75px;
     object-fit: cover;
     border-radius: 8px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: -2px 4px 10px rgba(0, 0, 0, 0.5);
   }
   
 
   @media (max-width: 1600px) {
     .TopBar-box{
       justify-content: space-between;
+    }
+    .anime-card {
+      border-top: 2px solid var(--logo-color);
+      padding: 8px ;
+      padding-left: 16px;
+      width: 375px;
+    }
+    .anime-card h4,
+    .anime-card h3 {
+      width: 265px;
+      font-size: 15px; 
+      padding-left: 16px;
+    }
+    .anime-card h4 {
+      font-size: 13px;
+    }
+    .cover-img {
+      width: 65px;
+      height: 65px;
     }
   }
 

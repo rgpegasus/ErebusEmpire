@@ -18,8 +18,6 @@
   --button-weight:700;
   --text-weight: 400;
   --little-text-weight:300;
-  
-  
 }
 * {
   margin: 0;
@@ -62,7 +60,10 @@ body {
   src: url('../../../../resources/fonts/Montserrat-Light.ttf') format('truetype');
   font-weight: 300;
 }
-
+.CategorieTitle {
+  color:blanc;
+  font-size: 50px;
+}
 
 .MainPage {
 overflow-y: auto; 
@@ -191,6 +192,15 @@ display: inline-block;
     font-size: 25px;
     padding: 9px 25px;
   }
+  .CategorieTitle {
+    font-size: 23px;
+    padding: 0px 20px;
+    padding-bottom: 15px;
+    border-bottom: 4px solid var(--logo-color);
+  }
+  .Space {
+    height: 40px;
+  }
 }
 @media (max-width: 1200px) {
   .MainPage::-webkit-scrollbar {
@@ -203,5 +213,8 @@ display: inline-block;
   .AnimeCover-button{
     font-size: 18px;
     padding: 8px 18px;
+  }
+  .Space {
+    height: 30px;
   }
 }

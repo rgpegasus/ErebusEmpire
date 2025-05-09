@@ -135,6 +135,7 @@ const LatestEpisodes = ({ episodes }) => {
 
       {episodes.length > 0 ? (
         <div className="LatestEpisodes">
+          <div className="LatestEpisodes-container">
           {episodes.map((episode) => (
             <div
               key={episode.id || episode.title}
@@ -157,6 +158,7 @@ const LatestEpisodes = ({ episodes }) => {
               </div> 
             </div>
           ))}
+          </div>
         </div>
       ) : (
         <div className="AFK">

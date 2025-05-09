@@ -20,10 +20,15 @@
   margin: 0 50px; 
   border-radius: 7px;
   display: flex;
-  gap: 50px;
-  padding: 70px 40px;
+  padding: 70px 40px 0;
   background-color: var(--secondary-color);
+}
+.LatestEpisodes-container {
+  gap: 50px;
+  display: flex;
+  border-radius: 7px;
   overflow-x: auto;
+  padding-bottom: 70px;
   scroll-behavior: smooth;
 }
 .LatestEpisodes.active {
@@ -144,20 +149,20 @@
   padding: 10px 0;
   border-radius: 5px;
 }
-.LatestEpisodes::-webkit-scrollbar {
+.LatestEpisodes-container::-webkit-scrollbar {
   height: 12px;
 }
-.LatestEpisodes::-webkit-scrollbar-track {
+.LatestEpisodes-container::-webkit-scrollbar-track {
   background-color: rgba(var(--primary-color), 0.8);
   border-radius: 0 0 7px 7px;
 }
-.LatestEpisodes::-webkit-scrollbar-thumb {
+.LatestEpisodes-container::-webkit-scrollbar-thumb {
   background-color: var(--logo-color);
   border-radius: 7px;
   cursor: grab;
   border: 2px solid var(--secondary-color);
 } 
-.LatestEpisodes::-webkit-scrollbar-thumb:hover {
+.LatestEpisodes-container::-webkit-scrollbar-thumb:hover {
   background-color: rgba(153, 110, 53, 0.75);
 }
 .LatestEpisodes-item.shift-delete {
@@ -186,8 +191,11 @@
   }
   
   .LatestEpisodes {
-    padding: 50px 30px;
+    padding: 50px 30px 0;
+  }
+  .LatestEpisodes-container {
     gap: 30px;
+    padding-bottom: 50px;
   }
   
   .LatestEpisodes-item {
@@ -215,6 +223,9 @@
   .LatestEpisodes-title-wrapper h2 {
     font-size: 15px;
   }
+  .LatestEpisodes-container::-webkit-scrollbar {
+    height: 10px;
+  }
 }
 
 @media (max-width: 1200px) {
@@ -233,8 +244,11 @@
   }
 
   .LatestEpisodes {
-    padding: 40px 20px;
-    gap: 20px;
+    padding: 40px 20px 0;
+  }
+  .LatestEpisodes-container {
+    gap:20px;
+    padding-bottom: 40px;
   }
 
   .LatestEpisodes-item {
@@ -261,5 +275,8 @@
 
   .LatestEpisodes-title-wrapper h2 {
     font-size: 14px;
+  }
+  .LatestEpisodes-container::-webkit-scrollbar {
+    height: 8px;
   }
 }

@@ -13,6 +13,7 @@ function TopBar() {
   const menuRef = useRef(null); 
   const inputRef = useRef(null); 
   const logoRef = useRef(null); 
+  const SearchLogo = document.querySelector('.SearchLogo');
   const toggleWidth = 1600;
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -25,6 +26,7 @@ function TopBar() {
         inputRef.current && !inputRef.current.contains(event.target) &&
         logoRef.current && !logoRef.current.contains(event.target)
       ) {
+        SearchLogo.classList.remove('hide');
         setInputValue(''); 
         setResults([]);
         setSearchVisible(false); 
@@ -96,6 +98,7 @@ function TopBar() {
 
   const toggleSearch = () => {
     setSearchVisible(prevState => !prevState);
+    SearchLogo.classList.add('hide');
   };
   
   useEffect(() => {

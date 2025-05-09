@@ -83,6 +83,7 @@ const WatchHistory = () => {
         <div>
           <div className="CategorieTitle">Reprendre la lecture :</div>
           <div className="LatestEpisodes">
+          <div className="LatestEpisodes-container">
             {watchedEpisodes.map((episode, index) => (
               <div
                 key={episode.key || index}
@@ -105,6 +106,7 @@ const WatchHistory = () => {
                 </div>
               </div>
             ))}
+          </div>
           </div>
           <div className='Space'></div><div className='Space'></div><div className='Space'></div>
         </div>

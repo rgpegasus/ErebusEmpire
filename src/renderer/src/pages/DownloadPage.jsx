@@ -224,7 +224,7 @@ const DownloadPage = () => {
       {selectedEpisode && (
         <div className="video-player mt-6">
           <VideoPlayer
-            src={selectedEpisode.filePath}
+            src={"selectedEpisode.filePath"}
             overlayEnabled
             title={selectedEpisode.animeTitle}
             subTitle={`${selectedEpisode.seasonTitle} - ${selectedEpisode.episodeTitle}`}

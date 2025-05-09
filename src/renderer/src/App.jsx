@@ -7,6 +7,13 @@ import DownloadPage from './pages/DownloadPage';
 import TopBar from './components/top-bar';
 import SeasonsPage from './pages/SeasonPage';
 import EpisodePage from './pages/EpisodePage.jsx';
+import SettingsPage from './components/profilePage/SettingsPage.jsx';
+import SwitchAccountPage from './components/profilePage/SwitchAccountPage.jsx';
+import FavoritesPage from './components/profilePage/FavoritesPage.jsx';
+import WatchlistPage from './components/profilePage/WatchlistPage.jsx';
+import HistoryPage from './components/profilePage/HistoryPage.jsx';
+import OnHoldPage from './components/profilePage/OnHoldPage.jsx';
+import AlreadySeenPage from './components/profilePage/AlreadySeenPage.jsx';
 
 const Logger = () => {
   const location = useLocation();
@@ -26,12 +33,19 @@ const App = () => {
       <Logger />
       <MenuBar />
       <div>
-        <TopBar />
+        <TopBar /> 
         <Routes>
           <Route path="/" element={<Navigate to="/erebus-empire/home" />} />
           <Route path="/erebus-empire/home" element={<HomePage/>} />
           <Route path="/erebus-empire/catalogue" element={<CatalogPage/>} />
           <Route path="/erebus-empire/downloads" element={<DownloadPage/>} />
+          <Route path="/erebus-empire/profile/settings" element={<SettingsPage/>} />
+          <Route path="/erebus-empire/profile/switchAccount" element={<SwitchAccountPage/>} />
+          <Route path="/erebus-empire/profile/favorites" element={<FavoritesPage/>} />
+          <Route path="/erebus-empire/profile/watchlist" element={<WatchlistPage/>} />
+          <Route path="/erebus-empire/profile/history" element={<HistoryPage/>} />
+          <Route path="/erebus-empire/profile/onHold" element={<OnHoldPage/>} />
+          <Route path="/erebus-empire/profile/alreadySeen" element={<AlreadySeenPage/>} />
           <Route path="/erebus-empire/anime/:animeId/:seasonId?" element={<SeasonsPage/>} />
           <Route path="/erebus-empire/anime/:animeId/:seasonId/:episodeId" element={<EpisodePage/>} />
         </Routes>

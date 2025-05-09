@@ -102,3 +102,24 @@
     margin: 0 50px ;
     border-radius: 7px;
   }
+
+  @media (max-width: 1600px) {
+    .EpisodesList {
+      padding: 50px 30px;
+      gap: 20px 25px ;
+    }
+    .EpisodeItem {
+      margin: 0;
+    }
+    .InfoBox {
+      padding: 30px;
+    }
+    .AnimeInfoText h1,
+    .AnimeInfoText h2,
+    .AnimeInfoText h3{
+      font-size: 15px;
+    }
+    .EpisodeItem h2 {
+      font-size: 19px;
+    } 
+  }

@@ -6,11 +6,11 @@ import logo_profil from "../../../../resources/pictures/logo_profil_full.png";
 import logo_app from "../../../../resources/pictures/logo_mini_app.png";
 import logo_favoris from "../../../../resources/pictures/logo_favoris.png";
 import logo_watchlist from "../../../../resources/pictures/logo_watchlist.png";
-import logo_enCours from "../../../../resources/pictures/logo_enCours.png";
-import logo_enAttente from "../../../../resources/pictures/logo_enAttente.png";
-import logo_vu from "../../../../resources/pictures/logo_vu.png";
+import logo_history from "../../../../resources/pictures/logo_history.png";
+import logo_onHold from "../../../../resources/pictures/logo_onHold.png";
+import logo_alreadySeen from "../../../../resources/pictures/logo_alreadySeen.png";
 import logo_settings from "../../../../resources/pictures/logo_settings.png";
-import logo_changeAccount from "../../../../resources/pictures/logo_changeAccount.png";
+import logo_switchAccount from "../../../../resources/pictures/logo_switchAccount.png";
 import logo_logOut from "../../../../resources/pictures/logo_logOut.png";
 
 
@@ -138,7 +138,10 @@ const handleProfileClick = () => {
       resolve(base64Image);
     });
   };
-
+  const navigateProfilPage = async (path) => {
+    setMenuVisible(!menuVisible)
+    navigate(path)
+  }
   return (
     <div className="TopBar-profile" ref={menuRef}>
       <div className="TopBar-profile-wrapper" onClick={CloseMenu}>
@@ -200,7 +203,7 @@ const handleProfileClick = () => {
                             draggable="false"
                             className="UtilityTopBar-app-logo"
                             />
-                            <h1 className='UtilityTopBar-app-title'>Erebus Empire</h1>
+                            <h1 className='UtilityTopBar-app-title'>DEV Erebus Empire</h1>
                         </div>
                     </div>
                 </div>
@@ -252,14 +255,14 @@ const handleProfileClick = () => {
                 )}
                 </div>
                 <div className='TopBar-profile-separation'></div>
-                <div className='TopBar-profile-menu-item'><img draggable="false" src={logo_settings}/>Paramètres</div>
-                <div className='TopBar-profile-menu-item'><img draggable="false" src={logo_changeAccount}/>Changer de profil</div>
+                <div onClick={() => navigateProfilPage("/erebus-empire/profile/settings")} className='TopBar-profile-menu-item'><img draggable="false" src={logo_settings}/>Paramètres</div>
+                <div onClick={() => navigateProfilPage("/erebus-empire/profile/switchAccount")} className='TopBar-profile-menu-item'><img draggable="false" src={logo_switchAccount}/>Changer de profil</div>
                 <div className='TopBar-profile-separation'></div>
-                <div className='TopBar-profile-menu-item'><img draggable="false" src={logo_favoris}/>Favoris</div>
-                <div className='TopBar-profile-menu-item'><img draggable="false" src={logo_watchlist}/>Watchlist</div>
-                <div className='TopBar-profile-menu-item'><img draggable="false" src={logo_enCours}/>Historique</div>
-                <div className='TopBar-profile-menu-item'><img draggable="false" src={logo_enAttente}/>En attente</div>
-                <div className='TopBar-profile-menu-item'><img draggable="false" src={logo_vu}/>Déjà vu</div>
+                <div onClick={() => navigateProfilPage("/erebus-empire/profile/favorites")} className='TopBar-profile-menu-item'><img draggable="false" src={logo_favoris}/>Favoris</div>
+                <div onClick={() => navigateProfilPage("/erebus-empire/profile/watchlist")} className='TopBar-profile-menu-item'><img draggable="false" src={logo_watchlist}/>Watchlist</div>
+                <div onClick={() => navigateProfilPage("/erebus-empire/profile/history")} className='TopBar-profile-menu-item'><img draggable="false" src={logo_history}/>Historique</div>
+                <div onClick={() => navigateProfilPage("/erebus-empire/profile/onHold")} className='TopBar-profile-menu-item'><img draggable="false" src={logo_onHold}/>En attente</div>
+                <div onClick={() => navigateProfilPage("/erebus-empire/profile/alreadySeen")} className='TopBar-profile-menu-item'><img draggable="false" src={logo_alreadySeen}/>Déjà Vu</div>
                 <div className='TopBar-profile-separation'></div>
                 <div className='TopBar-profile-menu-item'><img draggable="false" src={logo_logOut}/>Se déconnecter</div>
             </div>
