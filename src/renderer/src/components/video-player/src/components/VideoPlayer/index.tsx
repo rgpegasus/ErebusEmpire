@@ -572,7 +572,6 @@ export default function VideoPlayertflixPlayer({
   useEffect(() => {
     if (videoComponent.current && src) {
       const isHLS = src.includes(".m3u8");
-  
       if (isHLS) {
         if (Hls.isSupported()) {
           const hls = new Hls();

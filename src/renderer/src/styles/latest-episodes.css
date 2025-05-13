@@ -79,7 +79,7 @@
   opacity: 0.4;
 }
 .LatestEpisodes-info {
-  color: var(--primary-text);
+  color: #D1D7E0; 
   font-family: var(--font-main);
   text-align: center;
   width: 250px;
@@ -178,7 +178,7 @@
 }
 
 
-@media (max-width: 1600px) {
+@media (max-width:1920px) {
   .Separation {
     margin: 0 auto 25px auto;
   }
@@ -273,7 +273,7 @@
   }
 
   .LatestEpisodes-info {
-    width: 180px;
+    width: 180px;   
   }
 
   .LatestEpisodes-info p {

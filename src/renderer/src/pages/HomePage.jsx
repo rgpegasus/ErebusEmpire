@@ -9,7 +9,9 @@ const HomePage = () => {
   const [latestEpisodes, setLatestEpisodes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);  
+  const [dataLoaded, setDataLoaded] = useState(false); 
   const navigate = useNavigate();
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -20,7 +22,7 @@ const HomePage = () => {
           : await window.electron.ipcRenderer.invoke('random-anime');
         setAnime(animeData);
         sessionStorage.setItem('anime', JSON.stringify(animeData));
-  
+
         const episodes = await window.electron.ipcRenderer.invoke('get-latest-episode');
         setLatestEpisodes(episodes || []);
       } catch (err) {
@@ -28,17 +30,25 @@ const HomePage = () => {
         setError('Une erreur est survenue lors du chargement des données.');
       } finally {
         setLoading(false);
+        setDataLoaded(true);  
       }
     };
-    fetchData();
-    const handleFocus = () => fetchData();
+    if (!dataLoaded) {
+      fetchData();
+    }
+
+    const handleFocus = () => {
+      if (!dataLoaded) {
+        fetchData();
+      }
+    };
   
     window.addEventListener('focus', handleFocus);
   
     return () => {
       window.removeEventListener('focus', handleFocus);
     };
-  }, []);
+  }, [dataLoaded]);  
 
   const getAnimeId = (url) => {
     const cleanUrl = new URL(url);
@@ -46,13 +56,13 @@ const HomePage = () => {
     const parts = pathname.split('/').filter(Boolean);
     return parts[parts.length - 1]; 
   };
-  
 
   const handleClick = (url) => {
     navigate(`/erebus-empire/anime/${getAnimeId(url)}/`);
   };
 
   if (loading) return <Loader />;
+
   return (
     <div className='MainPage'>
       {error && <div className="error">{error}</div>}  

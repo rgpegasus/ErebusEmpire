@@ -8,6 +8,8 @@ import './styles/download-page.css'
 import './styles/catalog-page.css'
 import './styles/UtilityTopBar.css'
 import './styles/settings-page.css'
+import './styles/loginPage.css'
+
 
 import React from 'react'
 import ReactDOM from 'react-dom/client'

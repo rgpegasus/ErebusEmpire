@@ -1,0 +1,240 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-main);
+  background-color: var(--background-color);
+  color: var(--primary-text);
+  height: 100%;
+}
+
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: radial-gradient(circle at center, var(--secondary-color), black);
+}
+.gradient-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(circle at center, var(--secondary-color), rgba(0, 0, 0, 0));
+  opacity: 0.5; 
+}
+
+.login-form {
+  z-index: 1;
+  background: var(--secondary-color);
+  opacity: 0.9;
+  padding: 40px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 0 30px var(--shadow-color);
+  color: var(--primary-text);
+}
+
+.title {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 10px;
+  color: var(--logo-color);
+  letter-spacing: 2px;
+  font-weight: var(--main-title-weight);
+}
+
+form h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: var(--title-weight);
+}
+
+input[type="email"],
+input[type="password"],
+.password-wrapper input {
+  width: 100%;
+  padding: 12px;
+  background: var(--third-color);
+  border: 1px solid var(--separation-color);
+  border-radius: 5px;
+  color: var(--primary-text);
+  font-size: 1rem;
+}
+
+input[type="email"] {
+  margin-bottom: 12px;
+}
+
+.password-wrapper {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.toggle-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--primary-text);
+  cursor: pointer;
+}
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 5px;
+  font-size: 1rem;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: 0.2s ease;
+  font-weight: var(--button-weight);
+}
+
+.btn.primary {
+  background: var(--logo-color);
+  border: none;
+  color: white;
+}
+
+.btn.primary:hover {
+  background: #b37d3e; /* version plus claire du logo-color */
+}
+
+.btn.secondary {
+  background: var(--separation-color);
+  color: white;
+  border: none;
+}
+
+.btn.secondary:hover {
+  background: #5a5a5a;
+}
+
+.btn.tertiary {
+  background: none;
+  color: var(--third-color);
+  border: 1px solid var(--separation-color);
+}
+
+.btn.tertiary:hover {
+  background: var(--third-color);
+  color: white;
+}
+
+.options {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: var(--primary-text);
+}
+
+.options label {
+  display: flex;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.options a {
+  color: var(--primary-text);
+  text-decoration: none;
+}
+
+.options a:hover {
+  text-decoration: underline;
+}
+
+.actions {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bg-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  object-position: bottom;
+}
+
+
+@media (max-width:1920px) {
+  .login-form {
+    max-width: 280px; /* Réduit encore plus */
+    padding: 20px; /* Moins de padding */
+  }
+
+  .title {
+    font-size: 22px; /* Taille plus petite */
+    margin-bottom: 6px;
+  }
+
+  form h2 {
+    font-size: 14px; /* Taille de sous-titre plus petite */
+    margin-bottom: 12px;
+  }
+
+  .btn {
+    font-size: 13px; /* Réduction des boutons */
+    padding: 8px;
+  }
+
+  input[type="email"],
+  input[type="password"],
+  .password-wrapper input {
+    font-size: 14px; /* Réduit un peu plus la taille des champs */
+    padding: 8px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .login-form {
+    max-width: 90%; /* Utilisation du maximum, mais toujours limité */
+    padding: 16px; /* Encore moins de padding */
+  }
+
+  .title {
+    font-size: 18px; /* Encore plus petit */
+    margin-bottom: 4px;
+  }
+
+  form h2 {
+    font-size: 13px; /* Taille très réduite */
+    margin-bottom: 10px;
+  }
+
+  input[type="email"],
+  input[type="password"],
+  .password-wrapper input {
+    padding: 6px; /* Champs de saisie plus petits */
+    font-size: 12px; /* Réduit encore plus la taille du texte */
+  }
+
+  .btn {
+    padding: 6px; /* Boutons plus compacts */
+    font-size: 12px; /* Plus petit */
+  }
+
+  .options {
+    flex-direction: column;
+    gap: 4px;
+    font-size: 10px; /* Taille texte très réduite */
+    align-items: flex-start;
+  }
+.options label {
+font-size: 10px;
+}
+
+.Testyi {
+font-size: 1px;
+}
+
+  .actions {
+    gap: 6px;
+    margin-top: 12px;
+  }
+}

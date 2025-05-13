@@ -43,7 +43,7 @@ const MenuBar = () => {
           </Link>
         </div>
       ))}
-    </div>
+    </div> 
   );
 };
 

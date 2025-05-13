@@ -1,13 +1,16 @@
 .SettingsPage {
-    padding: 0 50px;
+  padding: 0 50px;
 }
 .setting-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 30px;
+  padding: 0px 30px;
+  height: 75px;
   background-color: var(--secondary-color);
   border-radius: 20px;
+  box-shadow: -2px 5px 10px var(--shadow-color);
+  margin-bottom: 20px;
 }
 
 .setting-label {
@@ -55,7 +58,6 @@
   color: var(--background-color);
 }
 
-/* When checked */
 .switch input:checked + .slider {
   background-color: var(--background-color);
 }
@@ -64,4 +66,30 @@
   left: 26px;
   background: var(--primary-text);
   color: var(--background-color);
+}
+
+.setting-item .buttons-wrapper {
+  display: flex;
+  gap: 15px;
+}
+
+.data-button {
+  display: flex;
+  align-items: center;
+  padding: 10px 18px;
+  gap:10px;
+  font-size: 16px;
+  background-color: var(--primary-text);
+  color: var(--background-color);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  font-family: var(--font-main);
+}
+
+.data-button:hover {
+  opacity: 0.8;
+  background-color: var(--logo-color);
+  transform: translateY(-2px);
 }

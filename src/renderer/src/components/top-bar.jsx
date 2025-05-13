@@ -14,7 +14,7 @@ function TopBar() {
   const inputRef = useRef(null); 
   const logoRef = useRef(null); 
   const SearchLogo = document.querySelector('.SearchLogo');
-  const toggleWidth = 1600;
+  const toggleWidth = 1920;
 
   useEffect(() => {
     const handleClickOutside = (event) => {

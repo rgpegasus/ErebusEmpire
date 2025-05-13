@@ -170,7 +170,7 @@
   transform: scale(1.02);
 }
 
-@media (max-width: 1600px) {
+@media (max-width:1920px) {
   .DownloadAnime-box {
     padding: 25px 35px;
     box-shadow: -1px 3px 5px var(--shadow-color);

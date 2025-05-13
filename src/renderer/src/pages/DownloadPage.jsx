@@ -120,7 +120,8 @@ const DownloadPage = () => {
       }
     } else {
       const { animeTitle, seasonTitle, episodeTitle, animeCover } = episode.metadata;
-      const filePath = `file://${episode.path.replace(/\\/g, '/')}`;
+      const filePath = encodeURI(`file://${episode.path.replace(/\\/g, '/')}`);
+      console.log(filePath)
       setSelectedEpisode({ animeTitle, seasonTitle, episodeTitle, animeCover, filePath });
     }
   };
@@ -222,7 +223,7 @@ const DownloadPage = () => {
       {selectedEpisode && (
         <div className="video-player mt-6">
           <VideoPlayer
-            src={"selectedEpisode.filePath"}
+            src={selectedEpisode.filePath}
             overlayEnabled
             title={selectedEpisode.animeTitle}
             subTitle={`${selectedEpisode.seasonTitle} - ${selectedEpisode.episodeTitle}`}

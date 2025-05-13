@@ -14,6 +14,7 @@ import WatchlistPage from './components/profilePage/WatchlistPage.jsx';
 import HistoryPage from './components/profilePage/HistoryPage.jsx';
 import OnHoldPage from './components/profilePage/OnHoldPage.jsx';
 import AlreadySeenPage from './components/profilePage/AlreadySeenPage.jsx';
+import LoginPage from './components/profilePage/FavoritesPage.jsx';
 
 const Logger = () => {
   const location = useLocation();
@@ -31,11 +32,13 @@ const App = () => {
   
   return (
     <Router>
+      {/* <LoginPage/> */}
       <Logger />
       <MenuBar />
       <div>
         <TopBar /> 
         <Routes>
+          <Route path="/" element={<Navigate to="/erebus-empire/home" />} />
           <Route path="/" element={<Navigate to="/erebus-empire/home" />} />
           <Route path="/erebus-empire/home" element={<HomePage/>} />
           <Route path="/erebus-empire/catalogue" element={<CatalogPage/>} />

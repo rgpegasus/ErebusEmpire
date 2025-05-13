@@ -115,7 +115,7 @@
   }
   
 
-  @media (max-width: 1600px) {
+  @media (max-width:1920px) {
     .TopBar-box{
       justify-content: space-between;
       box-shadow: 0px 2px 6px var(--shadow-color);

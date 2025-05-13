@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron';
+import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron';
 import { join, resolve} from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/pictures/logo_app_only.png';
@@ -10,6 +10,7 @@ import RPC from 'discord-rpc';
 const clientId = '1366193765701783604';
 const rpc = new RPC.Client({ transport: 'ipc' });
 let startTimestamp = null;
+import JSZip from 'jszip';
 
 async function setActivity(details = 'En train de mater des animés', state = 'Sur Erebus Empire') {
   if (!rpc) return;
@@ -36,32 +37,11 @@ rpc.login({ clientId }).catch(console.error);
 
 
 const scraper = new AnimeScraper("animesama");
-const logFolderPath = join(app.getPath('userData'), 'logs');
 import path from 'path';
 
 const chromePath = isDev
   ? join(__dirname, '..', '..', 'puppeteer', 'chrome', 'win64-135.0.7049.95', 'chrome-win64', 'chrome.exe')
   : join(process.resourcesPath, 'app.asar.unpacked', 'puppeteer', 'chrome', 'win64-135.0.7049.95', 'chrome-win64', 'chrome.exe');
-
-if (!fs.existsSync(logFolderPath)) {
-  fs.mkdirSync(logFolderPath, { recursive: true });
-}
-const logFilePath = join(logFolderPath, 'app.log');
-
-fs.appendFileSync(logFilePath, `Log de l'application - ${new Date().toISOString()}\n`);
-
-const logToFile = (...messages) => {
-  const timestamp = new Date().toISOString();
-
-  const formatted = messages.map(msg => {
-    return typeof msg === 'object'
-      ? JSON.stringify(msg, null, 2)
-      : msg;
-  }).join(' ');
-
-  console.log(`[${timestamp}] ${formatted}\n`);
-  fs.appendFileSync(logFilePath, `[${timestamp}] ${formatted}\n`);
-};
 
 
 let mainWindow;
@@ -186,10 +166,8 @@ ipcMain.on('defaul-rich-presence', () => {
   });
   ipcMain.handle("get-episodes", async (event, query)=> {
     try {
-      logToFile("URL de la saison:", query)
       return await scraper.getEmbed(query, ["oneupload", "sibnet", "sendvid"], chromePath);
     } catch (error){
-      logToFile('Erreur dans le main process:', error)
       console.error('Erreur dans le main process:', error);
       return null;
     }
@@ -218,161 +196,166 @@ ipcMain.on('defaul-rich-presence', () => {
       return null;
     }
   });
+  // Défini ce dossier de base une fois
+const baseFolder = path.join(app.getPath('appData'), 'erebus-empire', 'userData', 'animeDownload');
+function sanitizeName(name) {
+  return name
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // enlève les accents
+    .replace(/[^a-zA-Z0-9 ]/g, '')                    // enlève les caractères spéciaux sauf espaces
+    .replace(/\s+/g, ' ')                              // normalise les espaces
+    .trim()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(''); // tu peux remplacer '' par '_' si tu préfères
+}
   ipcMain.handle('download-video', async (event, videoUrl, metaData) => {
-    const { episodeTitle, seasonTitle, animeTitle, animeCover } = metaData;
-  
-    const ytDlpPath = isDev
-      ? join(__dirname, '..', '..', 'resources', 'bin', 'yt-dlp.exe')
-      : join(process.resourcesPath, 'app.asar.unpacked', 'resources', 'bin', 'yt-dlp.exe');
-  
-    const userDownloadFolder = join(app.getPath('videos'), 'Erebus Empire');
-    const animeFolder = join(userDownloadFolder, animeTitle);
-    const seasonFolder = join(animeFolder, seasonTitle);
-    const episodePath = join(seasonFolder, `${episodeTitle}.mp4`);
-    const coverPath = join(animeFolder, 'cover.jpg');
-    const dataJsonPath = join(animeFolder, 'data.json');
-  
-    [userDownloadFolder, animeFolder, seasonFolder].forEach((f) => {
-      if (!fs.existsSync(f)) fs.mkdirSync(f, { recursive: true });
-    });
-    if (!fs.existsSync(coverPath)) {
-      try {
-        const res = await fetch(animeCover);
-        const buf = await res.arrayBuffer();
-        fs.writeFileSync(coverPath, Buffer.from(buf));
-      } catch (err) {
-        logToFile(`Erreur cover: ${err}`);
-      }
-    }
-    const animeData = fs.existsSync(dataJsonPath)
-      ? JSON.parse(fs.readFileSync(dataJsonPath, 'utf-8'))
-      : {};
-    animeData.animeTitle ??= animeTitle;
-    animeData.animeCover ??= coverPath;
-    animeData.season ??= {};
-    animeData.season[seasonTitle] ??= {};
-    animeData.season[seasonTitle][episodeTitle] = {
-      videoPath: episodePath,
-      downloadedAt: null,
-      state: "downloading"
-    };
-    fs.writeFileSync(dataJsonPath, JSON.stringify(animeData, null, 2));
-    const command = `"${ytDlpPath}" -o "${episodePath}" "${videoUrl}"`;
-    logToFile(`[yt-dlp command] ${command}`);
-  
-    return new Promise((resolve, reject) => {
-      const downloadProcess = exec(command, (error, stdout, stderr) => {
-        if (error) {
-          logToFile(`Erreur téléchargement : ${stderr}`);
-          return reject(stderr);
-        }
-        const updated = JSON.parse(fs.readFileSync(dataJsonPath, 'utf-8'));
-        updated.season[seasonTitle][episodeTitle].downloadedAt = new Date().toISOString();
-        updated.season[seasonTitle][episodeTitle].state = "downloaded";
-        fs.writeFileSync(dataJsonPath, JSON.stringify(updated, null, 2));
-  
-        logToFile(`Téléchargement OK : ${episodeTitle}`);
-        resolve(stdout);
-      });
-  
-      downloadProcess.stdout.on('data', (data) => {
-        const output = data.toString();
-        const match = output.match(/\[download\]\s+(\d+(?:\.\d+)?)%.*?ETA (\d+:\d+)/);
-        const mainWindow = BrowserWindow.getAllWindows()[0]; // ✅ accès direct à la fenêtre
-      
-        if (match) {
-          const percent = match[1];
-          const eta = match[2];
-          if (mainWindow) {
-            mainWindow.webContents.send('download-progress', {
-              animeTitle,
-              seasonTitle,
-              episodeTitle,
-              percent: parseFloat(percent),
-              eta,
-              videoUrl
-            });
-          }
-        } else {
-          const percentOnly = output.match(/(\d+(?:\.\d+)?)%/);
-          if (percentOnly && mainWindow) {
-            mainWindow.webContents.send('download-progress', {
-              animeTitle,
-              seasonTitle,
-              episodeTitle,
-              percent: parseFloat(percentOnly[1]),
-              eta: null,
-              videoUrl
-            });
-          }
-        }
-      });      
-      downloadProcess.stderr.on('data', (data) => {
-        logToFile(`stderr: ${data}`);
-      });
-    });
+  const { episodeTitle, seasonTitle, animeTitle, animeCover } = metaData;
+
+  const ytDlpPath = isDev
+    ? path.join(__dirname, '..', '..', 'resources', 'bin', 'yt-dlp.exe')
+    : path.join(process.resourcesPath, 'app.asar.unpacked', 'resources', 'bin', 'yt-dlp.exe');
+
+  const userDataFolder = baseFolder;
+  const animeFolder = path.join(userDataFolder,  sanitizeName(animeTitle));
+  const seasonFolder = path.join(animeFolder,  sanitizeName(seasonTitle));
+  const episodePath = path.join(seasonFolder, `${sanitizeName(episodeTitle)}.mp4`);
+  const coverPath = path.join(animeFolder, 'cover.jpg');
+  const dataJsonPath = path.join(animeFolder, 'animeData.json');
+
+  [userDataFolder, animeFolder, seasonFolder].forEach((f) => {
+    if (!fs.existsSync(f)) fs.mkdirSync(f, { recursive: true });
   });
-  ipcMain.handle('get-downloads', async () => {
-    const userDownloadFolder = join(app.getPath('videos'), 'Erebus Empire');
+
+  if (!fs.existsSync(coverPath)) {
     try {
-      const animeFolders = fs.readdirSync(userDownloadFolder)
-        .map(name => join(userDownloadFolder, name))
-        .filter(path => fs.lstatSync(path).isDirectory());
-  
-      const episodes = [];
-  
-      for (const animeFolder of animeFolders) {
-        const dataPath = join(animeFolder, 'data.json');
-        if (!fs.existsSync(dataPath)) continue;
-  
-        const jsonData = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
-  
-        const animeTitle = jsonData.animeTitle;
-        const animeCover = jsonData.animeCover;
-  
-        for (const [seasonTitle, episodesData] of Object.entries(jsonData.season || {})) {
-          for (const [episodeTitle, episodeData] of Object.entries(episodesData)) {
-            const name = `${animeTitle} - ${seasonTitle} : ${episodeTitle}`;
-            const path = episodeData.videoPath;
-  
-            episodes.push({
-              name,
-              path,
-              cover: animeCover,
-              metadata: {
-                animeTitle,
-                animeCover,
-                seasonTitle,
-                episodeTitle,
-                videoPath: path,
-                downloadedAt: episodeData.downloadedAt,
-                state:episodeData.state
-              },
-              file: path.split(/[\\/]/).pop(), // juste le nom du fichier mp4
-            });
-          }
+      const res = await fetch(animeCover);
+      const buf = await res.arrayBuffer();
+      fs.writeFileSync(coverPath, Buffer.from(buf));
+    } catch (err) {
+    }
+  }
+
+  const animeData = fs.existsSync(dataJsonPath)
+    ? JSON.parse(fs.readFileSync(dataJsonPath, 'utf-8'))
+    : {};
+  animeData.animeTitle ??= animeTitle;
+  animeData.animeCover ??= coverPath;
+  animeData.season ??= {};
+  animeData.season[seasonTitle] ??= {};
+  animeData.season[seasonTitle][episodeTitle] = {
+    videoPath: episodePath,
+    downloadedAt: null,
+    state: "downloading"
+  };
+  fs.writeFileSync(dataJsonPath, JSON.stringify(animeData, null, 2));
+
+  const command = `"${ytDlpPath}" -o "${episodePath}" "${videoUrl}"`;
+
+  return new Promise((resolve, reject) => {
+    const downloadProcess = exec(command, (error, stdout, stderr) => {
+      if (error) {
+        return reject(stderr);
+      }
+      const updated = JSON.parse(fs.readFileSync(dataJsonPath, 'utf-8'));
+      updated.season[seasonTitle][episodeTitle].downloadedAt = new Date().toISOString();
+      updated.season[seasonTitle][episodeTitle].state = "downloaded";
+      fs.writeFileSync(dataJsonPath, JSON.stringify(updated, null, 2));
+      resolve(stdout);
+    });
+
+    downloadProcess.stdout.on('userData', (data) => {
+      const output = data.toString();
+      const match = output.match(/\[download\]\s+(\d+(?:\.\d+)?)%.*?ETA (\d+:\d+)/);
+      const mainWindow = BrowserWindow.getAllWindows()[0];
+    
+      if (match) {
+        const percent = match[1];
+        const eta = match[2];
+        if (mainWindow) {
+          mainWindow.webContents.send('download-progress', {
+            animeTitle,
+            seasonTitle,
+            episodeTitle,
+            percent: parseFloat(percent),
+            eta,
+            videoUrl
+          });
+        }
+      } else {
+        const percentOnly = output.match(/(\d+(?:\.\d+)?)%/);
+        if (percentOnly && mainWindow) {
+          mainWindow.webContents.send('download-progress', {
+            animeTitle,
+            seasonTitle,
+            episodeTitle,
+            percent: parseFloat(percentOnly[1]),
+            eta: null,
+            videoUrl
+          });
         }
       }
-  
-      return {
-        folderPath: userDownloadFolder,
-        episodes
-      };
-    } catch (error) {
-      console.error('Erreur lors de la lecture des données téléchargées :', error);
-      return [];
-    }
+    });      
+    downloadProcess.stderr.on('userData', (data) => {
+    });
   });
+});
+ipcMain.handle('get-downloads', async () => {
+  const userDataFolder = baseFolder;
+  try {
+    const animeFolders = fs.readdirSync(userDataFolder)
+      .map(name => path.join(userDataFolder, name))
+      .filter(p => fs.lstatSync(p).isDirectory());
+
+    const episodes = [];
+
+    for (const animeFolder of animeFolders) {
+      const dataPath = path.join(animeFolder, 'animeData.json');
+      if (!fs.existsSync(dataPath)) continue;
+
+      const jsonData = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
+      const animeTitle = jsonData.animeTitle;
+      const animeCover = jsonData.animeCover;
+
+      for (const [seasonTitle, episodesData] of Object.entries(jsonData.season || {})) {
+        for (const [episodeTitle, episodeData] of Object.entries(episodesData)) {
+          const name = `${animeTitle} - ${seasonTitle} : ${episodeTitle}`;
+          const episodePath = episodeData.videoPath;
+          episodes.push({
+            name,
+            path: episodePath,
+            cover: animeCover,
+            metadata: {
+              animeTitle,
+              animeCover,
+              seasonTitle,
+              episodeTitle,
+              videoPath: episodePath,
+              downloadedAt: episodeData.downloadedAt,
+              state: episodeData.state
+            },
+            file: episodePath.split(/[\\/]/).pop(),
+          });
+        }
+      }
+    }
+
+    return {
+      folderPath: userDataFolder,
+      episodes
+    };
+  } catch (error) {
+    console.error('Erreur lors de la lecture des données téléchargées :', error);
+    return [];
+  }
+});
 ipcMain.handle('delete-episode', async (event, filePath) => {
   try {
     await fs.promises.unlink(filePath);
 
-    // Trouver les chemins
     const seasonDir = path.dirname(filePath);
     const animeDir = path.dirname(seasonDir);
-    const dataJsonPath = path.join(animeDir, 'data.json');
+    const dataJsonPath = path.join(animeDir, 'animeData.json');
 
-    // Modifier data.json
     if (fs.existsSync(dataJsonPath)) {
       const data = JSON.parse(await fs.promises.readFile(dataJsonPath, 'utf-8'));
 
@@ -384,23 +367,18 @@ ipcMain.handle('delete-episode', async (event, filePath) => {
         if (Object.keys(data.season[seasonName]).length === 0) {
           delete data.season[seasonName];
         }
-        
         await fs.promises.writeFile(dataJsonPath, JSON.stringify(data, null, 2), 'utf-8');
-        console.log(`Mise à jour de data.json : ${episodeName} supprimé`);
-      } else {
-        console.warn(`Épisode ${episodeName} non trouvé dans data.json`);
+        console.log(`Mise à jour de animeData.json : ${episodeName} supprimé`);
       }
-    } else {
-      console.warn(`data.json introuvable pour ${animeDir}`);
     }
-
 
     const seasonFiles = await fs.promises.readdir(seasonDir);
     if (seasonFiles.length === 0) {
       await fs.promises.rmdir(seasonDir);
       console.log(`Dossier saison supprimé: ${seasonDir}`);
+
       const animeFiles = await fs.promises.readdir(animeDir);
-      if (animeFiles.length === 2 && animeFiles.includes('cover.jpg') && animeFiles.includes('data.json')) {
+      if (animeFiles.length === 2 && animeFiles.includes('cover.jpg') && animeFiles.includes('animeData.json')) {
         for (const file of animeFiles) {
           await fs.promises.unlink(path.join(animeDir, file));
           console.log(`Fichier supprimé: ${file}`);
@@ -416,6 +394,90 @@ ipcMain.handle('delete-episode', async (event, filePath) => {
     throw error;
   }
 });
+ipcMain.handle('export-data', async () => {
+  const baseFolder = path.join(app.getPath('appData'), 'erebus-empire', 'userData');
+  const zip = new JSZip();
+  const addFilesToZip = (dirPath, zipFolder) => {
+    const files = fs.readdirSync(dirPath);
+    files.forEach(file => {
+      const filePath = path.join(dirPath, file);
+      if (fs.lstatSync(filePath).isDirectory()) {
+        const folder = zipFolder.folder(file);
+        addFilesToZip(filePath, folder);
+      } else {
+        zipFolder.file(file, fs.readFileSync(filePath));
+      }
+    });
+  };
+  if (fs.existsSync(baseFolder)) {
+    addFilesToZip(baseFolder, zip); 
+    const { filePath } = await dialog.showSaveDialog({
+      title: 'Exporter les données',
+      defaultPath: 'erebus_data.zip',
+      filters: [{ name: 'ZIP Files', extensions: ['zip'] }],
+    });
+
+    if (filePath) {
+      const zipData = await zip.generateAsync({ type: 'nodebuffer' });
+      fs.writeFileSync(filePath, zipData);
+      return filePath;  
+    }
+  } else {
+    console.error('Le dossier de données utilisateur n\'existe pas :', baseFolder);
+    return null; 
+  }
+
+  return null;
+});
+ipcMain.handle('import-data', async (event) => {
+  const { filePaths } = await dialog.showOpenDialog({
+    properties: ['openFile'],
+    filters: [{ name: 'ZIP Files', extensions: ['zip'] }],
+  });
+  if (filePaths.length === 0) {
+    return 'Aucun fichier sélectionné';
+  }
+
+  const filePath = filePaths[0]; 
+
+  try {
+    const zip = new JSZip();
+    const fileData = fs.readFileSync(filePath);
+    const zipContents = await zip.loadAsync(fileData);
+    if (Object.keys(zipContents.files).length === 0) {
+      return 'Le fichier zip est vide';
+    }
+    const baseFolder = path.join(app.getPath('appData'), 'erebus-empire', 'userData');
+    if (fs.existsSync(baseFolder)) {
+      fs.rmSync(baseFolder, { recursive: true, force: true });  
+    }
+    fs.mkdirSync(baseFolder, { recursive: true });
+    for (const fileName of Object.keys(zipContents.files)) {
+      const zipEntry = zipContents.files[fileName];
+      if (zipEntry.dir) {
+        continue;
+      }
+
+      const fileData = await zipEntry.async('nodebuffer');
+      const relativePathParts = fileName.split(path.posix.sep);
+const trimmedPath = relativePathParts.slice(1).join(path.sep);
+const targetFilePath = path.join(baseFolder, trimmedPath);
+      const dirPath = path.dirname(targetFilePath);
+      if (!fs.existsSync(dirPath)) {
+        fs.mkdirSync(dirPath, { recursive: true });
+      }
+      fs.writeFileSync(targetFilePath, fileData);
+    }
+
+    return 'Données importées avec succès';
+
+  } catch (error) {
+    console.error('Erreur lors de l\'importation du fichier zip:', error);
+    return 'Erreur lors de l\'importation. Assurez-vous que le fichier est un zip valide.';
+  }
+});
+
+
   createWindow()
   // mainWindow.webContents.openDevTools(); // Force l'ouverture des DevTools
 
