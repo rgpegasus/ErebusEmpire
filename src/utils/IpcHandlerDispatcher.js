@@ -1,0 +1,13 @@
+export { SearchAnime } from '@ipcHandlers/SearchAnime';
+export { RandomAnime } from '@ipcHandlers/RandomAnime';
+export { InfoAnime } from '@ipcHandlers/InfoAnime';
+export { SeasonsAnime } from '@ipcHandlers/SeasonsAnime';
+export { EpisodesSeason } from '@ipcHandlers/EpisodesSeason';
+export { UrlEpisode } from '@ipcHandlers/UrlEpisode';
+export { LatestEpisodes } from '@ipcHandlers/LatestEpisodes';
+export { CatalogAnime } from '@ipcHandlers/CatalogAnime';
+export { DownloadEpisode } from '@ipcHandlers/DownloadEpisode';
+export { DownloadList } from '@ipcHandlers/DownloadList';
+export { DeleteDownloadEpisode } from '@ipcHandlers/DeleteDownloadEpisode';
+export { ExportData } from '@ipcHandlers/ExportData';
+export { ImportData } from '@ipcHandlers/ImportData';

@@ -1,3 +1,0 @@
-build/win-unpacked/resources/app.asar filter=lfs diff=lfs merge=lfs -text
-puppeteer/chrome/win64-135.0.7049.95/chrome-win64/chrome.dll filter=lfs diff=lfs merge=lfs -text
-build/win-unpacked/Erebus[[:space:]]Empire.exe filter=lfs diff=lfs merge=lfs -text

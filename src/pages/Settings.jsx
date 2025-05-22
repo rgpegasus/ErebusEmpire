@@ -1,0 +1,1 @@
+export { Settings } from '../features/profile/pages/Settings';

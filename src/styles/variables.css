@@ -1,0 +1,62 @@
+:root {
+  --logo-color: #996e35;     
+  --primary-color: 3, 5, 8; 
+  --secondary-color: #13151C;      
+  --background-color: #0B0C10;     
+  --separation-color:#424242;
+  --third-color:#525151;
+  --primary-text:#D1D7E0 ;
+  --shadow-color:#05060A ;
+  --size-menu: 325px; 
+  --size-top-bar:60px;
+  --font-main: "Montserrat", sans-serif;
+  --main-title-weight:800;
+  --title-weight : 700;
+  --little-title-weight : 600;
+  --main-text-weight : 500;
+  --button-weight:700;
+  --text-weight: 400;
+  --little-text-weight:300;
+  --first-size: 1500px;
+}
+:root.light-theme {
+  --primary-color: 220, 220, 220; 
+  --secondary-color: #e9e3e3;
+  --background-color: #D2D2D2;
+  --separation-color: #ad9d9d;
+  --third-color: #DADADA;
+  --primary-text: #1A1A1A;
+  --shadow-color: #989696;
+}
+
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../../../../resources/fonts/Montserrat-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+}
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../../../../resources/fonts/Montserrat-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../../../../resources/fonts/Montserrat-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+}
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../../../../resources/fonts/Montserrat-Medium.ttf') format('truetype');
+  font-weight: 500;
+}
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../../../../resources/fonts/Montserrat-Regular.ttf') format('truetype');
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../../../../resources/fonts/Montserrat-Light.ttf') format('truetype');
+  font-weight: 300;
+}

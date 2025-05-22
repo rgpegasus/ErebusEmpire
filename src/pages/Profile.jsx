@@ -1,0 +1,1 @@
+export { Profile } from '../features/profile/pages/Profile';

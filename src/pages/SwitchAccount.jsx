@@ -1,0 +1,1 @@
+export { SwitchAccount } from '../features/profile/pages/SwitchAccount';
