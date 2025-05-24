@@ -9,7 +9,7 @@ const chromePath = isDev
 function EpisodesSeason(scraper) {
   ipcMain.handle("get-episodes", async (event, query, SeasonInfo = false)=> {
     try {
-      return await scraper.getEmbed(query, ["oneupload", "sibnet", "sendvid"], chromePath, SeasonInfo);
+      return await scraper.getEmbed(query, ["oneupload", "sibnet", "sendvid"], SeasonInfo, chromePath );
     } catch (error){
       console.error('Erreur dans le main process:', error);
       return null;

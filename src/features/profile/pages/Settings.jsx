@@ -60,9 +60,9 @@ export const Settings = () => {
     updateProfile(); // Appel initial
 
     return () => window.removeEventListener('profileUpdated', updateProfile);
-  }, []);
+  }, []); 
 
-
+ 
   const toggleTheme = () => setIsDark(prev => !prev);
   const togglePerf = () => setIsPerf(prev => !prev);
   const toggleNotif = () => setIsNotif(prev => !prev);

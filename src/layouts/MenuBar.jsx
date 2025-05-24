@@ -12,7 +12,7 @@ const MenuBar = () => {
   const location = useLocation(); 
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
 
-  useEffect(() => {
+  useEffect(() => { 
     const observer = new MutationObserver(() => {
       const newTheme = localStorage.getItem('theme') || 'dark';
       setTheme(newTheme);

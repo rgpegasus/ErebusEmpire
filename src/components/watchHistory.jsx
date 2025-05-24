@@ -12,92 +12,70 @@ const WatchHistory = () => {
   const [watchedEpisodes, setWatchedEpisodes] = useState([]);
   const [shiftPressed, setShiftPressed] = useState(false);
   const navigate = useNavigate();
-const prevRef = useRef(null);
+  const prevRef = useRef(null);
   const nextRef = useRef(null);
+  const containerRef = useRef(null);
+  const swiperRef = useRef(null);
   const [isInside, setIsInside] = useState(false);
-const containerRef = useRef(null);
 
   useEffect(() => {
-    // Ce timeout est crucial pour que swiper trouve bien les refs après le rendu
-    setTimeout(() => {
-      if (swiperRef.current) {
-        swiperRef.current.params.navigation.prevEl = prevRef.current;
-        swiperRef.current.params.navigation.nextEl = nextRef.current;
-        swiperRef.current.navigation.destroy();
-        swiperRef.current.navigation.init();
-        swiperRef.current.navigation.update();
-      }
-    });
-  }, []);
+    loadWatchedEpisodes();
 
-  const swiperRef = React.useRef(null);
+    const handleKeyDown = (e) => {
+      if (e.key === 'Shift' && isInside) setShiftPressed(true);
+    };
+    const handleKeyUp = (e) => {
+      if (e.key === 'Shift') setShiftPressed(false);
+    };
 
-useEffect(() => {
-  loadWatchedEpisodes();
-  const handleKeyDown = (e) => {
-    if (e.key === 'Shift' && isInside) {
-      setShiftPressed(true);
-    }
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [isInside]);
+
+  const loadWatchedEpisodes = async () => {
+    const all = await animeWatchHistory.loadAll(); 
+    console.log(all)
+    if (!all) return;
+
+    const episodes = Object.entries(all).map(([key, data]) => ({ key, ...data }));
+    episodes.sort((a, b) => b.timestamp - a.timestamp);
+    setWatchedEpisodes(episodes);
   };
 
-  const handleKeyUp = (e) => {
-    if (e.key === 'Shift') {
-      setShiftPressed(false);
+  const deleteEpisode = async (episode) => {
+    await animeWatchHistory.delete(episode.key);
+    const all = await animeWatchHistory.loadAll();
+    if (Object.keys(all).length === 0) {
+      setWatchedEpisodes([]);
+    } else {
+      setWatchedEpisodes((prev) => prev.filter((ep) => ep.key !== episode.key));
     }
-  };
-
-  window.addEventListener('keydown', handleKeyDown);
-  window.addEventListener('keyup', handleKeyUp);
-
-  return () => {
-    window.removeEventListener('keydown', handleKeyDown);
-    window.removeEventListener('keyup', handleKeyUp);
-  };
-}, [isInside]);
-
-
-  const loadWatchedEpisodes = () => {
-    const history = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key.startsWith('lastWatched_')) {
-        const raw = localStorage.getItem(key);
-        try {
-          const parsed = JSON.parse(raw);
-          history.push({ ...parsed, key });
-        } catch (e) {
-          console.error(`Erreur parsing historique pour ${key}`, e);
-        }
-      }
-    }
-
-    history.sort((a, b) => b.timestamp - a.timestamp);
-    setWatchedEpisodes(history);
   };
 
   const handleEpisodeClick = (episode, event) => {
     if (event.shiftKey) {
-      localStorage.removeItem(episode.key);
-      setWatchedEpisodes((prev) =>
-        prev.filter((ep) => ep.key !== episode.key)
-      );
+      deleteEpisode(episode);
       return;
     }
 
-    const [animeId, seasonId] = episode.key.split('_');
     const episodeId = episode.episodeTitle
       .toLowerCase()
       .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
-    navigate(`/erebus-empire/anime/${animeId}/${seasonId}/${episodeId}`, {
-      
+
+    navigate(`/erebus-empire/anime/${episode.animeId}/${episode.seasonId}/${episodeId}`, {
       state: {
         url: episode.url,
         host: episode.host,
         episodeTitle: episode.episodeTitle,
         episodes: episode.episodes,
-        animeId: episode.animeId, 
+        animeId: episode.animeId,
         seasonId: episode.seasonId,
         animeTitle: episode.animeTitle,
         seasonTitle: episode.seasonTitle,

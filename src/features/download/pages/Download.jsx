@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { VideoPlayer } from '@components/video-player/src';
-
+import { ErebusPlayer } from '@features/anime/components/player/VideoPlayer';
+import { useNavigate } from 'react-router-dom';
 const naturalSort = (a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
 
 export const Download = () => {
@@ -11,7 +11,7 @@ export const Download = () => {
   const [downloadProgress, setDownloadProgress] = useState({});
   const [shiftPressed, setShiftPressed] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const handleKeyDown = (e) => e.key === 'Shift' && setShiftPressed(true);
     const handleKeyUp = (e) => e.key === 'Shift' && setShiftPressed(false);
@@ -125,7 +125,9 @@ export const Download = () => {
       setSelectedEpisode({ animeTitle, seasonTitle, episodeTitle, animeCover, filePath });
     }
   };
-
+const BackMenu = () => {
+    navigate("/erebus-empire/home")
+  };
   return (
     <div className="MainPage">
       <div className="Space" />
@@ -203,15 +205,15 @@ export const Download = () => {
                 <div className="DownloadAnime-episode-list">
                   {episodes
                     .sort((a, b) => naturalSort(a.metadata.episodeTitle, b.metadata.episodeTitle))
-                    .map(episode => (
+                    .map((episode, index) => (
                       <div
-                        key={episode.path}
+                        key={`${episode.path}-${index}`}
                         onClick={e => handleEpisodeClick(episode, e)}
                         className={`DownloadAnime-episode-item ${shiftPressed ? 'shift-delete' : ''}`}
                       >
                         <h4>{episode.metadata.episodeTitle}</h4>
                       </div>
-                    ))}
+                  ))}
                 </div>
               </div>
             </div>
@@ -222,18 +224,16 @@ export const Download = () => {
       {/* Lecteur vidéo */}
       {selectedEpisode && (
         <div className="video-player mt-6">
-          <VideoPlayer
+          <ErebusPlayer
             src={selectedEpisode.filePath}
-            overlayEnabled
+            overlayEnabled={true}
             title={selectedEpisode.animeTitle}
             subTitle={`${selectedEpisode.seasonTitle} - ${selectedEpisode.episodeTitle}`}
             titleMedia={`${selectedEpisode.animeTitle} - ${selectedEpisode.seasonTitle} : ${selectedEpisode.episodeTitle}`}
-            autoControllCloseEnabled
+            autoControllCloseEnabled={true}
             fullPlayer={false}
-            playerLanguage="fr"
-            autoPlay
-            playbackRateEnable={false}
-            primaryColor="#996e35"
+            autoPlay={true}
+            onCrossClick={BackMenu}
           />
         </div>
       )}

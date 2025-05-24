@@ -3,12 +3,15 @@ import { join} from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import { ErebusIcon } from '@utils/PictureDispatcher';
 import {AnimeScraper} from 'better-ani-scraped';
+import fsExtra from 'fs-extra'; 
+import fs from 'fs';
 import RPC from 'discord-rpc';
 const clientId = '1366193765701783604';
 const rpc = new RPC.Client({ transport: 'ipc' });
 const scraper = new AnimeScraper("animesama");
 import { SearchAnime, RandomAnime, InfoAnime, SeasonsAnime, EpisodesSeason, UrlEpisode, LatestEpisodes, CatalogAnime, DownloadEpisode, DownloadList, DeleteDownloadEpisode, ExportData, ImportData } from '@utils/IpcHandlerDispatcher.js'; 
-
+import { AnimeCoverTemp, AnimeWatchHistory } from '@utils/ServicesDataDispatcher'
+const sessionStorage = join(app.getPath('appData'), 'erebus-empire', 'userData', 'anime', 'sessionStorage');
 
 let startTimestamp = null;
 let mainWindow = null;
@@ -80,6 +83,15 @@ function createWindow() {
   }
 
   mainWindow.on('closed', () => {
+    try {
+      if (fs.existsSync(sessionStorage)) {
+        fsExtra.removeSync(sessionStorage);
+        console.log('Session supprimée après fermeture de la fenêtre');
+      }
+    } catch (error) {
+      console.error('Erreur suppression sessionStorage :', error);
+    }
+
     mainWindow = null;
   });
 }
@@ -149,8 +161,9 @@ if (!gotTheLock) {
     DeleteDownloadEpisode();
     ExportData();
     ImportData();
-
+    AnimeCoverTemp()
     createWindow();
+    AnimeWatchHistory()
 
     ipcMain.on('open-devtools', () => {
       if (mainWindow && !mainWindow.webContents.isDevToolsOpened()) {
@@ -168,6 +181,7 @@ if (!gotTheLock) {
       if (BrowserWindow.getAllWindows().length === 0) createWindow();
     });
   });
+
 
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {

@@ -194,7 +194,7 @@ const handleProfileClick = () => {
                               draggable="false"
                               className="UtilityTopBar-app-logo"
                               />
-                              <h1 className='UtilityTopBar-app-title'>DEV Erebus Empire</h1>
+                              <h1 className='UtilityTopBar-app-title'>Erebus Empire</h1>
                           </div>
                       </div>
                   </div>

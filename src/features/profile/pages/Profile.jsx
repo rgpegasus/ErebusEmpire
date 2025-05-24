@@ -31,7 +31,7 @@ export const Profile = () => {
 const importData = async () => {
   const result = await window.electron.ipcRenderer.invoke('import-data');
   
-  alert(result.message); // message = succès ou erreur
+  alert(result.message); 
   console.log(result.success, result.devUnlocked)
   if (result.success && result.devUnlocked) {
     setIsDevVisible(true)
@@ -40,7 +40,7 @@ const importData = async () => {
   }
 };
 
-  
+   
     const navigate = useNavigate();
   return (
     <div className='MainPage'>

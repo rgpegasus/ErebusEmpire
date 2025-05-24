@@ -37,7 +37,6 @@ const prevRef = useRef(null);
   const buildErebusPathFromRecentAnime = async (anime) => {
     const { url: animeUrl, episode } = anime;
     const animeId = animeUrl.split("/").slice(4, 5).join("/");
-    const seasonId = animeUrl.split("/").slice(5, 6).join("/");
     let embedData = [];
     let seasonTitle = "null"; 
     try {
@@ -45,11 +44,12 @@ const prevRef = useRef(null);
       const { animeInfo, episodes } = data;
       embedData = episodes
       seasonTitle = animeInfo.seasonTitle
+      
     } catch (err) {
       console.error("Erreur récupération embed:", err);
     }
     if (!embedData || embedData.length === 0) return null;
-  
+    const seasonId = toSlug(seasonTitle);
     const { episodeNumber } = parseEpisodeNumbers(episode);
     const episodeInfo = episode.toLowerCase();
   

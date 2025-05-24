@@ -20,7 +20,9 @@ export default defineConfig({
       alias: {
         '@src': resolve(__dirname, 'src'),
         '@utils': resolve(__dirname, 'src/utils'),
+        '@resources': resolve(__dirname, 'resources'),
         '@ipcHandlers': resolve(__dirname, 'src/electron/ipcHandlers'),
+        '@services': resolve(__dirname, 'src/services'),
       },
     },
     plugins: [externalizeDepsPlugin()],
@@ -53,8 +55,10 @@ export default defineConfig({
     resolve: {
       alias: {
         '@src': resolve(__dirname, 'src'),
+        '@resources': resolve(__dirname, 'resources'),
         '@electron': resolve(__dirname, 'src/electron'),
         '@ipcHandlers': resolve(__dirname, 'src/electron/ipcHandlers'),
+        '@services': resolve(__dirname, 'src/services'),
         '@utils': resolve(__dirname, 'src/utils'),
         '@pages': resolve(__dirname, 'src/pages'),
         '@features': resolve(__dirname, 'src/features'),

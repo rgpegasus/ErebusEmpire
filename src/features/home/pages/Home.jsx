@@ -3,7 +3,6 @@ import { Loader} from '@utils/PageDispatcher'
 import LatestEpisodes from '@components/latest-episodes';
 import WatchHistory from '@components/watchHistory';
 import { useNavigate } from 'react-router-dom';
-
 export const Home = () => {
   const [anime, setAnime] = useState(null);
   const [latestEpisodes, setLatestEpisodes] = useState([]);
@@ -12,17 +11,16 @@ export const Home = () => {
   const [dataLoaded, setDataLoaded] = useState(false); 
   const navigate = useNavigate();
 
-  useEffect(() => {
+useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const storedAnime = sessionStorage.getItem('anime');
-        const animeData = storedAnime 
-          ? JSON.parse(storedAnime) 
-          : await window.electron.ipcRenderer.invoke('random-anime');
+        let animeData = await animeCover.load();
+        if (!animeData) {
+          animeData = await window.electron.ipcRenderer.invoke('random-anime');
+          animeCover.save(animeData);
+        }
         setAnime(animeData);
-        sessionStorage.setItem('anime', JSON.stringify(animeData));
-
         const episodes = await window.electron.ipcRenderer.invoke('get-latest-episode');
         setLatestEpisodes(episodes || []);
       } catch (err) {
