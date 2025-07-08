@@ -16,7 +16,7 @@ function loadHistory() {
   }
 }
 function LoadAllAnimeWatchHistory() {
-  return loadHistory(); // renvoie tout
+  return loadHistory(); 
 }
 function saveHistory(data) {
   fs.mkdirSync(baseFolder, { recursive: true });

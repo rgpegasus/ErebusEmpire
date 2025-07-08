@@ -116,7 +116,8 @@ const prevRef = useRef(null);
             seasonId,
             animeTitle: episode.title,
             seasonTitle,
-            animeCover:episode.cover
+            animeCover:episode.cover,
+            seasonUrl:episode.url
           },
         });
       }

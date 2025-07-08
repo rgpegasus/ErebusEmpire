@@ -17,11 +17,13 @@ export const Episode = () => {
     seasonId, 
     animeTitle, 
     seasonTitle, 
-    animeCover 
+    animeCover,
+    seasonUrl
   } = location.state || {};
   const episodeIndex = episodes.findIndex(
     (ep) => ep.title.toLowerCase().replace(/\s+/g, '-') === episodeTitle.toLowerCase().replace(/\s+/g, '-')
   );
+  const intervalRef = useRef(null);
 
   const nextEpisode = episodes[episodeIndex + 1];
   const [EpisodeUrl, setEpisodeUrl] = useState(url);
@@ -67,26 +69,30 @@ useEffect(() => {
   }; 
   
   const EndEpisodeNext = (episode) => {
-    const episodeId = `${episode.title.toLowerCase().replace(/\s+/g, '-')}`
-    if (episode) {
-      navigate(
-        `/erebus-empire/anime/${animeId}/${seasonId}/${episodeId}`, 
-        {
-          state: {
-            url: episode.url,
-            host: episode.host,
-            episodeTitle: episode.title,
-            episodes,
-            animeId,
-            seasonId,
-            animeTitle,
-            seasonTitle,
-            animeCover,
-            skipFrom: location.pathname,  
-          },
-        }
-      );
-    }
+    clearInterval(intervalRef.current);
+    animeWatchHistory.delete(storageKey)
+    // animeWatchHistory.save(storageKey, buildWatchData());
+    // const episodeId = `${episode.title.toLowerCase().replace(/\s+/g, '-')}`
+    // if (episode) {
+    //   navigate(
+    //     `/erebus-empire/anime/${animeId}/${seasonId}/${episodeId}`, 
+    //     {
+    //       state: {
+    //         url: episode.url,
+    //         host: episode.host,
+    //         episodeTitle: episode.title,
+    //         episodes,
+    //         animeId,
+    //         seasonId,
+    //         animeTitle,
+    //         seasonTitle,
+    //         animeCover,
+    //         skipFrom: location.pathname,  
+    //         seasonUrl
+    //       },
+    //     }
+    //   );
+    // }
   };
 
   const handleNavigation = (episode) => {
@@ -103,7 +109,8 @@ useEffect(() => {
           seasonId, 
           animeTitle, 
           seasonTitle, 
-          animeCover
+          animeCover,
+          seasonUrl
         } }
       );
     }
@@ -138,7 +145,7 @@ const buildWatchData = () => ({
   animeCover,
   timestamp: Date.now(),
   videoTime: videoTimeRef.current,
-  episodes,
+  seasonUrl
 });
 
 useEffect(() => {
@@ -153,14 +160,15 @@ useEffect(() => {
 
 useEffect(() => { 
   if (!restored || !storageKey) return;
-  const intervalId = setInterval(() => {
+  intervalRef.current = setInterval(() => {
     animeWatchHistory.save(storageKey, buildWatchData());
   }, 5000);
   return () => {
-    clearInterval(intervalId);
+    clearInterval(intervalRef.current);
     animeWatchHistory.save(storageKey, buildWatchData());
   };
 }, [restored, storageKey]);
+
 
 
 

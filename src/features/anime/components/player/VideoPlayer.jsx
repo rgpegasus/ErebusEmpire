@@ -23,7 +23,7 @@ export const ErebusPlayer = ({
   onNextClick = undefined,
   onClickItemListReproduction = undefined,
   onDownloadClick = undefined,
-  onCrossClick = () => {},
+  onCrossClick = undefined,
   startPosition = 0,
   dataNext = {},
   reprodutionList = [],
@@ -456,7 +456,24 @@ const handleControlClick = (e) => {
     if (muted) return <FaVolumeMute />;
     if (volume >= 60) return <FaVolumeUp />;
     if (volume >= 10) return <FaVolumeDown />;
-    return <FaVolumeOff />;
+    if (volume > 0) return <FaVolumeOff />;
+    return <FaVolumeMute />;
+  };
+  const clickTimeout = useRef(null);
+const handleClick = () => {
+    if (clickTimeout.current === null) {
+      clickTimeout.current = setTimeout(() => {
+        play();
+        clickTimeout.current = null;
+      }, 250);
+    }
+  };
+  const handleDoubleClick = () => {
+    if (clickTimeout.current !== null) {
+      clearTimeout(clickTimeout.current);
+      clickTimeout.current = null;
+    }
+    chooseFullScreen();
   };
 
   return (
@@ -464,8 +481,8 @@ const handleControlClick = (e) => {
       className={`container ${fullPlayer ? 'full-player' : ''} ${error ? 'hide-video' : ''}`}
       onMouseMove={hoverScreen}
       ref={playerElement}
-      onDoubleClick={chooseFullScreen}
-      onClick={play}
+      onClick={handleClick}
+      onDoubleClick={handleDoubleClick}
       style={{ fontFamily }}
     >
       {(videoReady === false || (waitingBuffer === true && playing === true)) && !error && !end && renderLoading()}
@@ -486,8 +503,8 @@ const handleControlClick = (e) => {
 
       <div className={`controls ${showControls && videoReady && !error ? 'show' : ''}`}>
         {backButton && (
-          <div className="back">
-            <div onClick={() => backButton} onDoubleClick={(e) => e.stopPropagation()} style={{ cursor: 'pointer' }}>
+          <div className="back" onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()} >
+            <div onClick={backButton}  style={{ cursor: 'pointer' }}>
               <FaArrowLeft />
               <span>Retour</span>
             </div>
@@ -519,19 +536,18 @@ const handleControlClick = (e) => {
             <div className="start">
               <div className="item-control" onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()}>
                 {!playing && (
-                  <FaPlay onClick={() => play()} />
+                  <div className='IconSvg'><FaPlay onClick={() => play()} /></div>
                 )}
                 {playing && (
-                  <FaPause onClick={() => play()} />
+                  <div className='IconSvg'><FaPause onClick={() => play()} /></div>
                 )}
               </div>
 
               <div className="item-control" onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()}>
-              <FaUndoAlt 
-                  onClick={() => previousSeconds(5)} />
-              </div> 
+                <div className='IconSvg'><FaUndoAlt onClick={() => previousSeconds(5)} /></div>
+              </div>
               <div className="item-control" onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()}>
-              <FaRedoAlt onClick={() => nextSeconds(10)} />
+              <div className='IconSvg'><FaRedoAlt onClick={() => nextSeconds(10)} /></div>
               </div>
 
               {!muted && (
@@ -561,14 +577,14 @@ const handleControlClick = (e) => {
                     onMouseEnter={() => setShowControlVolume(true)} 
                     onClick={() => setMuttedAction(true)} 
                   >
-                    {getVolumeIcon()}
+                    <div className='IconSvg'>{getVolumeIcon()}</div>
                   </div>
                 </div>
               )}
 
               {muted && (
                 <div className="item-control" onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()}>
-                    <FaVolumeMute onClick={() => setMuttedAction(false)} />
+                    <div className='IconSvg'><FaVolumeMute onClick={() => setMuttedAction(false)} /></div>
                 </div>
               )}
               <div className="item-control info-video">
@@ -586,7 +602,7 @@ const handleControlClick = (e) => {
                         onMouseEnter={() => setShowDataNext(true)}
                         onMouseLeave={() => setShowDataNext(false)}
                     >
-                        <FaStepForward onClick={onNextClick} />
+                        <div className='IconSvg'><FaStepForward onClick={onNextClick} /></div>
                     </div>
                     </div>
                 )}
@@ -605,7 +621,6 @@ const handleControlClick = (e) => {
                             }
                             >
                             <div className="bold">
-                                {/* <span style={{ marginRight: 15 }}>{index + 1}</span> */}
                                 {item.name}
                             </div>
                             {item.percent && <div className="percent" />}
@@ -617,7 +632,7 @@ const handleControlClick = (e) => {
                     </div>
                 )}
                 {reprodutionList?.length > 1 && (
-                    <FaClone onMouseEnter={() => setShowReproductionList(true)} />
+                  <div className='IconSvg'><FaClone onMouseEnter={() => setShowReproductionList(true)} /></div>
                 )}
                 </div>
 
@@ -645,7 +660,7 @@ const handleControlClick = (e) => {
                     </div>
                   )}
 
-                  <FaCog onMouseEnter={() => setShowQuality(true)} />
+                  <div className='IconSvg'><FaCog onMouseEnter={() => setShowQuality(true)} /></div>
                 </div>
               )}
               
@@ -655,16 +670,13 @@ const handleControlClick = (e) => {
               
               {onDownloadClick && (
                 <div className="item-control" onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()}>
-                  <FaDownload
-                    onClick={onDownloadClick}
-                    onDoubleClick={(e) => e.stopPropagation()}
-                  />
+                  <div className='IconSvg'><FaDownload onClick={onDownloadClick}/></div>
                 </div>
               )}
 
               <div className="item-control" onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()}>
-                {!fullScreen && <FaExpand onClick={enterFullScreen} />}
-                {fullScreen && <FaCompress onClick={exitFullScreen} />}
+                {!fullScreen && <div className='IconSvg'><FaExpand onClick={enterFullScreen} /></div>}
+                {fullScreen && <div className='IconSvg'><FaCompress onClick={exitFullScreen} /></div>}
               </div>
             </div>
           </div>

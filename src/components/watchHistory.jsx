@@ -57,32 +57,44 @@ const WatchHistory = () => {
     }
   };
 
-  const handleEpisodeClick = (episode, event) => {
-    if (event.shiftKey) {
-      deleteEpisode(episode);
-      return;
+  const fetchEpisodes = async (episode) => {
+    try {
+      return await window.electron.ipcRenderer.invoke('get-episodes', episode.seasonUrl);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des épisodes :", error);
     }
+  }; 
 
-    const episodeId = episode.episodeTitle
-      .toLowerCase()
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
+const handleEpisodeClick = async (episode, event) => {
+  const episodes = await fetchEpisodes(episode);  
+  console.log("caca", episodes);
 
-    navigate(`/erebus-empire/anime/${episode.animeId}/${episode.seasonId}/${episodeId}`, {
-      state: {
-        url: episode.url,
-        host: episode.host,
-        episodeTitle: episode.episodeTitle,
-        episodes: episode.episodes,
-        animeId: episode.animeId,
-        seasonId: episode.seasonId,
-        animeTitle: episode.animeTitle,
-        seasonTitle: episode.seasonTitle,
-        animeCover: episode.animeCover,
-      },
-    });
-  };
+  if (event.shiftKey) {
+    deleteEpisode(episode);
+    return;
+  }
+
+  const episodeId = episode.episodeTitle
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+
+  navigate(`/erebus-empire/anime/${episode.animeId}/${episode.seasonId}/${episodeId}`, {
+    state: {
+      url: episode.url,
+      host: episode.host,
+      episodeTitle: episode.episodeTitle,
+      episodes,  
+      animeId: episode.animeId,
+      seasonId: episode.seasonId,
+      animeTitle: episode.animeTitle,
+      seasonTitle: episode.seasonTitle,
+      animeCover: episode.animeCover,
+      seasonUrl: episode.seasonUrl
+    },
+  });
+};
 
    return (
     <div>

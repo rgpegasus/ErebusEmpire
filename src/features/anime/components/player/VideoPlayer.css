@@ -360,7 +360,7 @@ video {
   transition: all 0.2s ease-out;
 }
 
-.controls svg:hover {
+.item-control:hover .IconSvg svg {
   opacity: 1;
   transform: scale(1.2);
 }
@@ -471,8 +471,8 @@ video {
 .volume-controller input::-webkit-slider-thumb {
   -webkit-appearance: none;
   border: none;
-  width: 18px;
-  height: 18px;
+  width: 13px;
+  height: 13px;
   border-radius: 50%;
   background: var(--primaryColor);
   cursor: pointer;

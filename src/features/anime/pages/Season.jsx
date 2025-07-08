@@ -91,7 +91,8 @@ export const Season = () => {
         seasonId : seasonId, 
         animeTitle:animeInfo.title, 
         seasonTitle:selected.title,
-        animeCover:animeInfo.cover
+        animeCover:animeInfo.cover,
+        seasonUrl:selectedSeason
       }
     });
   };
