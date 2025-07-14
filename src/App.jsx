@@ -8,7 +8,7 @@ import { Catalog, Home, Download, Season, Episode, Settings, SwitchAccount, Favo
 
 const Logger = () => {
   const location = useLocation();
-  // console.log("🧭 Chemin actuel :", location.pathname);
+  console.log("🧭 Chemin actuel :", location.pathname);
   return null;
 };
 

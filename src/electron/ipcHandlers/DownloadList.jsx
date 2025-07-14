@@ -4,7 +4,7 @@ import fs from 'fs';
 const userDataFolder = path.join(app.getPath('appData'), 'erebus-empire', 'userData', 'animeDownload');
 
 function DownloadList() {
-  ipcMain.handle('get-downloads', async () => {
+  ipcMain.handle('get-downloads', async (event) => {
     try {
       const animeFolders = fs.readdirSync(userDataFolder)
         .map(name => path.join(userDataFolder, name))

@@ -11,3 +11,4 @@ export { DownloadList } from '@ipcHandlers/DownloadList';
 export { DeleteDownloadEpisode } from '@ipcHandlers/DeleteDownloadEpisode';
 export { ExportData } from '@ipcHandlers/ExportData';
 export { ImportData } from '@ipcHandlers/ImportData';
+export { AvailableLanguages } from '@ipcHandlers/AvailableLanguages'

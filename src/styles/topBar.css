@@ -1,6 +1,6 @@
 /* Top bar */
 .TopBar-box{
-    z-index: 1;
+    z-index: 99;
     height: var(--size-top-bar);
     width: calc(100vw - var(--size-menu));
     margin-left: var(--size-menu);

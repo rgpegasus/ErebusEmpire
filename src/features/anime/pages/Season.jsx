@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Loader } from '@utils/PageDispatcher'
 import { toSlug } from '@utils/toSlug'
+import { FlagDispatcher } from '@utils/FlagDispatcher';
 
 export const Season = () => {
   const { animeId, seasonId } = useParams();
@@ -10,14 +11,18 @@ export const Season = () => {
   const [animeInfo, setAnimeInfo] = useState(null);
   const [seasons, setSeasons] = useState([]);
   const [selectedSeason, setSelectedSeason] = useState("");
+  const [selectedLanguage, setSelectedLanguage] = useState("");
+  const [availableLanguages, setAvailableLanguages] = useState("");
   const [episodes, setEpisodes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [episodeCache, setEpisodeCache] = useState({});
 
-  // Récupérer les informations de l'anime
+
+
   useEffect(() => {
     const fetchAnimeInfo = async () => {
       try {
-        setLoading(true);
+        setLoading(true); 
         const info = await window.electron.ipcRenderer.invoke('info-anime', animeUrl);
         setAnimeInfo(info);
       } catch (error) {
@@ -29,73 +34,138 @@ export const Season = () => {
 
   // Récupérer les saisons et réinitialiser les épisodes à chaque changement d'anime
   useEffect(() => {
-    const fetchSeasons = async () => {
-      try {
-        setLoading(true);
-        const fetchedSeasons = await window.electron.ipcRenderer.invoke('get-seasons', animeUrl);
-        setSeasons(fetchedSeasons);
-        if (fetchedSeasons.length > 0) {
-          const seasonId = toSlug(fetchedSeasons[0].title);
-          navigate(`/erebus-empire/anime/${animeId}/${seasonId}`, { replace: true });
-          setSelectedSeason(fetchedSeasons[0].url); 
-        }
-      } catch (error) {
-        console.error("Erreur lors de la récupération des saisons :", error);
+  const fetchSeasons = async () => {
+    try {
+      setLoading(true);
+      setEpisodeCache({});
+      const result = await window.electron.ipcRenderer.invoke('get-seasons', animeUrl);
+
+      if (!result || result.error || !Array.isArray(result.seasons) || result.seasons.length === 0) {
+        console.warn("Aucune saison trouvée ou erreur:", result?.error);
+        setSeasons([]);
+        setSelectedSeason(null);
+        return;
       }
-    };
-    fetchSeasons();
-  }, [animeUrl]);
+
+      setSeasons(result.seasons);
+      setSelectedLanguage(result.language)
+      setSelectedSeason(result.seasons[0].url);
+
+      const seasonId = result.seasons[0].url.split("/")[5];
+      navigate(`/erebus-empire/anime/${animeId}/${seasonId}`, { replace: true });
+    } catch (error) {
+      console.error("Erreur lors de la récupération des saisons :", error);
+      setSeasons([]);
+      setSelectedSeason(null);
+    }
+  };
+
+  fetchSeasons();
+}, [animeUrl]);
+
 
   // Récupérer les épisodes en fonction de la saison sélectionnée
   useEffect(() => {
-    const fetchEpisodes = async () => { 
-      if (!selectedSeason) return;
+    const fetchEpisodes = async () => {
+      if (!selectedSeason || !selectedLanguage) return;
+
+      setLoading(true);
+
       try {
-        setLoading(true);
-        const episodeLinks = await window.electron.ipcRenderer.invoke('get-episodes', selectedSeason);
+        // On récupère toujours les langues disponibles (même si les épisodes sont en cache)
+        const languages = await window.electron.ipcRenderer.invoke('get-available-languages', selectedSeason);
+        setAvailableLanguages(languages);
+
+        const seasonKey = selectedSeason.split("/").slice(0, 6).join("/") + "/";
+        const cached = episodeCache[seasonKey]?.[selectedLanguage];
+
+        if (cached) {
+          setEpisodes(cached);
+          return;
+        }
+
+        const episodeLinks = await window.electron.ipcRenderer.invoke('get-episodes', selectedSeason, true);
         setEpisodes(episodeLinks);
+
+        setEpisodeCache(prevCache => ({
+          ...prevCache,
+          [seasonKey]: {
+            ...(prevCache[seasonKey] || {}),
+            [selectedLanguage]: episodeLinks
+          }
+        }));
       } catch (error) {
         console.error("Erreur lors de la récupération des épisodes :", error);
       } finally {
         setLoading(false);
       }
-    }; 
-    
+    };
     fetchEpisodes();
-  }, [selectedSeason]);
+  }, [selectedSeason, selectedLanguage]);
 
   const handleSelectChange = (event) => {
     const newSeasonUrl = event.target.value;
     setSelectedSeason(newSeasonUrl);
-  
-    // Trouver la saison sélectionnée
+
     const selected = seasons.find(season => season.url === newSeasonUrl);
     
     if (selected) {
-      const seasonId = toSlug(selected.title);
+      const seasonId = selected.url.split("/").slice(5, 6).join("/");
       navigate(`/erebus-empire/anime/${animeId}/${seasonId}`, { replace: true });
     }
   };
 
-  const handleEpisodeClick = (episode) => {
-    const episodeId = toSlug(episode.title);
-      const selected = seasons.find(season => season.url === selectedSeason);
-      const path = `/erebus-empire/anime/${animeId}/${seasonId}/${episodeId}`
-    navigate(path, { 
-      state: { 
-        url: episode.url, 
-        host:episode.host,
-        episodeTitle: episode.title, 
-        episodes: episodes, 
-        animeId : animeId,  
-        seasonId : seasonId, 
-        animeTitle:animeInfo.title, 
-        seasonTitle:selected.title,
-        animeCover:animeInfo.cover,
-        seasonUrl:selectedSeason
+const handleEpisodeClick = async (episode) => {
+  setLoading(true); 
+  const episodeId = toSlug(episode.title);
+  const seasonKey = selectedSeason.split("/").slice(0, 6).join("/") + "/";
+  const selectedSeasonData = seasons.find(season => season.url.includes(`/${selectedSeason.split("/")[5]}/`));
+  const path = `/erebus-empire/anime/${animeId}/${seasonId}/${episodeId}`;
+
+  try {
+    const currentCache = episodeCache[seasonKey] || {};
+    const missingLangs = availableLanguages.filter(lang => !currentCache[lang.toLowerCase()]);
+
+    const newEntries = await Promise.all(
+      missingLangs.map(async (lang) => {
+        const langUrl = seasonKey + lang.toLowerCase();
+        const eps = await window.electron.ipcRenderer.invoke('get-episodes', langUrl, true);
+        return [lang.toLowerCase(), eps];
+      })
+    );
+
+    const updatedCache = {
+      ...currentCache,
+      ...Object.fromEntries(newEntries)
+    };
+
+    // Mise à jour du cache global
+    setEpisodeCache(prev => ({
+      ...prev,
+      [seasonKey]: updatedCache
+    }));
+    console.log(updatedCache, "caca", episode)
+    // Navigation unique avec cache mis à jour
+    navigate(path, {
+      state: {
+        episodeTitle: episode.title,
+        episodes: updatedCache,
+        animeId,
+        seasonId,
+        animeTitle: animeInfo.title,
+        seasonTitle: selectedSeasonData?.title,
+        animeCover: animeInfo.cover,
+        seasonUrl: selectedSeason,
+        availableLanguages,
+        selectedLanguage
       }
     });
-  };
+
+  } catch (error) {
+    console.error("Erreur dans handleEpisodeClick :", error);
+  }
+};
+ 
 
   if (loading) {
     return <Loader />;
@@ -122,27 +192,55 @@ export const Season = () => {
         <h1>{animeInfo.altTitles.join(', ')}</h1>
       </div>
       {/* Sélecteur de saison */}
-      {seasons.length > 0 && (
-        <div>
-          {seasons.length > 1 ? (
-            <select
-              id="saison"
-              name="saison"
-              value={selectedSeason}
-              onChange={handleSelectChange}
-              className="SelectSeason"
-            >
-              {seasons.map((season) => (
-                <option key={season.url} value={season.url} className="OptionStyle">
-                  {season.title + "⠀⠀"}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <p className="SingleSeasonTitle">{seasons[0].title}</p>
+      <div className='SeasonsPageTop'>
+        {seasons.length > 0 && (
+          <div>
+            {seasons.length > 1 ? (
+              <select
+                id="saison"
+                name="saison"
+                value={selectedSeason}
+                onChange={handleSelectChange}
+                className="SelectSeason"
+              >
+                {seasons.map((season) => (
+                  <option key={season.url} value={season.url} className="OptionStyle">
+                    {season.title + "⠀⠀"}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <p className="SingleSeasonTitle">{seasons[0].title}</p>
+            )}
+          </div>
+        )}
+        <div className="AvailableLanguages">
+          {availableLanguages.map((lang, index) => {
+            const flag = FlagDispatcher(lang.toLowerCase());
+            return (
+              <span
+                key={index}
+                className={`LanguageItem${selectedLanguage === lang.toLowerCase() ? ' selected' : ''}`}
+              >
+                {flag && (
+                  <img
+                    onClick={() => {setSelectedLanguage(lang.toLowerCase()); setSelectedSeason(selectedSeason.split("/").slice(0, 6).join("/") + "/" + lang.toLowerCase());}}
+                    src={flag}
+                    alt={lang}
+                    draggable='false'
+                    className={`LanguageItem-img${selectedLanguage === lang.toLowerCase() ? ' selected' : ''}`}
+                  />
+                )}
+                <div className={`LanguageItem-txt${selectedLanguage === lang.toLowerCase() ? ' selected' : ''}`}>
+                  {lang.toUpperCase()}
+                </div>
+              </span>
+            );
+          }
           )}
         </div>
-      )}
+      </div>
+      
       <div className='Space'></div>
       {/* Affichage des épisodes */}
       <div className="CategorieTitle">Episodes :</div>

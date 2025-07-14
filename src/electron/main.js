@@ -9,7 +9,7 @@ import RPC from 'discord-rpc';
 const clientId = '1366193765701783604';
 const rpc = new RPC.Client({ transport: 'ipc' });
 const scraper = new AnimeScraper("animesama");
-import { SearchAnime, RandomAnime, InfoAnime, SeasonsAnime, EpisodesSeason, UrlEpisode, LatestEpisodes, CatalogAnime, DownloadEpisode, DownloadList, DeleteDownloadEpisode, ExportData, ImportData } from '@utils/IpcHandlerDispatcher.js'; 
+import { SearchAnime, RandomAnime, InfoAnime, SeasonsAnime, EpisodesSeason, UrlEpisode, LatestEpisodes, CatalogAnime, DownloadEpisode, DownloadList, DeleteDownloadEpisode, ExportData, ImportData, AvailableLanguages } from '@utils/IpcHandlerDispatcher.js'; 
 import { AnimeCoverTemp, AnimeWatchHistory } from '@utils/ServicesDataDispatcher'
 const sessionStorage = join(app.getPath('appData'), 'erebus-empire', 'userData', 'anime', 'sessionStorage');
 
@@ -156,14 +156,16 @@ if (!gotTheLock) {
     UrlEpisode();
     LatestEpisodes(scraper);
     CatalogAnime(scraper);
+    AvailableLanguages(scraper);
+    AnimeWatchHistory();
     DownloadEpisode();
     DownloadList();
     DeleteDownloadEpisode();
     ExportData();
     ImportData();
-    AnimeCoverTemp()
+    AnimeCoverTemp();
     createWindow();
-    AnimeWatchHistory()
+    
 
     ipcMain.on('open-devtools', () => {
       if (mainWindow && !mainWindow.webContents.isDevToolsOpened()) {

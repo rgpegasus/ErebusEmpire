@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
 import { getVideoUrlFromEmbed} from 'better-ani-scraped';
 
-function UrlEpisode(scraper) {
+function UrlEpisode() {
   ipcMain.handle("get-url", async (event, query, host)=> {
      try {
       return await getVideoUrlFromEmbed(host, query);

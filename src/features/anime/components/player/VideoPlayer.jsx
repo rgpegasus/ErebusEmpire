@@ -6,17 +6,21 @@ import {
   FaClone, FaDownload, FaArrowLeft
 } from 'react-icons/fa';
 import { MdPictureInPictureAlt } from 'react-icons/md';
-import { FiCheck, FiX } from 'react-icons/fi';
+import { LuSlidersHorizontal } from 'react-icons/lu';
+import { FiX } from 'react-icons/fi';
 import './VideoPlayer.css';
+import { FlagDispatcher } from '@utils/FlagDispatcher';
 
 export const ErebusPlayer = ({
   src,
   title = false,
   subTitle = false,
   titleMedia = false,
+  cover = false,
   extraInfoMedia = false,
   fullPlayer = true,
   backButton = undefined,
+  episodeSources = undefined,
   autoPlay = false,
   onEnded = undefined,
   onErrorVideo = undefined,
@@ -27,19 +31,21 @@ export const ErebusPlayer = ({
   startPosition = 0,
   dataNext = {},
   reprodutionList = [],
-  qualities = [],
-  onChangeQuality = () => {},
+  onTimeUpdate = undefined, 
   overlayEnabled = true,
-  autoControllCloseEnabled = true,
   primaryColor = 'var(--logo-color)',
   secundaryColor = 'var(--primary-text)',
   fontFamily = 'var(--font-main)',
+  availableLanguages=undefined,
+  currentLanguage=undefined,
+  onChangeLanguage = undefined
 }) => {
   const videoRef = useRef(null);
   const timerRef = useRef(null);
   const timerBuffer = useRef(null);
   const playerElement = useRef(null);
   const listReproduction = useRef(null);
+  
 
   const [videoReady, setVideoReady] = useState(false);
   const [playing, setPlaying] = useState(autoPlay);
@@ -56,9 +62,16 @@ export const ErebusPlayer = ({
   const [showInfo, setShowInfo] = useState(false);
   const [started, setStarted] = useState(false);
   const [showControlVolume, setShowControlVolume] = useState(false);
-  const [showQuality, setShowQuality] = useState(false);
   const [showDataNext, setShowDataNext] = useState(false);
   const [showReproductionList, setShowReproductionList] = useState(false);
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+  const [currentSource, setCurrentSource] = useState(src);
+
+  const sources = episodeSources?.host?.map((host, i) => ({
+    host,
+    url: episodeSources.url[i],
+  }));
+
 
   const secondsToHms = (d) => {
     d = Number(d);
@@ -89,7 +102,12 @@ export const ErebusPlayer = ({
 
     const target = e.target;
     setProgress(target.currentTime);
+
+    if (typeof onTimeUpdate === 'function' && videoRef.current) {
+      onTimeUpdate({ currentTime: videoRef.current.currentTime });
+    }
   };
+
 
   const goToPosition = (position) => {
     if (videoRef.current) {
@@ -97,7 +115,10 @@ export const ErebusPlayer = ({
       setProgress(position);
     }
   };
-
+  const handleSelectSource = (source) => {
+    setCurrentSource(source.url);
+    setShowSettingsMenu(false)
+  };
   const play = () => {
     if (videoRef.current) {
       setPlaying(!playing);
@@ -179,7 +200,7 @@ export const ErebusPlayer = ({
     }
   };
 
-  const erroVideo = () => {
+  const errorVideo = () => {
     if (onErrorVideo) onErrorVideo();
     setError("Erreur de lecture");
   };
@@ -208,7 +229,6 @@ export const ErebusPlayer = ({
 
   const enterFullScreen = () => {
     if (playerElement.current) {
-      setShowInfo(true);
       if (playerElement.current.requestFullscreen) {
         playerElement.current.requestFullscreen();
         setFullScreen(true);
@@ -222,8 +242,6 @@ export const ErebusPlayer = ({
         document.exitFullscreen();
         return;
       }
-
-      setShowInfo(true);
       if (playerElement.current.requestFullscreen) {
         playerElement.current.requestFullscreen();
       }
@@ -244,26 +262,19 @@ const controllScreenTimeOut = () => {
   if (showReproductionList) {
     return;
   }
-
-  if (!autoControllCloseEnabled) {
-    setShowInfo(true);
-    return;
-  }
-
   setShowControls(false);
-  if (!playing) setShowInfo(true);
+  if (videoRef.current.paused) setShowInfo(true); 
 };
 
 const hoverScreen = () => {
   setShowControls(true);
   setShowInfo(false);
-
   if (timerRef.current) clearTimeout(timerRef.current);
   timerRef.current = setTimeout(controllScreenTimeOut, 2500);
 };
 
 const handleControlClick = (e) => {
-  e?.stopPropagation(); // Le '?' évite les erreurs si 'e' est undefined
+  e?.stopPropagation(); 
   setShowControls(true);
   if (timerRef.current) clearTimeout(timerRef.current);
   timerRef.current = setTimeout(controllScreenTimeOut, 2500);
@@ -336,7 +347,7 @@ const handleControlClick = (e) => {
   }, [showReproductionList]);
 
   useEffect(() => {
-    if (src && videoRef.current) {
+    if (currentSource && videoRef.current) {
       videoRef.current.currentTime = startPosition;
       setProgress(0);
       setDuration(0);
@@ -346,7 +357,21 @@ const handleControlClick = (e) => {
       setShowDataNext(false);
       setPlaying(autoPlay);
     }
-  }, [src]);
+    if (fullPlayer) {
+      enterFullScreen()
+    }
+  }, [currentSource]);
+  useEffect(() => {
+    const video = videoRef.current;
+    const sync = () => setPlaying(!video.paused);
+    video?.addEventListener('pause', sync);
+    video?.addEventListener('play', sync);
+    return () => {
+      video?.removeEventListener('pause', sync);
+      video?.removeEventListener('play', sync);
+    };
+  }, []);
+
 
   useEffect(() => {
     document.addEventListener('keydown', getKeyBoardInteration);
@@ -365,30 +390,31 @@ const handleControlClick = (e) => {
   }, [document.fullscreenElement]);
 
   useEffect(() => {
-    if (videoRef.current && src) {
-      const isHLS = src.includes(".m3u8");
-      if (isHLS) {
-        if (Hls.isSupported()) {
-          const hls = new Hls();
-          hls.loadSource(src);
-          hls.attachMedia(videoRef.current);
-          hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            if (autoPlay) videoRef.current?.play();
-          });
-          return () => hls.destroy();
-        } else if (videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
-          videoRef.current.src = src;
-          if (autoPlay) videoRef.current.play();
-        } else {
-          setError("Format HLS non supporté par votre navigateur.");
-        }
-      } else {
-        videoRef.current.src = src;
-        console.log("source", videoRef.current.src)
+  if (videoRef.current && currentSource) {
+    const isHLS = currentSource.includes(".m3u8");
+
+    if (isHLS) {
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(currentSource);
+        hls.attachMedia(videoRef.current);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          if (autoPlay) videoRef.current?.play();
+        });
+        return () => hls.destroy();
+      } else if (videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
+        videoRef.current.src = currentSource;
         if (autoPlay) videoRef.current.play();
+      } else {
+        setError("Format HLS non supporté par votre navigateur.");
       }
+    } else {
+      videoRef.current.src = currentSource;
+      if (autoPlay) videoRef.current.play();
     }
-  }, [src]);
+  }
+}, [currentSource]);
+
 
   const renderLoading = () => (
     <div className="loading" style={{ '--primaryColor': primaryColor }}>
@@ -400,9 +426,10 @@ const handleControlClick = (e) => {
     </div>
   );
 
-  const renderInfoVideo = () => (
+const renderInfoVideo = () => {
+  return (
     <div 
-      className={`standby-info ${showInfo && videoReady && !playing ? 'show' : ''}`}
+      className={`standby-info ${showInfo && !showSettingsMenu && videoReady && !playing ? 'show' : ''}`}
       style={{ '--primaryColor': primaryColor, '--secundaryColor': secundaryColor }}
     >
       {(title || subTitle) && (
@@ -415,6 +442,8 @@ const handleControlClick = (e) => {
       <footer>En pause</footer>
     </div>
   );
+};
+
 
   const renderCloseVideo = () => (
     <div className={`video-pre-loading ${!videoReady || error ? 'show' : ''} ${error ? 'error' : ''}`}>
@@ -427,28 +456,6 @@ const handleControlClick = (e) => {
           <FiX onClick={onCrossClick} />
         </header>
       )}
-
-      <section>
-        {error && (
-          <div>
-            <h1>{error}</h1>
-            {qualities.length > 1 && (
-              <div>
-                <p>Essayez d'accéder à une autre qualité</p>
-                <div className="links-error">
-                  {qualities.map(item => (
-                    <div key={item.id} onClick={() => onChangeQuality(item.id)}>
-                      {item.prefix && <span>HD</span>}
-                      <span>{item.name}</span>
-                      {item.playing && <FiX />}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </section>
     </div>
   );
 
@@ -464,6 +471,7 @@ const handleClick = () => {
     if (clickTimeout.current === null) {
       clickTimeout.current = setTimeout(() => {
         play();
+        hoverScreen()
         clickTimeout.current = null;
       }, 250);
     }
@@ -478,7 +486,7 @@ const handleClick = () => {
 
   return (
     <div
-      className={`container ${fullPlayer ? 'full-player' : ''} ${error ? 'hide-video' : ''}`}
+      className={`container ${error ? 'hide-video' : ''}`}
       onMouseMove={hoverScreen}
       ref={playerElement}
       onClick={handleClick}
@@ -493,25 +501,100 @@ const handleClick = () => {
 
       <video
         ref={videoRef}
-        src={src}
+        src={currentSource}
         controls={false}
         onCanPlay={startVideo}
         onTimeUpdate={timeUpdate}
-        onError={erroVideo}
+        onError={errorVideo}
         onEnded={onEndedFunction}
       />
+{showSettingsMenu && (
+<>
+  <div
+    className="settings-overlay"
+    onClick={() => setShowSettingsMenu(false)}
+  />
+  <div
+    className="settings-menu-slide"
+    onClick={(e) => e.stopPropagation()}
+  >
+    <div className="settings-menu-header">
+      <span>Paramètres</span>
+      <button className="close-button" onClick={() => {setShowSettingsMenu(false);videoRef.current.play()}}>
+        <FiX />
+      </button>
+    </div>
+    <div className="settings-menu-content">
+      <div className="SettingsMenuTop">
+        <div className='SettingsMenuTop-cover'>
+          <img
+            src={cover}
+            alt="Cover"
+            draggable="false"
+            className="SettingsMenuTop-image"
+          />
+        </div>
+        <div className='SettingsMenuTop-title'>
+          <div className='SettingsMenuTop-animeTitle'>{title}</div>
+          <h1 className='SettingsMenuTop-subTitle'>{subTitle}</h1>
+        </div>
+      </div>
+      <div className='TopBar-profile-separation'></div>
+      <div className='SettingsMenuSources-list'>
+        {sources?.map((source, index) => (
+          <button
+            key={index}
+            onClick={() => handleSelectSource(source)}
+            className={`SettingsMenuSources-item ${
+              currentSource === source.url ? 'selected' : ''
+            }`}
+          >
+            Lecteur {index + 1}
+          </button>
+        ))}
+      </div>
+      <div className='TopBar-profile-separation'></div>
+      <div className="SettingsMenuAvailableLanguages">
+        {availableLanguages.map((lang, index) => {
+          const flag = FlagDispatcher(lang.toLowerCase());
+          return (
+            <span
+              key={index}
+              className={`SettingsMenuLanguageItem${currentLanguage === lang.toLowerCase() ? ' selected' : ''}`}
+            >
+              {flag && (
+                <img
+                  onClick={() => onChangeLanguage(lang.toLowerCase())}
+                  src={flag}
+                  alt={lang}
+                  draggable='false'
+                  className={`SettingsMenuLanguageItem-img${currentLanguage === lang.toLowerCase() ? ' selected' : ''}`}
+                />
+              )}
+              <div className={`SettingsMenuLanguageItem-txt${currentLanguage === lang.toLowerCase() ? ' selected' : ''}`}>
+                {lang.toUpperCase()}
+              </div>
+            </span>
+          );
+        }
+        )}
+      </div>
+    </div>
+  </div>
+</>
+)}
 
-      <div className={`controls ${showControls && videoReady && !error ? 'show' : ''}`}>
+      <div className={`controls ${showControls && videoReady && !showSettingsMenu && !error ? 'show' : ''}`}>
         {backButton && (
           <div className="back" onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()} >
             <div onClick={backButton}  style={{ cursor: 'pointer' }}>
               <FaArrowLeft />
-              <span>Retour</span>
+              <span>Saisons</span>
             </div>
           </div>
         )}
 
-        {!showControlVolume && !showQuality && !showDataNext && !showReproductionList && (
+        {!showControlVolume && !showDataNext && !showReproductionList && (
           <div className="line-reproduction">
             <input
               type="range"
@@ -635,37 +718,9 @@ const handleClick = () => {
                   <div className='IconSvg'><FaClone onMouseEnter={() => setShowReproductionList(true)} /></div>
                 )}
                 </div>
-
-
-              {qualities?.length > 1 && (
-                <div className="item-control" onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()} onMouseLeave={() => setShowQuality(false)}>
-                  {showQuality && (
-                    <div className="item-list-quality">
-                      <div>
-                        {qualities.map(item => (
-                          <div
-                            key={item.id}
-                            onClick={() => {
-                              setShowQuality(false);
-                              onChangeQuality(item.id);
-                            }}
-                          >
-                            {item.prefix && <span>HD</span>}
-                            <span>{item.name}</span>
-                            {item.playing && <FiCheck />}
-                          </div>
-                        ))}
-                      </div>
-                      <div className="box-connector" />
-                    </div>
-                  )}
-
-                  <div className='IconSvg'><FaCog onMouseEnter={() => setShowQuality(true)} /></div>
-                </div>
-              )}
               
               <div className="item-control" onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()}>
-                <MdPictureInPictureAlt onClick={() => togglePiP} onDoubleClick={(e) => e.stopPropagation()} />
+                <div className='IconSvg'><MdPictureInPictureAlt onClick={togglePiP}/></div>
               </div>
               
               {onDownloadClick && (
@@ -673,6 +728,13 @@ const handleClick = () => {
                   <div className='IconSvg'><FaDownload onClick={onDownloadClick}/></div>
                 </div>
               )}
+              <div className="item-control" onClick={(e) => {
+                e?.stopPropagation(); 
+                setShowSettingsMenu(!showSettingsMenu);
+                videoRef.current.pause()
+              }}>
+                <div className='IconSvg'><LuSlidersHorizontal /></div>
+              </div>
 
               <div className="item-control" onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()}>
                 {!fullScreen && <div className='IconSvg'><FaExpand onClick={enterFullScreen} /></div>}

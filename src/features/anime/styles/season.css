@@ -11,11 +11,11 @@
     font-weight: var(--button-weight);
     cursor: pointer;
     outline: none;
-    margin-top: 10px;
+    padding-top: 10px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
+  } 
   .SelectSeason:focus {
     border-color: var(--logo-color);
   }
@@ -49,7 +49,41 @@
     width: auto;
     max-width: 100%;
   }
-  
+  .SeasonsPageTop {
+    display: flex;
+    gap: 50px;
+    align-items: center;
+  }
+  .LanguageItem {
+    margin-top:3px;
+    display: inline-flex;
+    flex-direction: column;
+    opacity: 0.25;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+  }
+  .LanguageItem-txt {
+    font-size: 14px;
+    color: var(--primary-text);
+    font-family: var(--font-main);
+    font-weight: var(--little-title-weight);
+  }
+  .LanguageItem-img {
+    width: 40px;
+    border: 1.5px solid var(--primary-text);
+    border-radius: 5px;
+    object-fit: cover;
+  }
+  .LanguageItem.selected {
+    opacity: 1;
+  }
+  .LanguageItem-txt.selected {
+    color: var(--logo-color);
+  }
+  .LanguageItem-img.selected {
+    border: 1.5px solid var(--logo-color)
+  }
   .EpisodeItem {
     cursor: pointer;
     width: 200px;

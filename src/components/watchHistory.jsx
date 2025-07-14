@@ -4,9 +4,10 @@ import EpisodeTitle from './scroll-title';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, EffectCoverflow, Keyboard } from 'swiper/modules';
 import { ChevronLeft, ChevronRight } from 'lucide-react'; 
+import { Loader } from '@utils/PageDispatcher';
 import 'swiper/css';
 import 'swiper/css/navigation';
-import 'swiper/css/effect-coverflow';
+import 'swiper/css/effect-coverflow'; 
 
 const WatchHistory = () => {
   const [watchedEpisodes, setWatchedEpisodes] = useState([]);
@@ -17,9 +18,10 @@ const WatchHistory = () => {
   const containerRef = useRef(null);
   const swiperRef = useRef(null);
   const [isInside, setIsInside] = useState(false);
+  const [loadingEpisode, setLoadingEpisode] = useState(false);
 
   useEffect(() => {
-    loadWatchedEpisodes();
+    loadWatchedEpisodes(); 
 
     const handleKeyDown = (e) => {
       if (e.key === 'Shift' && isInside) setShiftPressed(true);
@@ -58,16 +60,34 @@ const WatchHistory = () => {
   };
 
   const fetchEpisodes = async (episode) => {
-    try {
-      return await window.electron.ipcRenderer.invoke('get-episodes', episode.seasonUrl);
-    } catch (error) {
-      console.error("Erreur lors de la récupération des épisodes :", error);
-    }
-  }; 
+  const result = {};
+
+  try {
+    const baseUrl = episode.seasonUrl.split("/").slice(0, 6).join("/");
+
+    const languageResults = await Promise.all(
+      episode.availableLanguages.map(async (lang) => {
+        const langUrl = `${baseUrl}/${lang.toLowerCase()}`;
+        const data = await window.electron.ipcRenderer.invoke('get-episodes', langUrl, true);
+        return { lang, data };
+      })
+    );
+
+    languageResults.forEach(({ lang, data }) => {
+      result[lang.toLowerCase()] = data;
+    });
+
+    return result;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des épisodes :", error);
+    return result;
+  }
+};
+
 
 const handleEpisodeClick = async (episode, event) => {
+  // setLoadingEpisode(true);
   const episodes = await fetchEpisodes(episode);  
-  console.log("caca", episodes);
 
   if (event.shiftKey) {
     deleteEpisode(episode);
@@ -82,8 +102,6 @@ const handleEpisodeClick = async (episode, event) => {
 
   navigate(`/erebus-empire/anime/${episode.animeId}/${episode.seasonId}/${episodeId}`, {
     state: {
-      url: episode.url,
-      host: episode.host,
       episodeTitle: episode.episodeTitle,
       episodes,  
       animeId: episode.animeId,
@@ -91,11 +109,16 @@ const handleEpisodeClick = async (episode, event) => {
       animeTitle: episode.animeTitle,
       seasonTitle: episode.seasonTitle,
       animeCover: episode.animeCover,
-      seasonUrl: episode.seasonUrl
+      seasonUrl: episode.seasonUrl,
+      availableLanguages:episode.availableLanguages,
+      selectedLanguage:episode.selectedLanguage
+
     },
   });
 };
-
+ if (loadingEpisode) {
+    return <Loader />;
+  }
    return (
     <div>
       {watchedEpisodes.length > 0 && (
@@ -156,7 +179,7 @@ const handleEpisodeClick = async (episode, event) => {
                       <div className="LatestEpisodes-info">
                         <EpisodeTitle title={`${episode.seasonTitle} ${episode.episodeTitle}`} />
                         <div className="Separation"></div>
-                        <p>VOSTFR</p>
+                        <p>{episode.selectedLanguage}</p>
                       </div>
                     </div>
                   </SwiperSlide>

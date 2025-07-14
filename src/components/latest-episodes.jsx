@@ -40,16 +40,15 @@ const prevRef = useRef(null);
     let embedData = [];
     let seasonTitle = "null"; 
     try {
-      const data = await window.electron.ipcRenderer.invoke('get-episodes', animeUrl, true);
+      const data = await window.electron.ipcRenderer.invoke('get-episodes', animeUrl, true, true);
       const { animeInfo, episodes } = data;
       embedData = episodes
       seasonTitle = animeInfo.seasonTitle
-      
     } catch (err) {
       console.error("Erreur récupération embed:", err);
     }
     if (!embedData || embedData.length === 0) return null;
-    const seasonId = toSlug(seasonTitle);
+    const seasonId = animeUrl.split("/").slice(5, 6).join("/");
     const { episodeNumber } = parseEpisodeNumbers(episode);
     const episodeInfo = episode.toLowerCase();
   
@@ -105,19 +104,20 @@ const prevRef = useRef(null);
   const handleEpisodeClick = async (episode) => {
     try {
       const { path, matchedEmbed, embedData, animeId, seasonId, seasonTitle} = await buildErebusPathFromRecentAnime(episode);
+      const episodes = {[episode.language]: embedData};
       if (path) {
         navigate(path, {
           state: {
-            url: matchedEmbed.url,
-            host:matchedEmbed.host,
             episodeTitle: matchedEmbed.title,
-            episodes: embedData,
+            episodes: episodes,
             animeId,
             seasonId,
             animeTitle: episode.title,
             seasonTitle,
             animeCover:episode.cover,
-            seasonUrl:episode.url
+            seasonUrl:episode.url,
+            availableLanguages:null,
+            selectedLanguage:episode.language
           },
         });
       }
