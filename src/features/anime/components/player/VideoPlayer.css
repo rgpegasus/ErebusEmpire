@@ -757,7 +757,7 @@ video {
   justify-content: center;
 }
 .SettingsMenuLanguageItem-txt {
-  font-size: 17px;
+  font-size: 15px;
   margin-left: 7px;
   color: var(--primary-text);
   font-family: var(--font-main);

@@ -1,1 +1,1 @@
-export { Profile } from '../features/profile/pages/Profile';
+export { Profile } from '@features/profile/pages/Profile';

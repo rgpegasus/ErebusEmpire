@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader } from '@utils/PageDispatcher'
+import { useLoader } from '@utils/PageDispatcher';
 import { ResearchIcon } from '@utils/PictureDispatcher';
 
 export const Catalog = () => {
@@ -8,7 +8,7 @@ export const Catalog = () => {
   const [input, setInput] = useState('');
   const [page, setPage] = useState(1);
   const [hasNext, setHasNext] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const { setLoading } = useLoader();
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
   const isSearch = query.trim() !== '';
@@ -21,26 +21,38 @@ export const Catalog = () => {
     })));
   };
 
-  const fetchData = async (p, q = '') => {
-    setLoading(true);
-    try {
-      const fn = q ? 'search-anime' : 'get-all-anime';
-      const args = q ? [q, 9999999] : [];
-      const pages = await Promise.all([
-        ...[0, 1, 2].map(offset => window.electron.ipcRenderer.invoke(fn, ...args, p + offset)),
-        window.electron.ipcRenderer.invoke(fn, ...args, p + 3),
-      ]);
-      const combined = pages.slice(0, 3).flat().filter(Boolean);
-      setList(combined);
-      setPage(p);
-      setHasNext((pages[3] || []).length > 0);
-      await preloadImages(combined);
-    } catch (e) {
-      console.error("Erreur :", e);
-    } finally {
-      setLoading(false);
-    }
-  };
+ const fetchData = async (startPage, searchQuery = '') => {
+  setLoading(true);
+
+  try {
+    const isSearching = searchQuery.trim() !== '';
+    const functionName = isSearching ? 'search-anime' : 'get-all-anime';
+    const functionArgs = isSearching ? [searchQuery, 9999999] : [];
+
+    const pageNumbers = [0, 1, 2];
+    const results = await Promise.all(
+      pageNumbers.map(offset => 
+        window.electron.ipcRenderer.invoke(functionName, ...functionArgs, startPage + offset)
+      )
+    );
+
+    const firstThreePages = results.slice(0, 2).flat().filter(Boolean); 
+    const fourthPage = 
+
+    setList(firstThreePages);
+    setPage(startPage);
+    setHasNext((fourthPage || []).length > 0);
+
+    // Précharger les images pour éviter les flashs
+    await preloadImages(firstThreePages);
+    
+  } catch (error) {
+    console.error("Erreur lors du chargement des données :", error);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     if (input.trim() === '') {
@@ -84,8 +96,6 @@ export const Catalog = () => {
     if (newPage < 1) return;
     fetchData(newPage, isSearch ? query : '');
   };
-
-  if (loading) return <Loader />;
 
   return (
     <div className='MainPage'>

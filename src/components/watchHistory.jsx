@@ -4,7 +4,7 @@ import EpisodeTitle from './scroll-title';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, EffectCoverflow, Keyboard } from 'swiper/modules';
 import { ChevronLeft, ChevronRight } from 'lucide-react'; 
-import { Loader } from '@utils/PageDispatcher';
+import { useLoader } from '@utils/PageDispatcher';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/effect-coverflow'; 
@@ -18,11 +18,10 @@ const WatchHistory = () => {
   const containerRef = useRef(null);
   const swiperRef = useRef(null);
   const [isInside, setIsInside] = useState(false);
-  const [loadingEpisode, setLoadingEpisode] = useState(false);
+  const { setLoading } = useLoader();
 
   useEffect(() => {
     loadWatchedEpisodes(); 
-
     const handleKeyDown = (e) => {
       if (e.key === 'Shift' && isInside) setShiftPressed(true);
     };
@@ -41,7 +40,6 @@ const WatchHistory = () => {
 
   const loadWatchedEpisodes = async () => {
     const all = await animeWatchHistory.loadAll(); 
-    console.log(all)
     if (!all) return;
 
     const episodes = Object.entries(all).map(([key, data]) => ({ key, ...data }));
@@ -86,14 +84,13 @@ const WatchHistory = () => {
 
 
 const handleEpisodeClick = async (episode, event) => {
-  // setLoadingEpisode(true);
-  const episodes = await fetchEpisodes(episode);  
 
   if (event.shiftKey) {
     deleteEpisode(episode);
     return;
   }
-
+  setLoading(true);
+  const episodes = await fetchEpisodes(episode); 
   const episodeId = episode.episodeTitle
     .toLowerCase()
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -115,10 +112,8 @@ const handleEpisodeClick = async (episode, event) => {
 
     },
   });
+  setLoading(false);
 };
- if (loadingEpisode) {
-    return <Loader />;
-  }
    return (
     <div>
       {watchedEpisodes.length > 0 && (

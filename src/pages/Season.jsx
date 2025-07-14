@@ -1,1 +1,1 @@
-export { Season } from '../features/anime/pages/Season';
+export { Season } from '@features/anime/pages/Season';

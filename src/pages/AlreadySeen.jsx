@@ -1,3 +1,3 @@
-export { AlreadySeen } from '../features/profile/pages/AlreadySeen';
+export { AlreadySeen } from '@features/profile/pages/AlreadySeen';
 
  

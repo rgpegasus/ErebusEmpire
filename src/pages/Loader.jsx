@@ -1,1 +1,1 @@
-export { Loader } from '../features/other/pages/Loader';
+export { Loader } from '@features/other/pages/Loader';

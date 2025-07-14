@@ -1,1 +1,1 @@
-export { Episode } from '../features/anime/pages/Episode';
+export { Episode } from '@features/anime/pages/Episode';

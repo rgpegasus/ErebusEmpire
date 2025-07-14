@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Hls from 'hls.js';
 import {
   FaPlay, FaPause, FaVolumeUp, FaVolumeDown, FaVolumeOff, FaVolumeMute,
-  FaUndoAlt, FaRedoAlt, FaExpand, FaCompress, FaStepForward, FaCog,
+  FaUndoAlt, FaRedoAlt, FaExpand, FaCompress, FaStepForward,
   FaClone, FaDownload, FaArrowLeft
 } from 'react-icons/fa';
 import { MdPictureInPictureAlt } from 'react-icons/md';
@@ -38,14 +38,15 @@ export const ErebusPlayer = ({
   fontFamily = 'var(--font-main)',
   availableLanguages=undefined,
   currentLanguage=undefined,
-  onChangeLanguage = undefined
+  onChangeLanguage = undefined,
+  settingsEnabled = true
 }) => {
   const videoRef = useRef(null);
   const timerRef = useRef(null);
   const timerBuffer = useRef(null);
   const playerElement = useRef(null);
   const listReproduction = useRef(null);
-  
+  console.log("source", src)
 
   const [videoReady, setVideoReady] = useState(false);
   const [playing, setPlaying] = useState(autoPlay);
@@ -341,7 +342,7 @@ const handleControlClick = (e) => {
       console.error('PiP error:', err);
     }
   };
-
+  
   useEffect(() => {
     if (showReproductionList) scrollToSelected();
   }, [showReproductionList]);
@@ -728,13 +729,15 @@ const handleClick = () => {
                   <div className='IconSvg'><FaDownload onClick={onDownloadClick}/></div>
                 </div>
               )}
-              <div className="item-control" onClick={(e) => {
-                e?.stopPropagation(); 
-                setShowSettingsMenu(!showSettingsMenu);
-                videoRef.current.pause()
-              }}>
-                <div className='IconSvg'><LuSlidersHorizontal /></div>
-              </div>
+              {settingsEnabled && (
+                <div className="item-control" onClick={(e) => {
+                  e?.stopPropagation(); 
+                  setShowSettingsMenu(!showSettingsMenu);
+                  videoRef.current.pause()
+                }}>
+                  <div className='IconSvg'><LuSlidersHorizontal /></div>
+                </div>
+              )}
 
               <div className="item-control" onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()}>
                 {!fullScreen && <div className='IconSvg'><FaExpand onClick={enterFullScreen} /></div>}

@@ -35,7 +35,10 @@ function LoadAnimeWatchHistory(key) {
 }
 
 function DeleteAnimeWatchHistory(key = null) {
+  
   const history = loadHistory();
+  console.time('delete-history');
+  
   if (key) {
     delete history[key];
     const isEmpty = Object.keys(history).length === 0;
@@ -47,6 +50,7 @@ function DeleteAnimeWatchHistory(key = null) {
   } else {
     return false;
   }
+  console.timeEnd('delete-history')
   return true;
 }
 

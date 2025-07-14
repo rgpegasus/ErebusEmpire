@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Loader } from '@utils/PageDispatcher';
+import { useLoader, Loader } from '@utils/PageDispatcher';
 import { ErebusPlayer } from '@features/anime/components/player/VideoPlayer';
 
 export const Episode = () => {
@@ -18,11 +18,10 @@ export const Episode = () => {
     availableLanguages,
     selectedLanguage
   } = location.state || {};
-
+  const { loading, setLoading } = useLoader();
   const [episodeSources, setEpisodeSources] = useState(null);
   const [episodeUrl, setEpisodeUrl] = useState(undefined);
   const [availableLanguagesEpisode, setAvailableLanguagesEpisode] = useState(undefined);
-  const [loadingEpisode, setLoadingEpisode] = useState(true);
   const [videoTime, setVideoTime] = useState(0);
   const [restored, setRestored] = useState(false);
   const intervalRef = useRef(null);
@@ -75,7 +74,7 @@ useEffect(() => {
     if (!episodeSources?.url || !episodeSources?.host) return;
 
     try {
-      setLoadingEpisode(true);
+      setLoading(true);
 
       const resolvedUrls = await Promise.all(
         episodeSources.url.map((epUrl, index) =>
@@ -95,7 +94,7 @@ useEffect(() => {
       console.error("Erreur lors de la résolution des sources :", err);
       setEpisodeUrl(episodeSources.url[0]);
     } finally {
-      setLoadingEpisode(false);
+      setLoading(false);
     }
   };
 
@@ -210,7 +209,7 @@ const changeLanguage = (lang) => {
     }
   };
 
-  if (loadingEpisode || !restored) {
+  if (loading || !restored) {
     return <Loader />;
   }
 

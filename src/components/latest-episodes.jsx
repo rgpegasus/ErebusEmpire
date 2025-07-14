@@ -5,12 +5,14 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, EffectCoverflow, Keyboard } from 'swiper/modules';
 import { ChevronLeft, ChevronRight } from 'lucide-react'; 
 import { toSlug } from '@utils/toSlug'
+import { useLoader } from '@utils/PageDispatcher';
 
 
 const LatestEpisodes = ({ episodes }) => {
   const navigate = useNavigate();
-const prevRef = useRef(null);
+  const prevRef = useRef(null);
   const nextRef = useRef(null);
+  const { setLoading } = useLoader();
  
   useEffect(() => {
     setTimeout(() => {
@@ -103,6 +105,7 @@ const prevRef = useRef(null);
   
   const handleEpisodeClick = async (episode) => {
     try {
+      setLoading(true)
       const { path, matchedEmbed, embedData, animeId, seasonId, seasonTitle} = await buildErebusPathFromRecentAnime(episode);
       const episodes = {[episode.language]: embedData};
       if (path) {
@@ -116,11 +119,12 @@ const prevRef = useRef(null);
             seasonTitle,
             animeCover:episode.cover,
             seasonUrl:episode.url,
-            availableLanguages:null,
+            availableLanguages:[episode.language],
             selectedLanguage:episode.language
           },
         });
       }
+      setLoading(false)
     } catch (err) {
       console.error("Erreur lors de la navigation :", err);
     }
@@ -129,7 +133,6 @@ const prevRef = useRef(null);
   return (
     <div>
       <div className="CategorieTitle">Derniers épisodes sortis :</div>
-
       {episodes.length > 0 ? (
         <div className="LatestEpisodes">
             <button

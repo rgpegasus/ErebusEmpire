@@ -1,1 +1,1 @@
-export { Catalog } from '../features/anime/pages/Catalog';
+export { Catalog } from '@features/anime/pages/Catalog';

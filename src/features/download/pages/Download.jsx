@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ErebusPlayer } from '@features/anime/components/player/VideoPlayer';
 import { useNavigate } from 'react-router-dom';
+import { useLoader } from '@utils/PageDispatcher';
 const naturalSort = (a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
 
 export const Download = () => {
@@ -9,6 +10,7 @@ export const Download = () => {
   const [selectedEpisode, setSelectedEpisode] = useState(null);
   const [selectedSeasons, setSelectedSeasons] = useState({});
   const [downloadProgress, setDownloadProgress] = useState({});
+  const { setLoading } = useLoader();
   const [shiftPressed, setShiftPressed] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const navigate = useNavigate();
@@ -31,6 +33,7 @@ export const Download = () => {
   useEffect(() => {
     const fetchDownloads = async () => {
       try {
+        setLoading(true)
         const { episodes } = await window.electron.ipcRenderer.invoke('get-downloads');
         const downloadingEpisodes = [];
         const animeMap = {};
@@ -61,6 +64,8 @@ export const Download = () => {
         setDownloadingData(downloadingEpisodes);
       } catch (error) {
         console.error('Erreur lors de la récupération des fichiers:', error);
+      } finally {
+        setLoading(false)
       }
     };
 
@@ -119,10 +124,12 @@ export const Download = () => {
         console.error('Erreur lors de la suppression du fichier:', error);
       }
     } else {
+      setLoading(true)
       const { animeTitle, seasonTitle, episodeTitle, animeCover } = episode.metadata;
       const filePath = encodeURI(`file://${episode.path.replace(/\\/g, '/')}`);
       console.log(filePath)
       setSelectedEpisode({ animeTitle, seasonTitle, episodeTitle, animeCover, filePath });
+      setLoading(false)
     }
   };
 const BackMenu = () => {
@@ -234,6 +241,7 @@ const BackMenu = () => {
             fullPlayer={false}
             autoPlay={true}
             onCrossClick={BackMenu}
+            settingsEnabled={false}
           />
         </div>
       )}

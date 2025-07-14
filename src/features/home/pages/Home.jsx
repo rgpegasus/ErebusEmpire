@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Loader} from '@utils/PageDispatcher'
+import { useLoader } from '@utils/PageDispatcher';
 import LatestEpisodes from '@components/latest-episodes';
 import WatchHistory from '@components/watchHistory';
 import { useNavigate } from 'react-router-dom';
 export const Home = () => {
   const [anime, setAnime] = useState(null);
   const [latestEpisodes, setLatestEpisodes] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { setLoading } = useLoader();
   const [error, setError] = useState(null);  
   const [dataLoaded, setDataLoaded] = useState(false); 
   const navigate = useNavigate();
@@ -59,21 +59,21 @@ useEffect(() => {
     navigate(`/erebus-empire/anime/${getAnimeId(url)}/`);
   };
 
-  if (loading) return <Loader />;
+
 
   return (
     <div className='MainPage'>
       {error && <div className="error">{error}</div>}  
       {anime?.cover && (
         <div className="AnimeCover">
-          <h2>{anime.title}</h2>
+          <h2>{anime?.title}</h2>
           <img
             draggable="false"
-            src={anime.cover}
-            alt={anime.title}
+            src={anime?.cover}
+            alt={anime?.title}
             className='AnimeCover-img'  
           />
-          <div className='AnimeCover-button' onClick={() => handleClick(anime.url)}>Regarder</div>
+          <div className='AnimeCover-button' onClick={() => handleClick(anime?.url)}>Regarder</div>
         </div>
       )}
       <WatchHistory />

@@ -1,1 +1,1 @@
-export { Settings } from '../features/profile/pages/Settings';
+export { Settings } from '@features/profile/pages/Settings';

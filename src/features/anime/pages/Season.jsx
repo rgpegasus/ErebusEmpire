@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Loader } from '@utils/PageDispatcher'
+import { useLoader } from '@utils/PageDispatcher';
 import { toSlug } from '@utils/toSlug'
 import { FlagDispatcher } from '@utils/FlagDispatcher';
 
@@ -12,9 +12,9 @@ export const Season = () => {
   const [seasons, setSeasons] = useState([]);
   const [selectedSeason, setSelectedSeason] = useState("");
   const [selectedLanguage, setSelectedLanguage] = useState("");
-  const [availableLanguages, setAvailableLanguages] = useState("");
+  const [availableLanguages, setAvailableLanguages] = useState([]);
   const [episodes, setEpisodes] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { setLoading } = useLoader();
   const [episodeCache, setEpisodeCache] = useState({});
 
 
@@ -25,6 +25,7 @@ export const Season = () => {
         setLoading(true); 
         const info = await window.electron.ipcRenderer.invoke('info-anime', animeUrl);
         setAnimeInfo(info);
+        setLoading(false);
       } catch (error) {
         console.error("Erreur lors de la récupération des informations de l'anime :", error);
       } 
@@ -53,6 +54,7 @@ export const Season = () => {
 
       const seasonId = result.seasons[0].url.split("/")[5];
       navigate(`/erebus-empire/anime/${animeId}/${seasonId}`, { replace: true });
+      setLoading(false)
     } catch (error) {
       console.error("Erreur lors de la récupération des saisons :", error);
       setSeasons([]);
@@ -160,16 +162,11 @@ const handleEpisodeClick = async (episode) => {
         selectedLanguage
       }
     });
-
+    setLoading(false)
   } catch (error) {
     console.error("Erreur dans handleEpisodeClick :", error);
   }
 };
- 
-
-  if (loading) {
-    return <Loader />;
-  }
 
   return (
     <div className="MainPage">
@@ -189,8 +186,9 @@ const handleEpisodeClick = async (episode) => {
       )}
       {/* Information de l'animé */}
       <div className='AnimeInfoText'>
-        <h1>{animeInfo.altTitles.join(', ')}</h1>
+        <h1>{animeInfo?.altTitles.join(', ')}</h1>
       </div>
+
       {/* Sélecteur de saison */}
       <div className='SeasonsPageTop'>
         {seasons.length > 0 && (
@@ -275,12 +273,12 @@ const handleEpisodeClick = async (episode) => {
       <div className='AnimeInfoText'>
         <div className="CategorieTitle">Synopsis :</div>
         <div className='InfoBox'>
-          <h2>{animeInfo.synopsis}</h2>
+          <h2>{animeInfo?.synopsis}</h2>
         </div>
         <div className='Space'></div>
         <div className="CategorieTitle">Genres :</div>
         <div className='InfoBox'>
-          <h3>{animeInfo.genres.join(', ')}</h3>
+          <h3>{animeInfo?.genres.join(', ')}</h3>
         </div>
         <div className='Space'></div>
       </div>

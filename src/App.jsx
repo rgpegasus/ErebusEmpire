@@ -3,8 +3,7 @@ import { HashRouter as Router, Routes, Route, useLocation, Navigate } from 'reac
 import MenuBar from "@layouts/MenuBar";
 import TopBar from '@layouts/TopBar';
 import { Catalog, Home, Download, Season, Episode, Settings, SwitchAccount, Favorites, Watchlist, History, OnHold, AlreadySeen, Profile} from '@utils/PageDispatcher'
-
-
+import { LoaderProvider } from '@utils/PageDispatcher';
 
 const Logger = () => {
   const location = useLocation();
@@ -37,30 +36,32 @@ const App = () => {
 }, [1000]);
 
   return (
-    <Router>
-      {/* <LoginPage/> */}
-      <Logger />
-      <MenuBar />
-      <div>
-        <TopBar /> 
-        <Routes>
-          <Route path="/" element={<Navigate to="/erebus-empire/home" />} />
-          <Route path="/erebus-empire/home" element={<Home/>} />
-          <Route path="/erebus-empire/catalogue" element={<Catalog/>} />
-          <Route path="/erebus-empire/downloads" element={<Download/>} />
-          <Route path="/erebus-empire/profile/settings" element={<Settings/>} />
-          <Route path="/erebus-empire/profile" element={<Profile/>} />
-          <Route path="/erebus-empire/profile/switchAccount" element={<SwitchAccount/>} />
-          <Route path="/erebus-empire/profile/favorites" element={<Favorites/>} />
-          <Route path="/erebus-empire/profile/watchlist" element={<Watchlist/>} />
-          <Route path="/erebus-empire/profile/history" element={<History/>} />
-          <Route path="/erebus-empire/profile/onHold" element={<OnHold/>} /> 
-          <Route path="/erebus-empire/profile/alreadySeen" element={<AlreadySeen/>} />
-          <Route path="/erebus-empire/anime/:animeId/:seasonId?" element={<Season/>} />
-          <Route path="/erebus-empire/anime/:animeId/:seasonId/:episodeId" element={<Episode/>} />
-        </Routes>
-      </div>
-    </Router>
+    <LoaderProvider>
+      <Router>
+        {/* <LoginPage/> */}
+        <Logger />
+        <MenuBar />
+        <div>
+          <TopBar /> 
+          <Routes>
+            <Route path="/" element={<Navigate to="/erebus-empire/home" />} />
+            <Route path="/erebus-empire/home" element={<Home/>} />
+            <Route path="/erebus-empire/catalogue" element={<Catalog/>} />
+            <Route path="/erebus-empire/downloads" element={<Download/>} />
+            <Route path="/erebus-empire/profile/settings" element={<Settings/>} />
+            <Route path="/erebus-empire/profile" element={<Profile/>} />
+            <Route path="/erebus-empire/profile/switchAccount" element={<SwitchAccount/>} />
+            <Route path="/erebus-empire/profile/favorites" element={<Favorites/>} />
+            <Route path="/erebus-empire/profile/watchlist" element={<Watchlist/>} />
+            <Route path="/erebus-empire/profile/history" element={<History/>} />
+            <Route path="/erebus-empire/profile/onHold" element={<OnHold/>} /> 
+            <Route path="/erebus-empire/profile/alreadySeen" element={<AlreadySeen/>} />
+            <Route path="/erebus-empire/anime/:animeId/:seasonId?" element={<Season/>} />
+            <Route path="/erebus-empire/anime/:animeId/:seasonId/:episodeId" element={<Episode/>} />
+          </Routes>
+        </div>
+      </Router>
+    </LoaderProvider>  
   );
 }
 

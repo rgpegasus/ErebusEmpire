@@ -1,1 +1,1 @@
-export { OnHold } from '../features/profile/pages/OnHold';
+export { OnHold } from '@features/profile/pages/OnHold';

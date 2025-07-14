@@ -12,3 +12,4 @@ export { Settings } from '@pages/Settings';
 export { SwitchAccount } from '@pages/SwitchAccount';
 export { Watchlist } from '@pages/Watchlist';
 export { Loader } from '@pages/Loader';
+export { useLoader, LoaderProvider } from '@pages/LoaderContext';
