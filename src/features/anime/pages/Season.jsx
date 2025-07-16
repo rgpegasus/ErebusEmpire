@@ -45,6 +45,7 @@ export const Season = () => {
         console.warn("Aucune saison trouvée ou erreur:", result?.error);
         setSeasons([]);
         setSelectedSeason(null);
+        setLoading(false)
         return;
       }
 
@@ -54,11 +55,12 @@ export const Season = () => {
 
       const seasonId = result.seasons[0].url.split("/")[5];
       navigate(`/erebus-empire/anime/${animeId}/${seasonId}`, { replace: true });
-      setLoading(false)
     } catch (error) {
       console.error("Erreur lors de la récupération des saisons :", error);
       setSeasons([]);
       setSelectedSeason(null);
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -140,14 +142,10 @@ const handleEpisodeClick = async (episode) => {
       ...currentCache,
       ...Object.fromEntries(newEntries)
     };
-
-    // Mise à jour du cache global
     setEpisodeCache(prev => ({
       ...prev,
       [seasonKey]: updatedCache
     }));
-    console.log(updatedCache, "caca", episode)
-    // Navigation unique avec cache mis à jour
     navigate(path, {
       state: {
         episodeTitle: episode.title,
@@ -191,7 +189,7 @@ const handleEpisodeClick = async (episode) => {
 
       {/* Sélecteur de saison */}
       <div className='SeasonsPageTop'>
-        {seasons.length > 0 && (
+        {seasons.length > 0 &&  (
           <div>
             {seasons.length > 1 ? (
               <select

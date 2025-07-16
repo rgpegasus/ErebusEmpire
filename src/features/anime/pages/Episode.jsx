@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useLoader, Loader } from '@utils/PageDispatcher';
+import { useLoader, Loader } from '@utils/PageDispatcher'; 
 import { ErebusPlayer } from '@features/anime/components/player/VideoPlayer';
 
-export const Episode = () => {
+export const Episode = () => {  
   const navigate = useNavigate();
   const location = useLocation();
   const {

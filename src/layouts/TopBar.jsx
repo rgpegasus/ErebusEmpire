@@ -144,7 +144,7 @@ function TopBar() {
       </div>
       {inputValue && (
         <div className="results-container">
-          {results.map((anime, index) => (
+          {results?.map((anime, index) => (
             <div key={index} className="anime-card" onClick={() => handleCardClick(anime)} style={{ cursor: "pointer" }}>
               {anime.cover ? (
                 <img draggable="false" src={anime.cover} alt={`Bannière de ${anime.title}`} className="cover-img" />
