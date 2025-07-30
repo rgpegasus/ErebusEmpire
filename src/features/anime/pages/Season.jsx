@@ -165,6 +165,57 @@ const handleEpisodeClick = async (episode) => {
     console.error("Erreur dans handleEpisodeClick :", error);
   }
 };
+const [showStatusMenu, setShowStatusMenu] = useState(false);
+const [animeStatus, setAnimeStatus] = useState({
+  favoris: false,
+  watchlist: false,
+  attente: false,
+  dejaVu: false,
+});
+  const buildAnimeData = () => ({
+    animeId,
+    animeTitle:animeInfo.title,
+    animeCover: animeInfo.cover,
+  });
+// Map des statuts vers leurs "storageName" respectifs
+const statusStorageMap = {
+  favoris: "animeFavorites",
+  watchlist: "animeWatchlist",
+  attente: "animeOnHold",
+  dejaVu: "animeAlreadySeen",
+};
+
+// Charger les statuts individuellement
+useEffect(() => {
+  const loadAllStatuses = async () => {
+    const statusObj = { ...animeStatus };
+    for (const key of Object.keys(statusObj)) {
+      const storageName = statusStorageMap[key];
+      const storageKey = animeId ? `/erebus-empire/anime/${animeId}` : null;
+      const value = await animeData.load(storageName, storageKey);
+      statusObj[key] = !!value; 
+    }
+    setAnimeStatus(statusObj);
+  };
+  loadAllStatuses();
+}, [animeId]);
+
+const toggleStatus = async (key) => {
+  const isActive = animeStatus[key];
+  const updatedStatus = { ...animeStatus, [key]: !isActive };
+  setAnimeStatus(updatedStatus);
+
+  const storageName = statusStorageMap[key];
+  const storageKey = animeId ? `/erebus-empire/anime/${animeId}` : null;
+
+  if (!isActive) {
+    console.log(storageName, storageKey, animeId, animeInfo.animeTitle, animeCover)
+    await animeData.save(storageName, storageKey, buildAnimeData());
+  } else {
+    await animeData.delete(storageName, storageKey);
+  }
+};
+
 
   return (
     <div className="MainPage">
@@ -188,8 +239,9 @@ const handleEpisodeClick = async (episode) => {
       </div>
 
       {/* Sélecteur de saison */}
-      <div className='SeasonsPageTop'>
-        {seasons.length > 0 &&  (
+      <div className='SeasonsPageTop'>    
+        <div className='SeasonsPageTop-item'>
+          {seasons.length > 0 &&  (
           <div>
             {seasons.length > 1 ? (
               <select
@@ -210,7 +262,7 @@ const handleEpisodeClick = async (episode) => {
             )}
           </div>
         )}
-        <div className="AvailableLanguages">
+        <div className='availableLanguages'>
           {availableLanguages.map((lang, index) => {
             const flag = FlagDispatcher(lang.toLowerCase());
             return (
@@ -220,7 +272,10 @@ const handleEpisodeClick = async (episode) => {
               >
                 {flag && (
                   <img
-                    onClick={() => {setSelectedLanguage(lang.toLowerCase()); setSelectedSeason(selectedSeason.split("/").slice(0, 6).join("/") + "/" + lang.toLowerCase());}}
+                    onClick={() => {
+                      setSelectedLanguage(lang.toLowerCase());
+                      setSelectedSeason(selectedSeason.split("/").slice(0, 6).join("/") + "/" + lang.toLowerCase());
+                    }}
                     src={flag}
                     alt={lang}
                     draggable='false'
@@ -232,9 +287,29 @@ const handleEpisodeClick = async (episode) => {
                 </div>
               </span>
             );
-          }
-          )}
+          })}
         </div>
+          
+          {/* Bouton Ajouter */}
+          {episodes.length > 0 && (<div className="StatusMenuContainer">
+            <button className="AddStatusButton" onClick={() => setShowStatusMenu(!showStatusMenu)}>＋ Ajouter</button>
+            {showStatusMenu && (
+              <div className="StatusDropdown">
+                {["favoris", "watchlist", "attente", "dejaVu"].map((key) => (
+                  <label key={key} className="StatusItem">
+                    <input
+                      type="checkbox"
+                      checked={animeStatus[key]}
+                      onChange={() => toggleStatus(key)}
+                    />
+                    {key.charAt(0).toUpperCase() + key.slice(1)}
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>)}
+        </div>
+
       </div>
       
       <div className='Space'></div>
@@ -264,20 +339,31 @@ const handleEpisodeClick = async (episode) => {
             ))}
           </div>
         ) : (
-          <p className="NoEpisodes">Aucun épisode disponible</p>
+          <div className="AFK">
+            <p>Aucun épisode disponible</p>
+          </div>
         )}
       </div>
-      <div className='Space'></div>
       <div className='AnimeInfoText'>
-        <div className="CategorieTitle">Synopsis :</div>
-        <div className='InfoBox'>
-          <h2>{animeInfo?.synopsis}</h2>
-        </div>
-        <div className='Space'></div>
-        <div className="CategorieTitle">Genres :</div>
-        <div className='InfoBox'>
-          <h3>{animeInfo?.genres.join(', ')}</h3>
-        </div>
+        
+        {animeInfo?.synopsis && (
+          <>
+            <div className='Space'></div>
+            <div className="CategorieTitle">Synopsis :</div>
+            <div className='InfoBox'>
+              <h2>{animeInfo?.synopsis}</h2>
+            </div>
+          </>
+        )}
+        {animeInfo?.genres && (
+          <>
+            <div className='Space'></div>
+            <div className="CategorieTitle">Genres :</div>
+            <div className='InfoBox'>
+              <h3>{animeInfo?.genres.join(', ')}</h3>
+            </div>
+          </>
+        )}
         <div className='Space'></div>
       </div>
     </div>

@@ -55,9 +55,14 @@
     font-weight: var(--main-title-weight);
     font-family: var(--font-main);
 }
-.Onglet-box-select img,
-.Onglet-box img {
-    width: 35px;
+.Onglet-logo {
+    width: 30px;
+    height: auto;
+    color: var(--logo-color);
+}
+.Onglet-box img,
+.Onglet-box-select {
+  width: 35px;
 }
 
 /* Compact Mode */
@@ -76,8 +81,7 @@ body.menu-compact {
     font-size: 0;
     padding-left: 0;
   }
-  body.menu-compact .Onglet-box img,
-  body.menu-compact .Onglet-box-select img {
+  body.menu-compact .Onglet-logo {
     width: 0;
   }
 

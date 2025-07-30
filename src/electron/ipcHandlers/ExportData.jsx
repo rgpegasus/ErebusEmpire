@@ -14,7 +14,7 @@ function ExportData() {
         if (fs.lstatSync(filePath).isDirectory()) {
           const folder = zipFolder.folder(file);
           addFilesToZip(filePath, folder);
-        } else {
+        } else { 
           zipFolder.file(file, fs.readFileSync(filePath));
         }
       });

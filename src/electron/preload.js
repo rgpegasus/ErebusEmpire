@@ -5,11 +5,11 @@ const animeCover = {
   save: (data) => ipcRenderer.invoke('save-anime-temp', data),
   load: () => ipcRenderer.invoke('load-anime-temp'),
 };
-const animeWatchHistory = {
-  save: (storageKey, data) => ipcRenderer.invoke('save-watch-history', storageKey, data),
-  load: (storageKey) => ipcRenderer.invoke('load-watch-history', storageKey),
-  loadAll: () => ipcRenderer.invoke('load-all-watch-history'),
-  delete: (storageKey) => ipcRenderer.invoke('delete-watch-history', storageKey),
+const animeData = {
+  save: (fileKey, storageKey, data) => ipcRenderer.invoke('save-anime-data', fileKey, storageKey, data),
+  load: (fileKey, storageKey) => ipcRenderer.invoke('load-anime-data', fileKey, storageKey),
+  loadAll: (fileKey) => ipcRenderer.invoke('load-all-anime-data', fileKey),
+  delete: (fileKey, storageKey) => ipcRenderer.invoke('delete-anime-data', fileKey, storageKey),
 };
 
 
@@ -27,7 +27,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('electron', { ...electronAPI, ...api });
     contextBridge.exposeInMainWorld('api', api);
     contextBridge.exposeInMainWorld('animeCover', animeCover); 
-    contextBridge.exposeInMainWorld('animeWatchHistory', animeWatchHistory); 
+    contextBridge.exposeInMainWorld('animeData', animeData); 
   } catch (error) {
     console.error(error);
   }
@@ -35,5 +35,5 @@ if (process.contextIsolated) {
   window.electron = { ...electronAPI, ...api };
   window.api = api;
   window.animeCover = animeCover; 
-  window.animeWatchHistory = animeWatchHistory; 
+  window.animeData = animeData; 
 }

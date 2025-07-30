@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLoader } from '@utils/PageDispatcher';
-import { ResearchIcon } from '@utils/PictureDispatcher';
+import { TbSearch } from "react-icons/tb";
 
 export const Catalog = () => {
-  const [list, setList] = useState([]);
+  const [listAnime, setListAnime] = useState([]);
   const [input, setInput] = useState('');
   const [page, setPage] = useState(1);
   const [hasNext, setHasNext] = useState(true);
@@ -37,11 +37,10 @@ export const Catalog = () => {
     );
 
     const firstThreePages = results.slice(0, 2).flat().filter(Boolean); 
-    const fourthPage = 
 
-    setList(firstThreePages);
+    setListAnime(firstThreePages);
     setPage(startPage);
-    setHasNext((fourthPage || []).length > 0);
+    setHasNext((results[2] || []).length > 0);
 
     // Précharger les images pour éviter les flashs
     await preloadImages(firstThreePages);
@@ -103,7 +102,7 @@ export const Catalog = () => {
       <div className="CategorieTitle">Catalogue d'animé :</div>
       <div className='CatalogAll'>
         <div className="CatalogEpisode-search-container">
-          <img draggable="false" src={ResearchIcon} alt="Recherche" className='CatalogEpisode-SearchLogo' />
+          <TbSearch className='CatalogEpisode-SearchLogo'/>
           <input
             type="text"
             value={input}
@@ -118,21 +117,26 @@ export const Catalog = () => {
         </div>
 
         <div className='Space'></div>
-        <div className="CatalogEpisodes">
-          {list.map((anime, i) => (
-            <div key={anime.title || i} className="CatalogEpisodes-item">
-              <div className="CatalogEpisodes-cover">
-                <h3>{anime.title}</h3>
-                <img src={anime.cover} alt={anime.title} draggable={false} className="EpisodeCover" />
-                <div onClick={() => navigate(`/erebus-empire/anime/${getAnimeId(anime.url)}/`)} className='CatalogEpisodes-button'>voir</div>
+        {listAnime.length > 0 ? (
+          <div className="CatalogEpisodes">
+            {listAnime.map((anime, i) => (
+              <div key={anime.title || i} className="CatalogEpisodes-item">
+                <div className="CatalogEpisodes-cover">
+                  <h3>{anime.title}</h3>
+                  <img src={anime.cover} alt={anime.title} draggable={false} className="EpisodeCover" />
+                  <div onClick={() => navigate(`/erebus-empire/anime/${getAnimeId(anime.url)}/`)} className='CatalogEpisodes-button'>voir</div>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-
+            ))}
+          </div>
+        ) : (
+          <div className="AFK">
+            <p>Aucun animé disponible</p>
+          </div>
+        )}
         <div className="pagination-buttons">
-          <button onClick={() => handlePageChange(-3)} disabled={page <= 1}>Précédent</button>
-          <button onClick={() => handlePageChange(3)} disabled={!hasNext}>Suivant</button>
+          <button onClick={() => handlePageChange(-2)} disabled={page <= 1}>Précédent</button>
+          <button onClick={() => handlePageChange(2)} disabled={!hasNext}>Suivant</button>
         </div>
       </div>
       <div className='Space'></div>

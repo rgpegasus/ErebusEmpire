@@ -1,8 +1,15 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
-import { SmallErebusIcon, FullProfilIcon, SettingIcon, SwitchAccountIcon, FavoritesIcon, WatchlistIcon, HistoryIcon, OnHoldIcon, AlreadySeenIcon, LogOutIcon} from '@utils/PictureDispatcher';
+import { FaDiscord, FaDonate, FaUserCircle } from "react-icons/fa";
+import { LuCircleCheckBig } from "react-icons/lu";
+import { IoSettingsSharp } from "react-icons/io5";
+import { FaEye } from "react-icons/fa6";
+import { PiClockCounterClockwiseBold } from "react-icons/pi";
+import { BsHourglassSplit } from "react-icons/bs";
+import { MdFavorite } from "react-icons/md";
+import { SmallErebusIcon, SwitchAccountIcon, LogOutIcon} from '@utils/PictureDispatcher';
 import OverlayPortal from '@components/OverlayPortal';
 
 
@@ -135,7 +142,7 @@ const handleProfileClick = () => {
   return (
     <div className="TopBar-profile">
       <div className="TopBar-profile-wrapper" onClick={CloseMenu}>
-        <img src={croppedImage || FullProfilIcon} alt="Profil" className="TopBar-profile-img" draggable="false" />
+        {croppedImage? (<img src={ croppedImage } alt="Profil" className="TopBar-profile-img" draggable="false" />):<FaUserCircle className="TopBar-profile-img"/>}
         <ChevronDown size={18} color="#996e35" style={{ marginLeft: 4 }} />
       </div>
 
@@ -147,12 +154,10 @@ const handleProfileClick = () => {
                   <div className="UtilityTopBar">
                   <div className='UtilityTopBar-profil'>
                       <div onClick={handleProfileClick}>
-                      <img
-                          src={croppedImage || FullProfilIcon}
-                          alt="Profil"
-                          draggable="false"
-                          className={`UtilityTopBar-image ${editMode ? 'editable' : ''}`}
-                      />
+                      {croppedImage
+                        ? ( <img src={ croppedImage } alt="Profil" className={`UtilityTopBar-image ${editMode ? 'editable' : ''}`} draggable="false" />)
+                        : ( <FaUserCircle className={`UtilityTopBar-image ${editMode ? 'editable' : ''}`}/> )
+                      }
                       <input
                           type="file"
                           accept="image/*"
@@ -248,16 +253,45 @@ const handleProfileClick = () => {
                   )}
                   </div>
                   <div className='TopBar-profile-separation'></div>
-                  <div onClick={() => navigateProfilPage("/erebus-empire/profile/settings")} className='TopBar-profile-menu-item'><img draggable="false" src={SettingIcon}/>Paramètres</div>
-                  <div onClick={() => navigateProfilPage("/erebus-empire/profile/switchAccount")} className='TopBar-profile-menu-item'><img draggable="false" src={SwitchAccountIcon}/>Changer de profil</div>
+
+                  <div onClick={() => navigateProfilPage("/erebus-empire/profile/settings")} className='TopBar-profile-menu-item'>
+                    <IoSettingsSharp className='TopBar-profile-menu-logo'/>
+                    Paramètres
+                  </div>
+                  {/* <div onClick={() => navigateProfilPage("/erebus-empire/profile/switchAccount")} className='TopBar-profile-menu-item'><img draggable="false" src={SwitchAccountIcon}/>Changer de profil</div> */}
                   <div className='TopBar-profile-separation'></div>
-                  <div onClick={() => navigateProfilPage("/erebus-empire/profile/favorites")} className='TopBar-profile-menu-item'><img draggable="false" src={FavoritesIcon}/>Favoris</div>
-                  <div onClick={() => navigateProfilPage("/erebus-empire/profile/watchlist")} className='TopBar-profile-menu-item'><img draggable="false" src={WatchlistIcon}/>Watchlist</div>
-                  <div onClick={() => navigateProfilPage("/erebus-empire/profile/history")} className='TopBar-profile-menu-item'><img draggable="false" src={HistoryIcon}/>Historique</div>
-                  <div onClick={() => navigateProfilPage("/erebus-empire/profile/onHold")} className='TopBar-profile-menu-item'><img draggable="false" src={OnHoldIcon}/>En attente</div>
-                  <div onClick={() => navigateProfilPage("/erebus-empire/profile/alreadySeen")} className='TopBar-profile-menu-item'><img draggable="false" src={AlreadySeenIcon}/>Déjà Vu</div>
+                  <div onClick={() => navigateProfilPage("/erebus-empire/profile/favorites")} className='TopBar-profile-menu-item'>
+                    <MdFavorite className='TopBar-profile-menu-logo'/>
+                    Favoris
+                  </div>
+                  <div onClick={() => navigateProfilPage("/erebus-empire/profile/watchlist")} className='TopBar-profile-menu-item'>
+                    <FaEye className='TopBar-profile-menu-logo'/>
+                    Watchlist
+                  </div>
+                  <div onClick={() => navigateProfilPage("/erebus-empire/profile/history")} className='TopBar-profile-menu-item'>
+                    <PiClockCounterClockwiseBold className='TopBar-profile-menu-logo'/>
+                    Historique
+                  </div>
+                  <div onClick={() => navigateProfilPage("/erebus-empire/profile/onHold")} className='TopBar-profile-menu-item'>
+                    <BsHourglassSplit className='TopBar-profile-menu-logo'/>
+                    En attente
+                  </div>
+                  <div onClick={() => navigateProfilPage("/erebus-empire/profile/alreadySeen")} className='TopBar-profile-menu-item'>
+                    <LuCircleCheckBig className='TopBar-profile-menu-logo'/>
+                    Déjà Vu
+                  </div>
                   <div className='TopBar-profile-separation'></div>
-                  <div className='TopBar-profile-menu-item'><img draggable="false" src={LogOutIcon}/>Se déconnecter</div>
+                  <div onClick={() => window.open("https://discord.gg/Mj9cYRQTcU", "_blank")} className='TopBar-profile-menu-item'>
+                    <FaDiscord className='TopBar-profile-menu-logo' />
+                    Discord
+                  </div>
+
+                  <div onClick={() => window.open("https://www.paypal.com/donate?hosted_button_id=rgpegasus_pro", "_blank")} className='TopBar-profile-menu-item'>
+                    <FaDonate className='TopBar-profile-menu-logo' />
+                    Soutenir
+                  </div>
+
+                  {/* <div className='TopBar-profile-menu-item'><img draggable="false" src={LogOutIcon}/>Se déconnecter</div> */}
               </div>
             </OverlayPortal>
         </div>

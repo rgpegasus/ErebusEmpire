@@ -39,7 +39,7 @@ const WatchHistory = () => {
   }, [isInside]);
 
   const loadWatchedEpisodes = async () => {
-    const all = await animeWatchHistory.loadAll(); 
+    const all = await animeData.loadAll("animeWatchHistory");  
     if (!all) return;
 
     const episodes = Object.entries(all).map(([key, data]) => ({ key, ...data }));
@@ -48,8 +48,8 @@ const WatchHistory = () => {
   };
 
   const deleteEpisode = async (episode) => {
-    await animeWatchHistory.delete(episode.key);
-    const all = await animeWatchHistory.loadAll();
+    await animeData.delete("animeWatchHistory", episode.key);
+    const all = await animeData.loadAll("animeWatchHistory");
     if (Object.keys(all).length === 0) {
       setWatchedEpisodes([]);
     } else {
@@ -67,6 +67,9 @@ const WatchHistory = () => {
       episode.availableLanguages.map(async (lang) => {
         const langUrl = `${baseUrl}/${lang.toLowerCase()}`;
         const data = await window.electron.ipcRenderer.invoke('get-episodes', langUrl, true);
+        if (data === null) { 
+          return null;
+        }
         return { lang, data };
       })
     );
@@ -74,11 +77,12 @@ const WatchHistory = () => {
     languageResults.forEach(({ lang, data }) => {
       result[lang.toLowerCase()] = data;
     });
+    
 
     return result;
   } catch (error) {
     console.error("Erreur lors de la récupération des épisodes :", error);
-    return result;
+    return null;
   }
 };
 
@@ -91,6 +95,10 @@ const handleEpisodeClick = async (episode, event) => {
   }
   setLoading(true);
   const episodes = await fetchEpisodes(episode); 
+  if (episodes === null) {
+    setLoading(false)
+    return;
+  }
   const episodeId = episode.episodeTitle
     .toLowerCase()
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -162,11 +170,11 @@ const handleEpisodeClick = async (episode, event) => {
                       onClick={(e) => handleEpisodeClick(episode, e)}
                     >
                       <div className="LatestEpisodes-cover">
-                        <h3>{episode.animeTitle}</h3>
+                        <h3>{episode?.animeTitle}</h3>
                         <img
-                          src={episode.animeCover}
+                          src={episode?.animeCover}
                           draggable="false"
-                          alt={episode.episodeTitle}
+                          alt={episode?.episodeTitle}
                           className="EpisodeCover"
                         />
                       

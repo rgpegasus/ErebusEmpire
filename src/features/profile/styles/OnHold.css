@@ -1,0 +1,18 @@
+.CatalogEpisodes-item.shift-delete {
+  border: 2px solid red;
+  transition: 0.2s ease;
+}
+.CatalogEpisodes-item.shift-delete:has(.CatalogEpisodes-button:hover) {
+  transform: scale(1.05);
+}
+
+.CatalogEpisodes-item.shift-delete .CatalogEpisodes-button {
+  background-color: rgb(255, 39, 39);
+  cursor: not-allowed;
+  transition: 0.2s ease;
+}
+.CatalogEpisodes-item.shift-delete .CatalogEpisodes-button:hover {
+  cursor: not-allowed;
+  background-color: rgb(255, 0, 0);
+}
+

@@ -1,12 +1,12 @@
 import React, { useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sun, Moon, ChevronRight, Rocket, BatteryLow, Bell, LucideBellOff } from 'lucide-react';
-import { FullProfilIcon } from '@utils/PictureDispatcher';
+import { FaUserCircle } from "react-icons/fa";
 
   const getUsageTime = () => {
     const savedTime = localStorage.getItem('usageTime');
     return savedTime ? parseInt(savedTime, 10) : 0;
-  };
+  }; 
   
   const convertSecondsToTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
@@ -76,7 +76,11 @@ export const Settings = () => {
         <div className='SettingsGroupe' onClick={() =>navigate("/erebus-empire/profile/")}>
           <div className='setting-item profil'>
             <div className='Settings-InfoUser'>
-              <img src={croppedImage || FullProfilIcon} alt="Profil" className="Settings-profile-img" draggable="false" />
+              {croppedImage? (
+                <img src={croppedImage} alt="Profil" className="Settings-profile-img" draggable="false" />
+              ):(
+                <FaUserCircle className='Settings-profile-img'/>
+              )}
               <div className="Settings-username">{username}</div>
             </div>
             <div className="Settings-usage-time">
@@ -96,7 +100,7 @@ export const Settings = () => {
               </span>
             </label>
           </div>
-          <div className="setting-item">
+          {/* <div className="setting-item">
             <span className="setting-label">Mode performance</span>
             <label className="switch">
               <input type="checkbox" checked={isPerf} onChange={togglePerf} />
@@ -104,8 +108,8 @@ export const Settings = () => {
                 <span className="icon">{isPerf ? <Rocket size={14} /> : <BatteryLow size={14} />}</span>
               </span>
             </label>
-          </div>
-          <div className="setting-item">
+          </div> */}
+          {/* <div className="setting-item">
             <span className="setting-label">Notifications</span>
             <label className="switch">
               <input type="checkbox" checked={isNotif} onChange={toggleNotif} />
@@ -113,10 +117,10 @@ export const Settings = () => {
                 <span className="icon">{isNotif ? <Bell size={14} /> : <LucideBellOff size={14} />}</span>
               </span>
             </label>
-          </div>
-          <div className="setting-item">
+          </div> */}
+          {/* <div className="setting-item">
             <span className="setting-label">Langue d'affichage</span>
-          </div>
+          </div> */}
         </div>
       </div>
       <div className='Space'></div>

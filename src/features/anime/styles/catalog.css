@@ -88,6 +88,8 @@
 
   .CatalogEpisode-SearchLogo {
     width: 40px;
+    height: auto;
+    color: var(--logo-color);
     padding-right: 10px;
   }
   .CatalogEpisode-search-container {

@@ -1,10 +1,10 @@
-import React, { useRef, useEffect, useState } from 'react';
-import {useNavigate } from 'react-router-dom';
+import React, { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import EpisodeTitle from '@components/scroll-title';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, EffectCoverflow, Keyboard } from 'swiper/modules';
 import { ChevronLeft, ChevronRight } from 'lucide-react'; 
-import { toSlug } from '@utils/toSlug'
+import { getRealEpisodeName } from '@utils/getRealEpisodeName'
 import { useLoader } from '@utils/PageDispatcher';
 
 
@@ -13,100 +13,15 @@ const LatestEpisodes = ({ episodes }) => {
   const prevRef = useRef(null);
   const nextRef = useRef(null);
   const { setLoading } = useLoader();
- 
-  useEffect(() => {
-    setTimeout(() => {
-      if (swiperRef.current) {
-        swiperRef.current.params.navigation.prevEl = prevRef.current;
-        swiperRef.current.params.navigation.nextEl = nextRef.current;
-        swiperRef.current.navigation.destroy();
-        swiperRef.current.navigation.init();
-        swiperRef.current.navigation.update();
-      }
-    });
-  }, []);
+
 
   const swiperRef = React.useRef(null);
 
-
-  const parseEpisodeNumbers = (str) => {
-    const lower = str.toLowerCase();
-    const episodeMatch = lower.match(/e(pisode)?\s*(\d+)/i); 
-    const episodeNumber = episodeMatch ? episodeMatch[2] : null;
-    return { episodeNumber };
-  };
-  
-  const buildErebusPathFromRecentAnime = async (anime) => {
-    const { url: animeUrl, episode } = anime;
-    const animeId = animeUrl.split("/").slice(4, 5).join("/");
-    let embedData = [];
-    let seasonTitle = "null"; 
-    try {
-      const data = await window.electron.ipcRenderer.invoke('get-episodes', animeUrl, true, true);
-      const { animeInfo, episodes } = data;
-      embedData = episodes
-      seasonTitle = animeInfo.seasonTitle
-    } catch (err) {
-      console.error("Erreur récupération embed:", err);
-    }
-    if (!embedData || embedData.length === 0) return null;
-    const seasonId = animeUrl.split("/").slice(5, 6).join("/");
-    const { episodeNumber } = parseEpisodeNumbers(episode);
-    const episodeInfo = episode.toLowerCase();
-  
-    let typeToSearch = 'episode';
-    if (episodeInfo.includes('oav') || episodeInfo.includes('ova')) typeToSearch = 'oav';
-    else if (episodeInfo.includes('film')) typeToSearch = 'film';
-    else if (episodeInfo.includes('spécial') || episodeInfo.includes('special')) typeToSearch = 'special';
-  
-    let matchedEmbed = null;
-  
-    matchedEmbed = embedData.find(e => toSlug(e.title) === toSlug(episode));
-  
-    if (!matchedEmbed && episodeNumber) {
-      matchedEmbed = embedData.find(e => {
-        const title = e.title.toLowerCase();
-        return title.includes(typeToSearch) && title.match(/e(pisode)?\s*(\d+)/i)?.[2] === episodeNumber;
-      });
-    }
-  
-    if (!matchedEmbed && episodeNumber) {
-      matchedEmbed = embedData.find(e => {
-        const title = e.title.toLowerCase();
-        const match = title.match(/e(pisode)?\s*(\d+)/i);
-        return title.includes(typeToSearch) && match && match[2] === episodeNumber;
-      });
-    }
-    
-  
-    if (!matchedEmbed) {
-      matchedEmbed = embedData.find(e => toSlug(e.title).includes(toSlug(episode)) || toSlug(episode).includes(toSlug(e.title)));
-    }
-
-    if (!matchedEmbed) {
-      matchedEmbed = embedData[0];
-    }
-  
-    const episodeSlug = matchedEmbed ? toSlug(matchedEmbed.title) : null;
-    const finalPath = episodeSlug
-      ? `/erebus-empire/anime/${animeId}/${seasonId}/${episodeSlug}`
-      : `/erebus-empire/anime/${animeId}/${seasonId}`;
-  
-    return {
-      path: finalPath,
-      embedData,
-      matchedEmbed,
-      animeId,
-      seasonId, 
-      seasonTitle,
-    };
-  };
-  
   
   const handleEpisodeClick = async (episode) => {
     try {
       setLoading(true)
-      const { path, matchedEmbed, embedData, animeId, seasonId, seasonTitle} = await buildErebusPathFromRecentAnime(episode);
+      const { path, matchedEmbed, embedData, animeId, seasonId, seasonTitle} = await getRealEpisodeName(episode);
       const episodes = {[episode.language]: embedData};
       if (path) {
         navigate(path, {
@@ -198,7 +113,7 @@ const LatestEpisodes = ({ episodes }) => {
               }}
               aria-label="Next slide"
             >
-              <ChevronRight size={50} color="#996e35" />
+              <ChevronRight size={50} color="#996e35" /> 
             </button>
         </div>
       ) : (

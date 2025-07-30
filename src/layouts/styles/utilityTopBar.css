@@ -30,6 +30,7 @@
   }
   .UtilityTopBar-image {
     width: 75px;
+    color: var(--logo-color);
     height: 75px;
     border-radius: 50%;
     object-fit: cover;
@@ -261,6 +262,7 @@
     cursor: pointer;
   }
   .TopBar-profile-img {
+    color: var(--logo-color);
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -282,6 +284,7 @@
   }
   
   .TopBar-profile-menu-item {
+    /* background-color: blue; */
     display: flex;
     justify-content: start;
     align-items: center;
@@ -297,7 +300,7 @@
     width: 25px;
   }
   .TopBar-profile-menu-item:last-child {
-    margin: 10px 0;
+    margin: 0 0 10px 0;
   }
   .TopBar-profile-menu-item:hover {
     background-color: var(--separation-color);
@@ -390,4 +393,11 @@
   .TopBar-profile-menu-item img {
     width: 18px;
   }
+}
+
+
+.TopBar-profile-menu-logo {
+  color: var(--logo-color);
+  width: 22px;
+  height: auto;
 }

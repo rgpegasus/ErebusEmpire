@@ -24,8 +24,11 @@
 .Settings-profile-img {
   border-radius: 50%;
   height: 100px;
+  width: auto;
+  color: var(--logo-color);
   border: 2px solid var(--logo-color);
 }
+
 .profil {
   cursor: pointer;
   height: 130px

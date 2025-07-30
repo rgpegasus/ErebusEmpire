@@ -10,10 +10,18 @@ export default defineConfig({
   main: {
     build: {
       outDir: 'out/main',
-      lib: {
-        entry: resolve(__dirname, 'src/electron/main.js'),
-        formats: ['cjs'],
-        fileName: () => 'main.js'
+      rollupOptions: {
+        input: {
+          main: resolve(__dirname, 'src/electron/main.js'),
+          background: resolve(__dirname, 'src/electron/background/background.js'),
+        },
+        output: {
+          entryFileNames: chunk => {
+            if (chunk.name === 'background') return 'background/background.js';
+            return '[name].js';
+          }
+        },
+        external: ['auto-launch', 'fs-extra', 'fs', 'path', 'electron', 'discord-rpc'],
       },
     },
     resolve: {

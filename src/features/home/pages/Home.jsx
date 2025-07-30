@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 export const Home = () => {
   const [anime, setAnime] = useState(null);
   const [latestEpisodes, setLatestEpisodes] = useState([]);
+  
   const { setLoading } = useLoader();
   const [error, setError] = useState(null);  
   const [dataLoaded, setDataLoaded] = useState(false); 
@@ -64,7 +65,7 @@ useEffect(() => {
   return (
     <div className='MainPage'>
       {error && <div className="error">{error}</div>}  
-      {anime?.cover && (
+      {anime?.cover ? (
         <div className="AnimeCover">
           <h2>{anime?.title}</h2>
           <img
@@ -75,6 +76,8 @@ useEffect(() => {
           />
           <div className='AnimeCover-button' onClick={() => handleClick(anime?.url)}>Regarder</div>
         </div>
+      ) : (
+        <div className='Space'></div>
       )}
       <WatchHistory />
       <LatestEpisodes episodes={latestEpisodes} />

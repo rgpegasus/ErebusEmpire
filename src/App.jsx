@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import MenuBar from "@layouts/MenuBar";
-import TopBar from '@layouts/TopBar';
+import MenuBar from "@layouts/components/MenuBar";
+import TopBar from '@layouts/components/TopBar';
 import { Catalog, Home, Download, Season, Episode, Settings, SwitchAccount, Favorites, Watchlist, History, OnHold, AlreadySeen, Profile} from '@utils/PageDispatcher'
 import { LoaderProvider } from '@utils/PageDispatcher';
 

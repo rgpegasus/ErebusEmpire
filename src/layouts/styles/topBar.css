@@ -22,6 +22,8 @@
   .SearchLogo {
     cursor: pointer;
     width: 30px;
+    height: auto;
+    color: var(--logo-color);
     margin-right: 10px;
     opacity: 1;
   }
@@ -81,6 +83,7 @@
     cursor: pointer;
   }
   .anime-card:hover{
+    
     background-color: var(--logo-color);
   }
   .anime-card h4,
@@ -142,24 +145,60 @@
     }
   }
 
-@media (max-width: 1200px) {
-    .anime-card {
-      border-top: 2px solid var(--logo-color);
-      padding: 8px ;
-      padding-left: 16px;
-      width: 375px;
-    }
-    .anime-card h4,
-    .anime-card h3 {
-      width: 265px;
-      font-size: 15px; 
-      padding-left: 16px;
-    }
-    .anime-card h4 {
-      font-size: 13px;
-    }
-    .cover-img {
-      width: 65px;
-      height: 65px;
-    }
+
+  .NotifiedEpisodes-logo {
+    height: auto;
+    width: 30px;
+    color: var(--logo-color);
+    margin-right: 40px ;
   }
+  .NotifiedEpisodes-logo:hover {
+    cursor: pointer;
+  }
+  .NotifiedEpisodes-list {
+    top:var(--size-top-bar);
+    right: 0;
+    height: 300px;
+    position: absolute;
+    overflow-y: auto; 
+    background-color: var(--secondary-color);
+    border-bottom-left-radius: 8px;
+    box-shadow: -2px 5px 10px var(--shadow-color);
+    z-index: 100;
+    min-width: 200px;
+    height: auto;
+    max-height: 415px;
+  }
+
+  .NotifiedEpisodes-list::-webkit-scrollbar {
+    width: 12px;
+  }
+  .NotifiedEpisodes-list::-webkit-scrollbar-track {
+    background-color: rgba(var(--primary-color), 0.8);
+    border-radius: 0 0 7px 7px;
+  }
+  .NotifiedEpisodes-list::-webkit-scrollbar-thumb {
+    background-color: var(--logo-color);
+    border-radius: 7px;
+    cursor: grab;
+    border: 2px solid var(--secondary-color);
+  }
+  .NotifiedEpisodes-list::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(153, 110, 53, 0.75);
+  }
+
+  .cover-img.hidden {
+  display: none;
+}
+
+.cover-img.loaded {
+  display: block;
+  opacity: 0;
+  animation: fadeIn 0.3s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}

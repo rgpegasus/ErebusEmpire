@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom'; 
-import { DarkErebusIcon, LightErebusIcon, ErebusIcon, CatalogIcon, DownloadIcon } from '@utils/PictureDispatcher';
-
+import { DarkErebusIcon, LightErebusIcon, ErebusIcon } from '@utils/PictureDispatcher';
+import { FaListUl, FaFileDownload } from "react-icons/fa";
 const menuItems = [
-  { to: "/erebus-empire/home", imgSrc: ErebusIcon, alt: "Logo Accueil", text: "Accueil" },
-  { to: "/erebus-empire/catalogue", imgSrc: CatalogIcon, alt: "Logo Catalogue", text: "Catalogue" },
-  { to: "/erebus-empire/downloads", imgSrc: DownloadIcon, alt: "Logo Téléchargement", text: "Téléchargements" },
+  { to: "/erebus-empire/home", imgSrc: ErebusIcon, alt: "Logo Accueil", text: "Accueil" }, // image ici
+  { to: "/erebus-empire/catalogue", icon: <FaListUl className='Onglet-logo'/>, text: "Catalogue" },
+  { to: "/erebus-empire/downloads", icon: <FaFileDownload className='Onglet-logo'/>, text: "Téléchargements" },
 ];
 
 const MenuBar = () => {
@@ -30,10 +30,14 @@ const MenuBar = () => {
       <div className="logo">
         <img draggable="false" src={logo_app} alt="Logo" />
       </div>
-      {menuItems.map(({ to, imgSrc, alt, text }) => (
+      {menuItems.map(({ to, icon, imgSrc, alt, text }) => (
         <div key={to} className={`Onglet-box ${location.pathname === to ? 'Onglet-box-select' : ''}`}>
           <Link to={to}>
-            <img draggable="false" src={imgSrc} alt={alt} />
+            {imgSrc ? (
+              <img draggable="false" src={imgSrc} alt={alt} className='Onglet-logo'/>
+            ) : (
+              <div className="icon">{icon}</div>
+            )}
             <p>{text}</p>
           </Link>
         </div>

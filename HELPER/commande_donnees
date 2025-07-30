@@ -1,0 +1,20 @@
+$stats = Get-ChildItem -Recurse -Include *.js,*.jsx,*.css | 
+    ForEach-Object {
+        $content = Get-Content $_.FullName -Raw
+        [PSCustomObject]@{
+            File       = $_.FullName
+            Lines      = ($content -split "`n").Count
+            Words      = ($content -split "\s+").Count
+            Characters = $content.Length
+        }
+    }
+
+# Résumé total
+$summary = $stats | Measure-Object -Property Lines, Words, Characters -Sum
+
+# Affichage lisible
+Write-Host "📊 Résumé du projet :`n" -ForegroundColor Cyan
+Write-Host "📄 Fichiers analysés : $($stats.Count)"
+Write-Host "📏 Lignes totales     : $($summary.Sum[0])"
+Write-Host "✍️  Mots totaux       : $($summary.Sum[1])"
+Write-Host "🔡 Caractères totaux  : $($summary.Sum[2])"

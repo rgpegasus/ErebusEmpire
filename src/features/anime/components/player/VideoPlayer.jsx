@@ -46,7 +46,6 @@ export const ErebusPlayer = ({
   const timerBuffer = useRef(null);
   const playerElement = useRef(null);
   const listReproduction = useRef(null);
-  console.log("source", src)
 
   const [videoReady, setVideoReady] = useState(false);
   const [playing, setPlaying] = useState(autoPlay);
@@ -105,9 +104,13 @@ export const ErebusPlayer = ({
     setProgress(target.currentTime);
 
     if (typeof onTimeUpdate === 'function' && videoRef.current) {
-      onTimeUpdate({ currentTime: videoRef.current.currentTime });
+      onTimeUpdate({
+        currentTime: videoRef.current.currentTime,
+        duration: videoRef.current.duration,
+      });
     }
   };
+
 
 
   const goToPosition = (position) => {

@@ -28,6 +28,7 @@ export const Episode = () => {
   const skipFinalSaveRef = useRef(false);
   const videoTimeRef = useRef(videoTime);
   const [resolvedSources, setResolvedSources] = useState([]);
+  const lastPresenceUpdateRef = useRef(0);
 
   const episodeIndex = episodes[selectedLanguage].findIndex(
     (ep) => ep.title.toLowerCase().replace(/\s+/g, '-') === episodeTitle.toLowerCase().replace(/\s+/g, '-')
@@ -56,12 +57,20 @@ export const Episode = () => {
   const episodeId = episodeTitle?.toLowerCase().replace(/\s+/g, '-');
   const storageKey = episodeId ? `/erebus-empire/anime/${animeId}/${seasonId}/${episodeId}` : null;
 
-  const updatePresence = (animeTitle, episodeNumber) => {
+  const updatePresence = (animeTitle, episodeNumber, animeCover, currentTime, duration) => {
+    const now = Date.now();
+    const start = now - currentTime * 1000;
+    const end = start + duration * 1000;
+
     window.electron.ipcRenderer.send('update-rich-presence', {
       anime: animeTitle,
       episode: episodeNumber,
+      cover: animeCover,
+      startTimestamp: start,
+      endTimestamp: end,
     });
   };
+
 
   useEffect(() => {
     return () => {
@@ -89,7 +98,7 @@ useEffect(() => {
 
       setResolvedSources(updatedSources);
       setEpisodeUrl(resolvedUrls[0]);
-      updatePresence(animeTitle, `${seasonTitle} - ${episodeTitle}`);
+      updatePresence(animeTitle, `${seasonTitle} - ${episodeTitle}`, animeCover);
     } catch (err) {
       console.error("Erreur lors de la résolution des sources :", err);
       setEpisodeUrl(episodeSources.url[0]);
@@ -135,7 +144,7 @@ const changeLanguage = (lang) => {
 
   useEffect(() => {
     if (!storageKey) return;
-    animeWatchHistory.load(storageKey).then((data) => {
+    animeData.load("animeWatchHistory", storageKey).then((data) => {
       const time = parseFloat(data?.videoTime || 0);
       setVideoTime(time);
       videoTimeRef.current = time;
@@ -146,13 +155,13 @@ const changeLanguage = (lang) => {
   useEffect(() => {
     if (!restored || !storageKey) return;
     intervalRef.current = setInterval(() => {
-      animeWatchHistory.save(storageKey, buildWatchData());
+      animeData.save("animeWatchHistory", storageKey, buildWatchData());
     }, 5000);
 
     return () => {
       clearInterval(intervalRef.current);
       if (!skipFinalSaveRef.current) {
-        animeWatchHistory.save(storageKey, buildWatchData());
+        animeData.save("animeWatchHistory", storageKey, buildWatchData());
       }
     };
   }, [restored, storageKey]);
@@ -164,7 +173,7 @@ const changeLanguage = (lang) => {
   const EndEpisodeNext = (episode) => {
     skipFinalSaveRef.current = true;
     clearInterval(intervalRef.current);
-    animeWatchHistory.delete(storageKey);
+    animeData.delete("animeWatchHistory", storageKey);
     const episodeId = `${episode.title.toLowerCase().replace(/\s+/g, '-')}`;
     navigate(`/erebus-empire/anime/${animeId}/${seasonId}/${episodeId}`, {
       state: {
@@ -187,9 +196,21 @@ const changeLanguage = (lang) => {
   const BackMenu = () => navigate("/erebus-empire/home");
   const BackSeason = () => navigate(`/erebus-empire/anime/${animeId}`);
 
-  const handleVideoTimeUpdate = ({ currentTime }) => {
+  const handleVideoTimeUpdate = ({ currentTime, duration }) => {
     if (typeof currentTime === 'number' && currentTime !== videoTime) {
       setVideoTime(currentTime);
+
+      const now = Date.now();
+      if (now - lastPresenceUpdateRef.current >= 5000 && duration) {
+        lastPresenceUpdateRef.current = now;
+        updatePresence(
+          animeTitle,
+          `${seasonTitle} - ${episodeTitle}`,
+          animeCover,
+          currentTime,
+          duration
+        );
+      }
     }
   };
 

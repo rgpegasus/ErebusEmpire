@@ -1,64 +1,89 @@
-import React, { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import { LoginPageBackground } from '@utils/PictureDispatcher';
+import React, { useRef, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const Favorites = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
+  const [animeFavorites, setAnimeFavorites] = useState([]);
+  const [shiftPressed, setShiftPressed] = useState(false);
+  const containerRef = useRef(null); 
+  const [isInside, setIsInside] = useState(false);
+  const navigate = useNavigate();
 
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
+  useEffect(() => {
+    loadAnimeFavorites(); 
+    const handleKeyDown = (e) => {
+      if (e.key === 'Shift' && isInside) setShiftPressed(true);
+    };
+    const handleKeyUp = (e) => {
+      if (e.key === 'Shift') setShiftPressed(false);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [isInside]);
+  
+  const loadAnimeFavorites = async () => {
+    const all = await animeData.loadAll("animeFavorites");  
+    if (!all) return;
+
+    const animes = Object.entries(all).map(([key, data]) => ({ key, ...data }));
+    animes.sort((a, b) => a.animeTitle.localeCompare(b.animeTitle));
+    setAnimeFavorites(animes);
   };
 
+  const deleteAnimeFavorites = async (anime) => {
+    await animeData.delete("animeFavorites", anime.key);
+    const all = await animeData.loadAll("animeFavorites");
+    if (Object.keys(all).length === 0) {
+      setAnimeFavorites([]);
+    } else {
+      setAnimeFavorites((prev) => prev.filter((an) => an.key !== anime.key));
+    }
+  };
+
+const handleAnimeClick = async (anime, event) => {
+  if (event.shiftKey) {
+    deleteAnimeFavorites(anime);
+    return;
+  }
+  navigate(`/erebus-empire/anime/${anime.animeId}`, {
+  });
+  setLoading(false);
+};
+
   return (
-    <div className="login-page">
-      <img src={LoginPageBackground} alt="LoginPageBackground" className="bg-image" />
-      <div class="gradient-overlay"></div>
-      <div className="login-form">
-        
-        <h1 className="title">EREBUS EMPIRE</h1>
-        <h2>{isLogin ? "Connexion" : "Créer un compte"}</h2>
-
-        <form>
-          <input type="email" placeholder="Adresse e-mail" required />
-
-          <div className="password-wrapper">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Mot de passe"
-              required
-            />
-            <span className="toggle-icon" onClick={togglePasswordVisibility}>
-              <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-            </span>
+    <div className='MainPage'>
+      <div className='Space'></div> 
+      <div className="CategorieTitle">Animés Favoris :</div>
+      <div className='CatalogAll'
+        ref={containerRef}
+        onMouseEnter={() => setIsInside(true)}
+        onMouseLeave={() => setIsInside(false)}
+      >
+        {animeFavorites.length > 0 ? (
+          <div className="CatalogEpisodes">
+            {animeFavorites.map((anime, i) => (
+              <div key={anime?.animeTitle || i} className={`CatalogEpisodes-item ${shiftPressed ? 'shift-delete' : ''}`}>
+                <div className="CatalogEpisodes-cover">
+                  <h3>{anime?.animeTitle}</h3>
+                  <img src={anime?.animeCover} alt={anime?.animeTitle} draggable={false} className="EpisodeCover" />
+                  <div onClick={(e) => handleAnimeClick(anime, e)} className='CatalogEpisodes-button'>{shiftPressed?"Suppr":"Voir"}</div>
+                </div>
+              </div>
+            ))}
           </div>
-
-          <button className="btn primary">{isLogin ? "Se connecter" : "S'inscrire"}</button>
-
-          <div className="options">
-            <label>
-              <input type="checkbox" />
-              Se souvenir de moi
-            </label>
-            <a href="#">Besoin d’aide ?</a>
+        ) : (
+          <div className="AFK">
+            <p>Aucun animé en attente</p>
           </div>
-
-          <div className="actions">
-            <button
-              type="button"
-              className="btn secondary"
-              onClick={() => setIsLogin(!isLogin)}
-            >
-              {isLogin ? "Créer un compte" : "Déjà inscrit ? Se connecter"}
-            </button>
-
-            <button type="button" className="btn tertiary">
-              Continuer sans se connecter
-            </button>
-          </div>
-        </form>
+        )}
       </div>
+      <div className='Space'></div>
     </div>
   );
 };
+

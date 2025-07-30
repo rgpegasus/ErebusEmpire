@@ -1,32 +1,53 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron';
-import { join} from 'path';
+import { join } from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import { ErebusIcon } from '@utils/PictureDispatcher';
 import {AnimeScraper} from 'better-ani-scraped';
 import fsExtra from 'fs-extra'; 
 import fs from 'fs';
-import RPC from 'discord-rpc';
+import { Client } from '@xhayper/discord-rpc';
 const clientId = '1366193765701783604';
-const rpc = new RPC.Client({ transport: 'ipc' });
+const rpc = new Client({ transport: { type: 'ipc' }, clientId });
 const scraper = new AnimeScraper("animesama");
 import { SearchAnime, RandomAnime, InfoAnime, SeasonsAnime, EpisodesSeason, UrlEpisode, LatestEpisodes, CatalogAnime, DownloadEpisode, DownloadList, DeleteDownloadEpisode, ExportData, ImportData, AvailableLanguages } from '@utils/IpcHandlerDispatcher.js'; 
-import { AnimeCoverTemp, AnimeWatchHistory } from '@utils/ServicesDataDispatcher'
+import { AnimeCoverTemp, AnimeData } from '@utils/ServicesDataDispatcher'
+import { spawn } from 'child_process';
+
+
+function launchBackgroundScript() {
+  const scriptPath = join(__dirname, 'background', 'background.js');
+
+  const subprocess = spawn(process.execPath, [scriptPath], {
+    detached: false,
+    stdio: 'ignore'
+  });
+
+  subprocess.unref();
+}
+
+launchBackgroundScript();
+
 const sessionStorage = join(app.getPath('appData'), 'erebus-empire', 'userData', 'anime', 'sessionStorage');
 
 let startTimestamp = null;
 let mainWindow = null;
 
-async function setActivity(details = 'En train de mater des animés', state = 'Sur Erebus Empire') {
+async function setActivity(details = "Dans la liste d'animés", state = 'Sur Erebus Empire') {
   if (!rpc) return;
   if (!startTimestamp) startTimestamp = new Date();
 
-  rpc.setActivity({
+  rpc.user.setActivity({
     details,
     state,
     startTimestamp,
     largeImageKey: 'icon',
     largeImageText: 'Erebus Empire',
     instance: false,
+    type: 3, 
+    buttons: [
+      { label: "Discord", url: "https://discord.gg/Mj9cYRQTcU" },
+      { label: "Installer", url: "https://github.com/rgpegasus/ErebusEmpire/releases/latest" }
+    ],
   });
 }
 
@@ -96,12 +117,10 @@ function createWindow() {
   });
 }
 
-// Expose mainWindow if needed
 module.exports = {
   getMainWindow: () => mainWindow
 };
 
-// Gestion de la single instance lock
 const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
@@ -121,31 +140,31 @@ if (!gotTheLock) {
       optimizer.watchWindowShortcuts(window);
     });
 
-    ipcMain.on('update-rich-presence', (event, { anime, episode }) => {
-      if (!rpc) return;
-      if (!startTimestamp) startTimestamp = new Date();
-      rpc.setActivity({
+    ipcMain.on('update-rich-presence', (event, { anime, episode, cover, startTimestamp, endTimestamp}) => {
+      if (!rpc || !rpc.user || typeof rpc.user.setActivity !== 'function') {
+        console.warn('Rich Presence non prêt : rpc ou rpc.user non défini');
+        return;
+      }
+      rpc.user.setActivity({
         details: `Regarde ${anime}`,
         state: `${episode}`,
-        startTimestamp,
-        largeImageKey: 'icon',
-        largeImageText: 'Erebus Empire',
-        smallImageKey: 'play',
+        startTimestamp: startTimestamp ? new Date(startTimestamp) : new Date(),
+        endTimestamp: endTimestamp ? new Date(endTimestamp) : undefined,
+        largeImageKey: `${cover}`,
+        largeImageText: `${anime}`,
         instance: false,
+        type:3,
+        buttons: [
+          { label: "Discord", url: "https://discord.gg/Mj9cYRQTcU" },
+          { label: "Installer", url: "https://github.com/rgpegasus/ErebusEmpire/releases/latest" }
+        ],
       });
     });
 
     ipcMain.on('defaul-rich-presence', () => {
       if (!rpc) return;
       if (!startTimestamp) startTimestamp = new Date();
-      rpc.setActivity({
-        details: "Se promène dans la liste d'animés",
-        state: 'Sur Erebus Empire',
-        startTimestamp,
-        largeImageKey: 'icon',
-        largeImageText: 'Erebus Empire',
-        instance: false,
-      });
+      setActivity();
     });
 
     SearchAnime(scraper);
@@ -157,7 +176,7 @@ if (!gotTheLock) {
     LatestEpisodes(scraper);
     CatalogAnime(scraper);
     AvailableLanguages(scraper);
-    AnimeWatchHistory();
+    AnimeData();
     DownloadEpisode();
     DownloadList();
     DeleteDownloadEpisode();
