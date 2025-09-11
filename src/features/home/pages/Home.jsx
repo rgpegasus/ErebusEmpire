@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLoader } from '@utils/PageDispatcher';
+import { useLoader } from '@utils/dispatchers/Page';
 import LatestEpisodes from '@components/latest-episodes';
 import WatchHistory from '@components/watchHistory';
 import { useNavigate } from 'react-router-dom';
@@ -20,7 +20,7 @@ useEffect(() => {
         if (!animeData) {
           animeData = await window.electron.ipcRenderer.invoke('random-anime');
           animeCover.save(animeData);
-        }
+        } 
         setAnime(animeData);
         const episodes = await window.electron.ipcRenderer.invoke('get-latest-episode');
         setLatestEpisodes(episodes || []);
@@ -80,6 +80,7 @@ useEffect(() => {
         <div className='Space'></div>
       )}
       <WatchHistory />
+      <div className='Space'></div>
       <LatestEpisodes episodes={latestEpisodes} />
       <div className='Space'></div>
     </div>

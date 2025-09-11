@@ -1,5 +1,4 @@
   .SelectSeason {
-    margin-left:50px;
     padding: 10px 15px;
     background-color: var(--secondary-color);
     color: var(--primary-text);
@@ -10,20 +9,63 @@
     font-size: 18px;
     font-weight: var(--button-weight);
     cursor: pointer;
-    outline: none;
+    outline: none; 
     padding-top: 10px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   } 
+  .OptionStyle {
+    background-color: var(--secondary-color);
+  }
   .SelectSeason:focus {
     border-color: var(--logo-color);
   }
+  .hidden-checkbox {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+.custom-checkbox {
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+  border: 1px solid var(--logo-color);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.2s;
+  background: var(--background-color);
+  position: relative;
+}
+
+/* la coche à l'intérieur */
+.custom-checkbox::after {
+  content: "";
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  width: 8px;
+  height: 5px;
+  border: solid white;
+  border-width: 0 0 1.5px 2.25px;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.hidden-checkbox:checked + .custom-checkbox {
+  background: var(--logo-color);
+}
+
+.hidden-checkbox:checked + .custom-checkbox::after {
+  opacity: 1; /* affiche la coche quand c’est check */
+}
+
   .SingleSeasonTitle {
     width: fit-content;
     border-radius: 8px;
     background-color: var(--secondary-color);
-    margin-left:50px;
     border: 2px solid transparent;
     padding: 10px 15px;
     font-family: var(--font-main);
@@ -50,14 +92,19 @@
   }
   .SeasonsPageTop {
     display: flex;
-    gap: 50px;
+    margin: 0 50px ;
     align-items: center;
   }
   .SeasonsPageTop-item {
     display: flex;
-    gap:30px;
+    justify-content: space-between;
     flex-direction: row;
     align-items: center;
+    width: 100%;
+  }
+  .SeasonsPageTop-left {
+    display: flex;
+    gap:30px
   }
   .LanguageItem {
     margin-top:3px;
@@ -72,6 +119,7 @@
     margin-right: 0;
   }
   .LanguageItem:hover {
+    opacity: 0.7;
     cursor: pointer;
   }
   .LanguageItem-txt {
@@ -86,8 +134,10 @@
     border-radius: 5px;
     object-fit: cover;
   }
+
   .LanguageItem.selected {
     opacity: 1;
+    cursor: auto;
   }
   .LanguageItem-txt.selected {
     color: var(--logo-color);
@@ -104,9 +154,20 @@
     box-shadow: -2px 5px 10px var(--shadow-color);
     background-color: #13151C;
     border: 2px solid var(--logo-color);
+    letter-spacing: 1px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
   }
 
   .EpisodeItem h2 {
+    position: absolute;
+    color: #D1D7E0;
+    text-transform: uppercase;
+    text-align: center;
+    font-weight: var(--main-title-weight);
+    font-family: var(--font-main);
     font-size: 21px;
     display: -webkit-box;          
     -webkit-line-clamp: 2;          
@@ -121,7 +182,12 @@
   .EpisodeItem-img {
     -webkit-user-drag: none;
     opacity: 0.3;
-    
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom: 1px solid var(--separation-color);
     border-radius: 7px;
   }
 
@@ -222,7 +288,7 @@
   padding: 10px 15px;
   color: var(--primary-text);
   cursor: pointer;
-  border: none;
+  border: 2px solid transparent;
   transition: 0.2s ease;
   font-family: var(--font-main);
   font-size: 15px;
@@ -233,6 +299,7 @@
   position: absolute;
   background-color: var(--secondary-color);
   border-radius: 8px;
+  right: 50px;
   margin-top: 4px;
   padding: 10px 15px;
   z-index: 10;

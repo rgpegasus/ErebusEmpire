@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useLoader, Loader } from '@utils/PageDispatcher'; 
-import { ErebusPlayer } from '@features/anime/components/player/VideoPlayer';
+import { useLoader, Loader } from '@utils/dispatchers/Page'; 
+import { ErebusPlayer } from '@components/video-player/VideoPlayer';
 
 export const Episode = () => {  
   const navigate = useNavigate();
@@ -30,12 +30,13 @@ export const Episode = () => {
   const [resolvedSources, setResolvedSources] = useState([]);
   const lastPresenceUpdateRef = useRef(0);
 
-  const episodeIndex = episodes[selectedLanguage].findIndex(
-    (ep) => ep.title.toLowerCase().replace(/\s+/g, '-') === episodeTitle.toLowerCase().replace(/\s+/g, '-')
+  const episodeIndex = episodes?.[selectedLanguage]?.findIndex(
+    (ep) => ep.title?.toLowerCase().replace(/\s+/g, '-') === episodeTitle?.toLowerCase()?.replace(/\s+/g, '-')
   );
+
   
   useEffect(() => {
-    const EpisodeLanguages = availableLanguages.filter((lang) => {
+    const EpisodeLanguages = availableLanguages?.filter((lang) => {
       const epList = episodes[lang.toLowerCase()];
       return epList && epList.length > episodeIndex && epList[episodeIndex]?.title;
     });
@@ -52,7 +53,7 @@ export const Episode = () => {
     }
   }, [selectedLanguage, episodeIndex, episodes]);
 
-  const nextEpisode = episodes[selectedLanguage][episodeIndex + 1];
+  const nextEpisode = episodes?.[selectedLanguage]?.[episodeIndex + 1];
 
   const episodeId = episodeTitle?.toLowerCase().replace(/\s+/g, '-');
   const storageKey = episodeId ? `/erebus-empire/anime/${animeId}/${seasonId}/${episodeId}` : null;
@@ -86,7 +87,7 @@ useEffect(() => {
       setLoading(true);
 
       const resolvedUrls = await Promise.all(
-        episodeSources.url.map((epUrl, index) =>
+        episodeSources.url?.map((epUrl, index) =>
           window.electron.ipcRenderer.invoke('get-url', epUrl, episodeSources.host[index])
         )
       );
@@ -230,7 +231,7 @@ const changeLanguage = (lang) => {
     }
   };
 
-  if (loading || !restored) {
+  if (loading || !restored ) {
     return <Loader />;
   }
 
@@ -254,7 +255,7 @@ const changeLanguage = (lang) => {
         } : null}
         onNextClick={() => EndEpisodeNext(nextEpisode)}
         onClickItemListReproduction={(slug) => {
-          const episode = episodes[selectedLanguage].find(
+          const episode = episodes[selectedLanguage]?.find(
             (ep) => ep.title.toLowerCase().replace(/\s+/g, '-') === slug
           );
           if (episode) handleNavigation(episode);

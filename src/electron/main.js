@@ -1,7 +1,8 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron';
 import { join } from 'path';
+import path from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
-import { ErebusIcon } from '@utils/PictureDispatcher';
+import { ErebusIcon } from '@utils/dispatchers/Pictures';
 import {AnimeScraper} from 'better-ani-scraped';
 import fsExtra from 'fs-extra'; 
 import fs from 'fs';
@@ -9,8 +10,8 @@ import { Client } from '@xhayper/discord-rpc';
 const clientId = '1366193765701783604';
 const rpc = new Client({ transport: { type: 'ipc' }, clientId });
 const scraper = new AnimeScraper("animesama");
-import { SearchAnime, RandomAnime, InfoAnime, SeasonsAnime, EpisodesSeason, UrlEpisode, LatestEpisodes, CatalogAnime, DownloadEpisode, DownloadList, DeleteDownloadEpisode, ExportData, ImportData, AvailableLanguages } from '@utils/IpcHandlerDispatcher.js'; 
-import { AnimeCoverTemp, AnimeData } from '@utils/ServicesDataDispatcher'
+import { SearchAnime, RandomAnime, InfoAnime, SeasonsAnime, EpisodesSeason, UrlEpisode, LatestEpisodes, CatalogAnime, DownloadEpisode, DownloadList, DeleteDownloadEpisode, ExportData, ImportData, AvailableLanguages } from '@utils/dispatchers/IpcHandler'; 
+import { AnimeCoverTemp, AnimeData } from '@utils/dispatchers/ServicesData'
 import { spawn } from 'child_process';
 
 
@@ -27,10 +28,11 @@ function launchBackgroundScript() {
 
 launchBackgroundScript();
 
-const sessionStorage = join(app.getPath('appData'), 'erebus-empire', 'userData', 'anime', 'sessionStorage');
+const sessionStorage = join(app.getPath('appData'), 'Erebus Empire', 'userData', 'anime', 'sessionStorage');
 
 let startTimestamp = null;
 let mainWindow = null;
+let deeplinkingUrl = null;
 
 async function setActivity(details = "Dans la liste d'animés", state = 'Sur Erebus Empire') {
   if (!rpc) return;
@@ -56,8 +58,18 @@ rpc.on('ready', () => {
 });
 
 rpc.login({ clientId }).catch(console.error);
-
-function createWindow() {
+function handleDeepLink(url) {
+  if (mainWindow) {
+    if (mainWindow.webContents.isLoading()) {
+      mainWindow.webContents.once('did-finish-load', () => {
+        mainWindow.webContents.send('deep-link', url);
+      });
+    } else {
+      mainWindow.webContents.send('deep-link', url);
+    }
+  }
+}
+function createWindow(route = '/') {
   mainWindow = new BrowserWindow({
     width: 1500,
     height: 1000,
@@ -65,7 +77,8 @@ function createWindow() {
     minHeight: 720,
     show: false,
     autoHideMenuBar: false,
-    frame: true,
+    frame: false,
+    titleBarStyle: 'hidden',
     fullscreen: true,
     ...(process.platform === 'linux' ? { icon: ErebusIcon } : {}),
     webPreferences: {
@@ -74,7 +87,13 @@ function createWindow() {
       sandbox: false
     }
   });
-
+  if (process.defaultApp) {
+    if (process.argv.length >= 2) {
+      app.setAsDefaultProtocolClient('erebusempire', process.execPath, [path.resolve(process.argv[1])]);
+    }
+  } else {
+    app.setAsDefaultProtocolClient('erebusempire');
+  }
   const logToRenderer = (msg) => {
     if (mainWindow) mainWindow.webContents.send('log-from-main', msg);
   };
@@ -98,9 +117,9 @@ function createWindow() {
   });
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL']);
+    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'] + '#' + route);
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'));
+    mainWindow.loadFile(join(__dirname, '../renderer/index.html'), { hash: route });
   }
 
   mainWindow.on('closed', () => {
@@ -120,26 +139,51 @@ function createWindow() {
 module.exports = {
   getMainWindow: () => mainWindow
 };
+app.on('open-url', (event, url) => {
+  event.preventDefault();
+  deeplinkingUrl = url;
+  handleDeepLink(url);
+});
+
+if (process.platform === 'win32') {
+  const url = process.argv.find(arg => arg.startsWith('erebusempire://'));
+  if (url) {
+    deeplinkingUrl = url;
+  }
+}
 
 const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
   app.quit();
 } else {
-  app.on('second-instance', () => {
+  app.on('second-instance', (event, argv) => {
+    const url = argv.find(arg => arg.startsWith('erebusempire://'));
+    if (url) {
+      deeplinkingUrl = url;
+      if (mainWindow) {
+        mainWindow.webContents.send('deep-link', deeplinkingUrl);
+      }
+    }
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore();
       mainWindow.focus();
     }
   });
-
   app.whenReady().then(() => {
-    electronApp.setAppUserModelId('com.electron');
-
+    electronApp.setAppUserModelId('com.erebus-empire.app');
     app.on('browser-window-created', (_, window) => {
       optimizer.watchWindowShortcuts(window);
     });
-
+    const route = deeplinkingUrl
+      ? deeplinkingUrl.replace('erebusempire://', '')
+      : '/';
+    createWindow(route);
+    // mainWindow.webContents.once('did-finish-load', () => {
+    //   if (deeplinkingUrl) {
+    //     mainWindow.webContents.send('deep-link', deeplinkingUrl);
+    //   }
+    // });
     ipcMain.on('update-rich-presence', (event, { anime, episode, cover, startTimestamp, endTimestamp}) => {
       if (!rpc || !rpc.user || typeof rpc.user.setActivity !== 'function') {
         console.warn('Rich Presence non prêt : rpc ou rpc.user non défini');
@@ -183,7 +227,6 @@ if (!gotTheLock) {
     ExportData();
     ImportData();
     AnimeCoverTemp();
-    createWindow();
     
 
     ipcMain.on('open-devtools', () => {
@@ -202,11 +245,20 @@ if (!gotTheLock) {
       if (BrowserWindow.getAllWindows().length === 0) createWindow();
     });
   });
-
-
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
       app.quit();
     }
+  });
+  ipcMain.on('window-minimize', () => mainWindow.minimize());
+
+  ipcMain.on('window-toggle-fullscreen', () => {
+    const isFull = mainWindow.isFullScreen();
+    mainWindow.setFullScreen(!isFull);
+  });
+
+  ipcMain.on('window-close', () => {
+    mainWindow = null;
+    app.quit(); 
   });
 }

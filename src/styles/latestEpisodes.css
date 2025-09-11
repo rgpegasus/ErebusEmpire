@@ -15,7 +15,10 @@
   font-size: 30px;
   font-weight: var(--title-weight);
 }
-
+.LatestEpisodes-ImgContainer {
+  height: 100%;
+  overflow: hidden;
+}
 .LatestEpisodes {
   margin: 0 50px; 
   border-radius: 7px;
@@ -67,10 +70,16 @@
 .Button-navigation {
   z-index: 10;
   background: none;
+  display: flex;
+  align-items: center;
   border: none;
-  transform: translateY(-25px);
-  cursor: pointer;
   padding: 0;
+}
+.Button-navigation-logo {
+  cursor: pointer;
+  height: 50px;
+  width: auto;
+  color: var(--logo-color);
 }
 .LatestEpisodes-wrapper::before {
   left: 0;

@@ -2,7 +2,7 @@
   display: flex;
   position: absolute;
   flex-direction: column;
-  z-index: 100000;
+  z-index: 1000;
   background-color: var(--background-color);
   align-items: center;
   justify-content: center;

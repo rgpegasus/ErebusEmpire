@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: erebus-empire
+appId: com.erebus-empire.app
+productName: Erebus Empire
 directories:
   buildResources: build
 files:
@@ -13,8 +13,9 @@ asarUnpack:
   - puppeteer/**
 win:
   executableName: erebus-empire
+  
 nsis:
-  artifactName: ${name}-${version}-setup.${ext}
+  artifactName: ErebusEmpire-v${version}-installer.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always

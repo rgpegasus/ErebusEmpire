@@ -1,24 +1,25 @@
 import { ipcMain, app} from 'electron';
 import isDev from 'electron-is-dev';
-import path from 'path';
+import { join } from 'path';
+import { BrowserWindow } from 'electron';
 import fs from 'fs';
 import { exec } from 'child_process';
-import { SanitizeName } from '@utils/SanitizeName'
-const userDataFolder = path.join(app.getPath('appData'), 'erebus-empire', 'userData', 'animeDownload');
+import { SanitizeName } from '@utils/functions/SanitizeName'
+const userDataFolder = join(app.getPath('appData'), 'Erebus Empire', 'userData', 'animeDownload');
 
 function DownloadEpisode() {
   ipcMain.handle('download-video', async (event, videoUrl, metaData) => {
     const { episodeTitle, seasonTitle, animeTitle, animeCover } = metaData;
   
     const ytDlpPath = isDev
-      ? path.join(__dirname, '..', '..', 'resources', 'bin', 'yt-dlp.exe')
-      : path.join(process.resourcesPath, 'app.asar.unpacked', 'resources', 'bin', 'yt-dlp.exe');
+      ? join(__dirname, '..', '..', 'resources', 'bin', 'yt-dlp.exe')
+      : join(process.resourcesPath, 'app.asar.unpacked', 'resources', 'bin', 'yt-dlp.exe');
 
-    const animeFolder = path.join(userDataFolder,  SanitizeName(animeTitle));
-    const seasonFolder = path.join(animeFolder,  SanitizeName(seasonTitle));
-    const episodePath = path.join(seasonFolder, `${SanitizeName(episodeTitle)}.mp4`);
-    const coverPath = path.join(animeFolder, 'cover.jpg');
-    const dataJsonPath = path.join(animeFolder, 'animeData.json');
+    const animeFolder = join(userDataFolder,  SanitizeName(animeTitle));
+    const seasonFolder = join(animeFolder,  SanitizeName(seasonTitle));
+    const episodePath = join(seasonFolder, `${SanitizeName(episodeTitle)}.mp4`);
+    const coverPath = join(animeFolder, 'cover.jpg');
+    const dataJsonPath = join(animeFolder, 'animeData.json');
   
     [userDataFolder, animeFolder, seasonFolder].forEach((f) => {
       if (!fs.existsSync(f)) fs.mkdirSync(f, { recursive: true });
@@ -47,12 +48,21 @@ function DownloadEpisode() {
     };
     fs.writeFileSync(dataJsonPath, JSON.stringify(animeData, null, 2));
   
-    const command = `"${ytDlpPath}" -o "${episodePath}" "${videoUrl}"`;
+    const command = `"${ytDlpPath}" --downloader ffmpeg --hls-use-mpegts -o "${seasonFolder}/%(title)s.%(ext)s" --merge-output-format mp4 "${videoUrl}"`;
+
+
   
     return new Promise((resolve, reject) => {
       const downloadProcess = exec(command, (error, stdout, stderr) => {
         if (error) {
           return reject(stderr);
+        }
+        const files = fs.readdirSync(seasonFolder);
+        const downloadedFilePath = files
+          .map(f => join(seasonFolder, f))
+          .find(f => f.endsWith(".mp4")); 
+        if (downloadedFilePath && downloadedFilePath !== episodePath) {
+          fs.renameSync(downloadedFilePath, episodePath);
         }
         const updated = JSON.parse(fs.readFileSync(dataJsonPath, 'utf-8'));
         updated.season[seasonTitle][episodeTitle].downloadedAt = new Date().toISOString();
@@ -61,7 +71,7 @@ function DownloadEpisode() {
         resolve(stdout);
       });
   
-      downloadProcess.stdout.on('userData', (data) => {
+      downloadProcess.stdout.on('data', (data) => {
         const output = data.toString();
         const match = output.match(/\[download\]\s+(\d+(?:\.\d+)?)%.*?ETA (\d+:\d+)/);
         const mainWindow = BrowserWindow.getAllWindows()[0];
@@ -93,7 +103,7 @@ function DownloadEpisode() {
           }
         }
       });      
-      downloadProcess.stderr.on('userData', (data) => {
+      downloadProcess.stderr.on('data', (data) => {
       });
     });
   });

@@ -1,68 +1,52 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useLoader } from '@utils/PageDispatcher';
-import { TbSearch } from "react-icons/tb";
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLoader } from '@utils/dispatchers/Page';
+import { SearchIcon } from '@utils/dispatchers/Icons';
+import ImgLoader from '@components/img-loader/ImgLoader';
+import styles from './Catalog.module.css';
 
 export const Catalog = () => {
   const [listAnime, setListAnime] = useState([]);
   const [input, setInput] = useState('');
-  const [page, setPage] = useState(1);
   const [hasNext, setHasNext] = useState(true);
-  const { setLoading } = useLoader();
-  const [query, setQuery] = useState('');
-  const navigate = useNavigate();
-  const isSearch = query.trim() !== '';
 
-  const preloadImages = async (items) => {
-    await Promise.all(items.map(anime => new Promise(resolve => {
-      const img = new Image();
-      img.src = anime.cover;
-      img.onload = img.onerror = resolve;
-    })));
+  const { setLoading } = useLoader();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const page = parseInt(searchParams.get('page') || '1', 10);
+  const query = searchParams.get('q') || '';
+
+  const fetchData = async (startPage, searchQuery = '') => {
+    setLoading(true);
+
+    try {
+      const isSearching = searchQuery.trim() !== '';
+      const functionName = isSearching ? 'search-anime' : 'get-all-anime';
+      const functionArgs = isSearching ? [searchQuery, 9999999] : [];
+
+      const pageNumbers = [0, 1];
+      const results = await Promise.all(
+        pageNumbers.map(offset =>
+          window.electron.ipcRenderer.invoke(functionName, ...functionArgs, startPage + offset)
+        )
+      );
+
+      const firstThreePages = results.slice(0, 1).flat().filter(Boolean);
+      setListAnime(firstThreePages);
+      setHasNext((results[1] || []).length > 0);
+    } catch (error) {
+      console.error("Erreur lors du chargement des données :", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
- const fetchData = async (startPage, searchQuery = '') => {
-  setLoading(true);
-
-  try {
-    const isSearching = searchQuery.trim() !== '';
-    const functionName = isSearching ? 'search-anime' : 'get-all-anime';
-    const functionArgs = isSearching ? [searchQuery, 9999999] : [];
-
-    const pageNumbers = [0, 1, 2];
-    const results = await Promise.all(
-      pageNumbers.map(offset => 
-        window.electron.ipcRenderer.invoke(functionName, ...functionArgs, startPage + offset)
-      )
-    );
-
-    const firstThreePages = results.slice(0, 2).flat().filter(Boolean); 
-
-    setListAnime(firstThreePages);
-    setPage(startPage);
-    setHasNext((results[2] || []).length > 0);
-
-    // Précharger les images pour éviter les flashs
-    await preloadImages(firstThreePages);
-    
-  } catch (error) {
-    console.error("Erreur lors du chargement des données :", error);
-  } finally {
-    setLoading(false);
-  }
-};
-
-
   useEffect(() => {
-    if (input.trim() === '') {
-      setQuery('');
-      fetchData(1);
-    }
-  }, [input]);
-
-  useEffect(() => {
-    if (isSearch) fetchData(1, query);
-  }, [query]);
+    setInput(query);
+    fetchData(page, query);
+    document.querySelector('.MainPage')?.scrollTo({ top: 0, behavior: 'instant' });
+  }, [page, query]);
 
   const getAnimeId = (url) => {
     try {
@@ -74,35 +58,34 @@ export const Catalog = () => {
 
   const handleSearch = () => {
     const trimmed = input.trim();
-    if (trimmed === '') {
-      setQuery('');
-      fetchData(1);
-    } else {
-      setQuery(trimmed);
-      fetchData(1, trimmed);
-    }
+    setSearchParams({ page: '1', ...(trimmed && { q: trimmed }) });
   };
 
   const handleClear = () => {
-    if (input.trim() === '' && !isSearch && page === 1) return;
     setInput('');
-    setQuery('');
-    fetchData(1);
+    setSearchParams({ page: '1' });
   };
 
   const handlePageChange = (delta) => {
     const newPage = page + delta;
     if (newPage < 1) return;
-    fetchData(newPage, isSearch ? query : '');
+
+    setSearchParams(prev => {
+      const params = new URLSearchParams(prev);
+      params.set('page', newPage);
+      if (query.trim()) params.set('q', query);
+      else params.delete('q');
+      return params;
+    });
   };
 
   return (
     <div className='MainPage'>
-      <div className='Space'></div> 
+      <div className='Space'></div>
       <div className="CategorieTitle">Catalogue d'animé :</div>
       <div className='CatalogAll'>
         <div className="CatalogEpisode-search-container">
-          <TbSearch className='CatalogEpisode-SearchLogo'/>
+          <SearchIcon className='CatalogEpisode-SearchLogo' />
           <input
             type="text"
             value={input}
@@ -123,8 +106,18 @@ export const Catalog = () => {
               <div key={anime.title || i} className="CatalogEpisodes-item">
                 <div className="CatalogEpisodes-cover">
                   <h3>{anime.title}</h3>
-                  <img src={anime.cover} alt={anime.title} draggable={false} className="EpisodeCover" />
-                  <div onClick={() => navigate(`/erebus-empire/anime/${getAnimeId(anime.url)}/`)} className='CatalogEpisodes-button'>voir</div>
+                  <div className={styles.Cover}>
+                    <ImgLoader
+                      key={anime.title + anime.cover}
+                      anime={anime}
+                    />
+                  </div>
+                  <div
+                    onClick={() => navigate(`/erebus-empire/anime/${getAnimeId(anime.url)}/`)}
+                    className='CatalogEpisodes-button'
+                  >
+                    voir
+                  </div>
                 </div>
               </div>
             ))}
@@ -134,13 +127,13 @@ export const Catalog = () => {
             <p>Aucun animé disponible</p>
           </div>
         )}
+
         <div className="pagination-buttons">
-          <button onClick={() => handlePageChange(-2)} disabled={page <= 1}>Précédent</button>
-          <button onClick={() => handlePageChange(2)} disabled={!hasNext}>Suivant</button>
+          <button onClick={() => handlePageChange(-1)} disabled={page <= 1}>Précédent</button>
+          <button onClick={() => handlePageChange(1)} disabled={!hasNext}>Suivant</button>
         </div>
       </div>
       <div className='Space'></div>
     </div>
   );
 };
-

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { ErebusPlayer } from '@features/anime/components/player/VideoPlayer';
+import { ErebusPlayer } from '@components/video-player/VideoPlayer';
 import { useNavigate } from 'react-router-dom';
-import { useLoader } from '@utils/PageDispatcher';
+import path from 'path'
+import { useLoader } from '@utils/dispatchers/Page';
 const naturalSort = (a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
 
 export const Download = () => {
@@ -126,7 +127,8 @@ export const Download = () => {
     } else {
       setLoading(true)
       const { animeTitle, seasonTitle, episodeTitle, animeCover } = episode.metadata;
-      const filePath = encodeURI(`file://${episode.path.replace(/\\/g, '/')}`);
+      const normalizedPath = episode.path.replace(/\\/g, "/");
+      const filePath = `file:///${normalizedPath}`;
       console.log(filePath)
       setSelectedEpisode({ animeTitle, seasonTitle, episodeTitle, animeCover, filePath });
       setLoading(false)

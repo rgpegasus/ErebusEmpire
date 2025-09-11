@@ -46,7 +46,6 @@ position: fixed;
 
 
 /* Bannière pour le menu et les saisons */
-.EpisodeItem,
 .AnimeCover {
 margin: 0;
 letter-spacing: 1px;
@@ -61,7 +60,7 @@ position: relative;
 .AnimeCover {
   background-color: #0B0C10;
 }
-.EpisodeItem h2,
+
 .AnimeCover h2{
 position: absolute;
 color: #D1D7E0;
@@ -72,7 +71,7 @@ font-weight: var(--main-title-weight);
 font-family: var(--font-main);
 max-width: 90%;
 }
-.EpisodeItem-img,
+
 .AnimeCover-img {
 opacity: 0.4;
 width: 100%;
@@ -171,43 +170,5 @@ display: inline-block;
   }
   .Space {
     height: 36px;
-  }
-}
-.ImageLoader {
-  position: relative;
-  background: #ff8585;
-  overflow: hidden;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  width: 75px;
-  height: 75px;
-  border-radius: 8px;
-}
-
-/* Animation de brillance */
-.ImageLoader::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100px;
-  width: 100px;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, #FFF, transparent);
-  animation: loading 1.5s infinite;
-  z-index: 2;
-}
-
-/* Animation */
-@keyframes loading {
-  100% {
-    left: 100%;
-  }
-}
-
-@media (max-width: 1920px) {
-  .ImageLoader {
-    width: 65px;
-    height: 65px;
   }
 }

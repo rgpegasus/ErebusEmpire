@@ -1,0 +1,62 @@
+.Logo {
+  color: var(--logo-color);
+  width: 22px;
+  height: auto;
+  margin-right: 15px;
+} 
+
+.LogoImg {
+    width: 22px;
+    height: 22px;
+    margin-right: 15px;
+}
+.Link {
+    width: 100%;
+    display: flex;
+    text-decoration: none; 
+    padding: 12px 40px;
+    height: 100%;
+    align-items: center;
+}
+.Label {
+    font-size: 17px;
+    color: var(--primary-text);
+    font-family: var(--font-main);
+    font-weight: var(--little-title-weight);
+}
+.OngletBoxClick {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  cursor: pointer;
+  padding: 12px 40px;
+}
+.OngletBox {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .OngletBox:last-child,
+  .OngletBoxClick:last-child {
+    margin: 0 0 10px 0;
+  }
+
+  .OngletBoxSelect,
+  .OngletBoxClick:hover,
+  .OngletBox:hover {
+    background-color: var(--separation-color);
+  }
+
+@media (max-width:1920px) {
+  .Label {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .Label {
+    font-size: 14px;
+  }
+}

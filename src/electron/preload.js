@@ -28,6 +28,17 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('api', api);
     contextBridge.exposeInMainWorld('animeCover', animeCover); 
     contextBridge.exposeInMainWorld('animeData', animeData); 
+    contextBridge.exposeInMainWorld('electronAPI', {
+      minimize: () => ipcRenderer.send('window-minimize'),
+      toggleFullScreen: () => ipcRenderer.send('window-toggle-fullscreen'),
+      close: () => ipcRenderer.send('window-close')
+    });
+    contextBridge.exposeInMainWorld('deeplinkAPI', {
+      onDeepLink: (callback) => {
+        ipcRenderer.on('deep-link', (event, url) => callback(url));
+      }
+    });
+
   } catch (error) {
     console.error(error);
   }
@@ -36,4 +47,12 @@ if (process.contextIsolated) {
   window.api = api;
   window.animeCover = animeCover; 
   window.animeData = animeData; 
+  window.electronAPI = {
+    minimize: () => ipcRenderer.send('window-minimize'),
+    toggleFullScreen: () => ipcRenderer.send('window-toggle-fullscreen'),
+    close: () => ipcRenderer.send('window-close')
+  };
+  window.deeplinkAPI = {
+    onDeepLink: (callback) => ipcRenderer.on('deep-link', (event, url) => callback(url))
+  };
 }

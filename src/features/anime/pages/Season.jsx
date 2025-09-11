@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useLoader } from '@utils/PageDispatcher';
-import { toSlug } from '@utils/toSlug'
-import { FlagDispatcher } from '@utils/FlagDispatcher';
+import { useLoader } from '@utils/dispatchers/Page';
+import { toSlug } from '@utils/functions/toSlug'
+import { FlagDispatcher } from '@utils/dispatchers/Flags';
 
 export const Season = () => {
   const { animeId, seasonId } = useParams();
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
   const animeUrl = `https://anime-sama.fr/catalogue/${animeId}`;
   const [animeInfo, setAnimeInfo] = useState(null);
   const [seasons, setSeasons] = useState([]);
@@ -15,9 +15,27 @@ export const Season = () => {
   const [availableLanguages, setAvailableLanguages] = useState([]);
   const [episodes, setEpisodes] = useState([]);
   const { setLoading } = useLoader();
+  const StatusDropdownRef = useRef(null)
+  const AddButtonRef = useRef(null)
   const [episodeCache, setEpisodeCache] = useState({});
+  const [showStatusMenu, setShowStatusMenu] = useState(false);
+  const [animeStatus, setAnimeStatus] = useState({
+    favoris: false,
+    watchlist: false,
+    attente: false,
+    dejaVu: false,
+  });
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (AddButtonRef.current && !AddButtonRef.current.contains(event.target) && StatusDropdownRef.current && !StatusDropdownRef.current.contains(event.target)) {
+        setShowStatusMenu(false)
+      }
+    };
 
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const fetchAnimeInfo = async () => {
@@ -165,13 +183,7 @@ const handleEpisodeClick = async (episode) => {
     console.error("Erreur dans handleEpisodeClick :", error);
   }
 };
-const [showStatusMenu, setShowStatusMenu] = useState(false);
-const [animeStatus, setAnimeStatus] = useState({
-  favoris: false,
-  watchlist: false,
-  attente: false,
-  dejaVu: false,
-});
+
   const buildAnimeData = () => ({
     animeId,
     animeTitle:animeInfo.title,
@@ -241,75 +253,82 @@ const toggleStatus = async (key) => {
       {/* Sélecteur de saison */}
       <div className='SeasonsPageTop'>    
         <div className='SeasonsPageTop-item'>
-          {seasons.length > 0 &&  (
-          <div>
-            {seasons.length > 1 ? (
-              <select
-                id="saison"
-                name="saison"
-                value={selectedSeason}
-                onChange={handleSelectChange}
-                className="SelectSeason"
-              >
-                {seasons.map((season) => (
-                  <option key={season.url} value={season.url} className="OptionStyle">
-                    {season.title + "⠀⠀"}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <p className="SingleSeasonTitle">{seasons[0].title}</p>
+          <div className='SeasonsPageTop-left'>
+            {seasons.length > 0 &&  (
+            <div>
+              {seasons.length > 1 ? (
+                <select
+                  id="saison"
+                  name="saison"
+                  value={selectedSeason}
+                  onChange={handleSelectChange}
+                  className="SelectSeason"
+                >
+                  {seasons.map((season) => (
+                    <option key={season.url} value={season.url} className="OptionStyle">
+                      {season.title + "⠀⠀"}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <p className="SingleSeasonTitle">{seasons[0].title}</p>
+              )}
+            </div>
             )}
-          </div>
-        )}
-        <div className='availableLanguages'>
-          {availableLanguages.map((lang, index) => {
-            const flag = FlagDispatcher(lang.toLowerCase());
-            return (
-              <span
-                key={index}
-                className={`LanguageItem${selectedLanguage === lang.toLowerCase() ? ' selected' : ''}`}
-              >
-                {flag && (
-                  <img
-                    onClick={() => {
-                      setSelectedLanguage(lang.toLowerCase());
-                      setSelectedSeason(selectedSeason.split("/").slice(0, 6).join("/") + "/" + lang.toLowerCase());
-                    }}
-                    src={flag}
-                    alt={lang}
-                    draggable='false'
-                    className={`LanguageItem-img${selectedLanguage === lang.toLowerCase() ? ' selected' : ''}`}
-                  />
-                )}
-                <div className={`LanguageItem-txt${selectedLanguage === lang.toLowerCase() ? ' selected' : ''}`}>
-                  {lang.toUpperCase()}
-                </div>
-              </span>
-            );
-          })}
-        </div>
-          
-          {/* Bouton Ajouter */}
-          {episodes.length > 0 && (<div className="StatusMenuContainer">
-            <button className="AddStatusButton" onClick={() => setShowStatusMenu(!showStatusMenu)}>＋ Ajouter</button>
-            {showStatusMenu && (
-              <div className="StatusDropdown">
-                {["favoris", "watchlist", "attente", "dejaVu"].map((key) => (
-                  <label key={key} className="StatusItem">
-                    <input
-                      type="checkbox"
-                      checked={animeStatus[key]}
-                      onChange={() => toggleStatus(key)}
-                    />
-                    {key.charAt(0).toUpperCase() + key.slice(1)}
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>)}
-        </div>
 
+            <div className='availableLanguages'>
+              {availableLanguages.map((lang, index) => {
+                const flag = FlagDispatcher(lang.toLowerCase());
+                return (
+                  <span
+                    key={index}
+                    className={`LanguageItem${selectedLanguage === lang.toLowerCase() ? ' selected' : ''}`}
+                  >
+                    {flag && (
+                      <img
+                        onClick={() => {
+                          setSelectedLanguage(lang.toLowerCase());
+                          setSelectedSeason(selectedSeason.split("/").slice(0, 6).join("/") + "/" + lang.toLowerCase());
+                        }}
+                        src={flag}
+                        alt={lang}
+                        draggable='false'
+                        className={`LanguageItem-img${selectedLanguage === lang.toLowerCase() ? ' selected' : ''}`}
+                      />
+                    )}
+                    <div className={`LanguageItem-txt${selectedLanguage === lang.toLowerCase() ? ' selected' : ''}`}>
+                      {lang.toUpperCase()}
+                    </div>
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+          {/* Bouton Ajouter */}
+          {episodes.length > 0 && (
+            <div>
+              <button ref={AddButtonRef} className="AddStatusButton" onClick={() => setShowStatusMenu(!showStatusMenu)}>＋ Ajouter</button>
+              {showStatusMenu && (
+                <div ref={StatusDropdownRef} className="StatusDropdown">
+                  {["favoris", "watchlist", "attente", "dejaVu"].map((key) => (
+                    <label key={key} className="StatusItem">
+                      <input
+                        id={`status-${key}`}
+                        type="checkbox"
+                        checked={animeStatus[key]}
+                        onChange={() => toggleStatus(key)}
+                        className="hidden-checkbox"
+                      />
+                      <label htmlFor={`status-${key}`} className="custom-checkbox"></label>
+
+                      {key.charAt(0).toUpperCase() + key.slice(1)}
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
       
       <div className='Space'></div>

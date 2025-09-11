@@ -1,1 +1,1 @@
-export { Watchlist } from '@features/profile/pages/Watchlist';
+export { Watchlist } from '@features/profile/pages/anime/Watchlist';

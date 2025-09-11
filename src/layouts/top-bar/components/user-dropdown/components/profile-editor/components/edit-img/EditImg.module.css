@@ -1,0 +1,137 @@
+.Overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+.Overlay:hover{
+  cursor:pointer;
+}
+
+.Container {
+  background: var(--separation-color);
+  padding: 15px 40px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  cursor:default
+}
+
+.Title {
+    margin-bottom: 20px;
+    font-size: 20px;
+    display: flex;
+    justify-content: flex-start;
+    font-weight: var(--little-title-weight);
+    font-family: var(--font-main);
+    color: var(--primary-text);
+  } 
+
+  .Cancel {
+    cursor: pointer;
+    font-size: 20px;
+    user-select: none;
+    color: var(--primary-text);
+    transition: color 0.2s;
+  }
+  .Cancel:hover {
+    color: var(--logo-color);
+  }
+
+  .TopContainer {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .Cropper {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+    background-color: var(--third-color);
+    border-radius: 8px;
+    box-shadow: -2px 5px 10px var(--shadow-color);
+    margin-bottom: 20px;
+  }
+
+  .Zoom {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  .Zoom input[type="range"] {
+    width: 50%;
+    margin-top: 8px;
+    background: transparent; 
+    appearance: none; 
+  }
+  .Zoom input[type="range"]::-webkit-slider-runnable-track {
+    height: 5px;
+    background: var(--background-color);
+    border-radius: 3px;
+    cursor:pointer;
+  } 
+  .Zoom input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    height: 15px;
+    width: 15px;
+    border-radius: 50%;
+    box-shadow: -1px 3px 5px var(--shadow-color);
+    background: var(--logo-color);
+    margin-top: -5.5px; 
+    cursor: grab;
+  }
+
+  .BottomContainer {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .Reset {
+    color: var(--primary-text);
+    font-weight: var(--title-weight);
+    font-family: var(--font-main);
+    font-size: 14px;
+    background-color: var(--separation-color);
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .Reset:hover {
+    color: var(--logo-color);
+  }
+
+  .Apply {
+    color: var(--primary-text);
+    font-weight: var(--title-weight);
+    font-family: var(--font-main);
+    opacity: 0.95;
+    border-radius: 7px;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    background-color: var(--background-color);
+    cursor: pointer;
+    border: 2px solid var(--logo-color);
+    box-shadow: -2px 5px 10px rgba(0, 0, 0, 0.7);
+    padding: 10px 20px;
+  }
+  .Apply:hover {
+    opacity: 1;
+    background-color: var(--logo-color);
+  }
+
+  
+  @media (max-width:1920px) {
+  .Cropper {
+    box-shadow: -1px 3px 5px var(--shadow-color);
+  }
+  .Apply {
+    box-shadow: -1px 3px 5px var(--shadow-color);
+  }
+}

@@ -1,42 +1,20 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import EpisodeTitle from './scroll-title';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, EffectCoverflow, Keyboard } from 'swiper/modules';
-import { ChevronLeft, ChevronRight } from 'lucide-react'; 
-import { useLoader } from '@utils/PageDispatcher';
+import { useLoader } from '@utils/dispatchers/Page';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/effect-coverflow'; 
+import ContentsCarousel from '@components/contents-carousel/ContentsCarousel';
 
 const WatchHistory = () => {
   const [watchedEpisodes, setWatchedEpisodes] = useState([]);
-  const [shiftPressed, setShiftPressed] = useState(false);
   const navigate = useNavigate();
-  const prevRef = useRef(null);
-  const nextRef = useRef(null);
-  const containerRef = useRef(null);
-  const swiperRef = useRef(null);
-  const [isInside, setIsInside] = useState(false);
   const { setLoading } = useLoader();
 
   useEffect(() => {
-    loadWatchedEpisodes(); 
-    const handleKeyDown = (e) => {
-      if (e.key === 'Shift' && isInside) setShiftPressed(true);
-    };
-    const handleKeyUp = (e) => {
-      if (e.key === 'Shift') setShiftPressed(false);
-    };
+    loadWatchedEpisodes();
+  }, []);
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, [isInside]);
 
   const loadWatchedEpisodes = async () => {
     const all = await animeData.loadAll("animeWatchHistory");  
@@ -88,11 +66,6 @@ const WatchHistory = () => {
 
 
 const handleEpisodeClick = async (episode, event) => {
-
-  if (event.shiftKey) {
-    deleteEpisode(episode);
-    return;
-  }
   setLoading(true);
   const episodes = await fetchEpisodes(episode); 
   if (episodes === null) {
@@ -123,87 +96,17 @@ const handleEpisodeClick = async (episode, event) => {
   setLoading(false);
 };
    return (
-    <div>
-      {watchedEpisodes.length > 0 && (
-        <div>
-          <div className="CategorieTitle">Reprendre la lecture :</div>
-          <div className="LatestEpisodes"
-          ref={containerRef}
-          onMouseEnter={() => setIsInside(true)}
-          onMouseLeave={() => setIsInside(false)}
-          >
-            
-            <button
-              ref={prevRef}
-              className="Button-navigation"
-              style={{
-                left: 0,
-              }}
-              aria-label="Previous slide"
-            >
-            <ChevronLeft size={50} color="#996e35" />
-            </button>
-            <div className="LatestEpisodes-wrapper">
-              <Swiper
-                onSwiper={(swiper) => (swiperRef.current = swiper)} 
-                modules={[Navigation, EffectCoverflow, Keyboard]}
-                navigation={{
-                  prevEl: prevRef.current,
-                  nextEl: nextRef.current,
-                }}
-                initialSlide={2}
-                keyboard={{ enabled: true }}
-                effect="coverflow"
-                grabCursor
-                centeredSlides
-                slidesPerView={5}
-                coverflowEffect={{
-                  rotate: 20,
-                  slideShadows: false,
-                }}
-                className="LatestEpisodes-container"
-              >
-                {watchedEpisodes.map((episode, index) => (
-                  <SwiperSlide key={episode.key || index}>
-                    <div
-                      className={`LatestEpisodes-item ${shiftPressed ? 'shift-delete' : ''}`}
-                      onClick={(e) => handleEpisodeClick(episode, e)}
-                    >
-                      <div className="LatestEpisodes-cover">
-                        <h3>{episode?.animeTitle}</h3>
-                        <img
-                          src={episode?.animeCover}
-                          draggable="false"
-                          alt={episode?.episodeTitle}
-                          className="EpisodeCover"
-                        />
-                      
-                      </div>
-                      <div className="LatestEpisodes-info">
-                        <EpisodeTitle title={`${episode.seasonTitle} ${episode.episodeTitle}`} />
-                        <div className="Separation"></div>
-                        <p>{episode.selectedLanguage}</p>
-                      </div>
-                    </div>
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-            </div>
-            <button
-              ref={nextRef}
-              className="Button-navigation"
-              style={{
-                right: 0,
-              }}
-              aria-label="Next slide"
-            >
-              <ChevronRight size={50} color="#996e35" />
-            </button>
-          </div>
-          <div className='Space'></div><div className='Space'></div>
-        </div>
-      )}
-    </div>
+    <ContentsCarousel
+      title="Reprendre la lecture :"
+      data={watchedEpisodes}
+      onClickEpisode={handleEpisodeClick}
+      onDeleteEpisode={(ep) => deleteEpisode(ep)}
+      getEpisodeCover={(ep) => ep.animeCover}
+      getEpisodeTitle={(ep) => ep.animeTitle}
+      getEpisodeSubTitle={(ep) => `${ep.seasonTitle} ${ep.episodeTitle}`}
+      availableLanguageKey="selectedLanguage"
+      enableShiftDelete={true}
+    />
   );
 };
 

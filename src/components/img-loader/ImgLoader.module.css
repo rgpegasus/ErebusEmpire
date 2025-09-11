@@ -1,0 +1,60 @@
+.Container {
+  position: relative;
+  width: 100%; 
+  height: 100%;
+}
+
+.ImageLoader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #ff8585;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Animation de brillance */
+.ImageLoader::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100px;
+  width: 100px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, #FFF, transparent);
+  animation: loading 1.5s infinite;
+  z-index: 2;
+}
+
+.Cover {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.Cover.hidden {
+  visibility: hidden;
+}
+
+.Cover.loaded {
+  visibility: visible;
+  opacity: 0;
+  animation: fadeIn 0.3s forwards;
+}
+
+/* Animations */
+@keyframes loading {
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+

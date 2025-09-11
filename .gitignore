@@ -5,4 +5,5 @@ dist
 out
 .DS_Store
 .eslintcache
+bin
 *.log*

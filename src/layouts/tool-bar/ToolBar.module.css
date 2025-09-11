@@ -1,0 +1,71 @@
+.Container {
+  position: fixed;
+  top: calc(-1 * var(--size-top-bar));
+  left: 0;
+  width: 100%;
+  height: var(--size-top-bar);
+  background: var(--logo-color);
+  border-bottom: 1px solid var(--separation-color);
+  color: #d1d7e0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 0 calc(100vw / 2.25 - 400px);
+  transition: top 0.3s ease;
+  z-index: 9999;
+}
+
+.Container.visible {
+  top: 0;
+}
+
+.Input {
+  width: calc(100vw/1.75);
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  outline: none;
+  background: none;
+  color: #d1d7e0;
+  opacity: 0.8;
+}
+.Input:hover,
+.Input:focus {
+  background-color: #b5a38b;
+  opacity: 1;
+  color: #FFF;
+}
+
+.ActionButtons {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0 4px;
+}
+.ContainerButton {
+  width: calc(var(--size-top-bar)*0.8);
+  height: calc(var(--size-top-bar)*0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.Button {
+  color: #d1d7e0;
+  height: 21px;
+  width: auto;
+}
+
+.ContainerButton:hover {
+  background: #b5a38b;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.ContainerButton:hover .Button  {
+  color: #FFF;
+}
+.ContainerButton:last-child:hover {
+  background: rgb(0, 0, 0);
+  border-radius: 4px;
+  cursor: pointer;
+}

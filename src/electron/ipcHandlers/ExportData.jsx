@@ -5,7 +5,7 @@ import JSZip from 'jszip';
 
 function ExportData() {
   ipcMain.handle('export-data', async (event) => {
-    const baseFolder = path.join(app.getPath('appData'), 'erebus-empire', 'userData');
+    const baseFolder = path.join(app.getPath('appData'), 'Erebus Empire', 'userData');
     const zip = new JSZip();
     const addFilesToZip = (dirPath, zipFolder) => {
       const files = fs.readdirSync(dirPath);

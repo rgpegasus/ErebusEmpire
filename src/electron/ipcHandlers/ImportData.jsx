@@ -19,7 +19,7 @@ function ImportData() {
 
     const filePath = filePaths[0];
     const ext = path.extname(filePath).toLowerCase();
-    const baseFolder = path.join(app.getPath('appData'), 'erebus-empire', 'userData');
+    const baseFolder = path.join(app.getPath('appData'), 'Erebus Empire', 'userData');
 
     try {
       // Crée le dossier de destination principal s'il n'existe pas
