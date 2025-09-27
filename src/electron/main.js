@@ -10,7 +10,7 @@ import { Client } from '@xhayper/discord-rpc';
 const clientId = '1366193765701783604';
 const rpc = new Client({ transport: { type: 'ipc' }, clientId });
 const scraper = new AnimeScraper("animesama");
-import { SearchAnime, RandomAnime, InfoAnime, SeasonsAnime, EpisodesSeason, UrlEpisode, LatestEpisodes, CatalogAnime, DownloadEpisode, DownloadList, DeleteDownloadEpisode, ExportData, ImportData, AvailableLanguages } from '@utils/dispatchers/IpcHandler'; 
+import { SearchAnime, RandomAnime, InfoAnime, SeasonsAnime, EpisodesSeason, UrlEpisode, LatestEpisodes, CatalogAnime, DownloadEpisode, DownloadList, DeleteDownloadEpisode, ExportData, ImportData, AvailableLanguages, ScansChapter, ScansImg } from '@utils/dispatchers/IpcHandler'; 
 import { AnimeCoverTemp, AnimeData } from '@utils/dispatchers/ServicesData'
 import { spawn } from 'child_process';
 
@@ -84,9 +84,10 @@ function createWindow(route = '/') {
     webPreferences: {
       webSecurity: false,
       preload: join(__dirname, '../preload/preload.js'),
-      sandbox: false
+      sandbox: false,
     }
   });
+  
   if (process.defaultApp) {
     if (process.argv.length >= 2) {
       app.setAsDefaultProtocolClient('erebusempire', process.execPath, [path.resolve(process.argv[1])]);
@@ -220,6 +221,8 @@ if (!gotTheLock) {
     LatestEpisodes(scraper);
     CatalogAnime(scraper);
     AvailableLanguages(scraper);
+    ScansChapter(scraper);
+    ScansImg(scraper);
     AnimeData();
     DownloadEpisode();
     DownloadList();

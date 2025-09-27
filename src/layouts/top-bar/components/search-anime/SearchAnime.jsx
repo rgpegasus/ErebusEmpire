@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import styles from './SearchAnime.module.css';
 import { SearchIcon } from '@utils/dispatchers/Icons'
+import { useNavigate } from 'react-router-dom';
 import ImgLoader from '@components/img-loader/ImgLoader';
+import styles from './SearchAnime.module.css';
+
 const SearchAnime = () => {
     
   const logoRef = useRef(null); 

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-import { Loader } from '@features/other/pages/Loader';
+import { Loader } from '@utils/dispatchers/Page';
 
 const LoaderContext = createContext();
 

@@ -1,7 +1,6 @@
-import styles from './OpenSideBar.module.css';
 import React, { useState, useEffect, useRef } from 'react';
-import { ErebusIcon } from '@utils/dispatchers/Pictures';
-
+import { ErebusIcon } from '@utils/dispatchers/Icons'
+import styles from './OpenSideBar.module.css';
 
 const OpenSideBar = () => {
 const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -18,7 +17,7 @@ const handleClickOutside = (event) => {
             body.classList.add('menu-compact');
         }
     }, 0);
-};
+}; 
 
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
@@ -54,11 +53,8 @@ const toggleMenu = () => {
 return (
     <div ref={menuRef}>
         {windowWidth <= toggleWidth && (
-            <img 
+            <ErebusIcon 
                 onClick={toggleMenu} 
-                draggable="false" 
-                src={ErebusIcon} 
-                alt="Logo Erebus Empire" 
                 className={styles.Logo} 
             />
         )}

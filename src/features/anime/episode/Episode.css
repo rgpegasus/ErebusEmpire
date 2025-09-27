@@ -1,0 +1,16 @@
+.ScansContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    transition: width 0.2s ease;
+}
+.ScansPage {
+    width: 100%;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+}
+.ImgScans {
+    width: 100%;
+}

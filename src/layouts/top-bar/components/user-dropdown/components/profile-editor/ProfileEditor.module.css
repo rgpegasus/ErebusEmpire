@@ -36,6 +36,8 @@
 }
 .AppLogo {
   width: 15px;
+  height: auto;
+  color: var(--logo-color);
 }
 .AppTitle {
   font-size: 10px;
@@ -138,6 +140,7 @@
   }
   .AppLogo {
     width: 13px;
+    height: auto;
   }
 
   .AppTitle {
@@ -162,6 +165,7 @@
   }
   .AppLogo {
     width: 12px;
+    height: auto;
   }
 
   .AppTitle {

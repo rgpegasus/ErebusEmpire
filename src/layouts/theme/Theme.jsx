@@ -1,0 +1,222 @@
+import React, { useState, useEffect, useContext } from "react";
+import { useLocation } from "react-router-dom";
+import {
+  LightThemeIcon,
+  DarkThemeIcon,
+  ColorPickerIcon,
+  ColorPaletteIcon,
+  CloseIcon,
+} from "@utils/dispatchers/Icons";
+import ReactDOM from "react-dom";
+import { HexColorPicker } from "react-colorful";
+import chroma from "chroma-js";
+import styles from "./Theme.module.css";
+import { UserContext } from '@context/user-context/UserContext';
+
+export default function Theme({ visible = false, onClose }) {
+  const [menuVisible, setMenuVisible] = useState(false);
+  const { theme, colorTheme, updateTheme, updateColorTheme } = useContext(UserContext);
+  const location = useLocation();
+  const [themeColor, setThemeColor] = useState(colorTheme || "#0B0C10");
+  const [inputValue, setInputValue] = useState(themeColor);
+
+  useEffect(() => {
+    setMenuVisible(visible);
+  }, [visible]);
+  
+  const SaveColor = () => {
+    updateColorTheme(themeColor)
+    onClose();
+  }
+  useEffect(() => {
+    const episodeRoute = /^\/erebus-empire\/anime\/[^/]+\/[^/]+\/[^/]+$/;
+    if (episodeRoute.test(location.pathname)) {
+      onClose();
+    }
+  }, [location.pathname]);
+  const handleHexInput = (val) => {
+    if (val.trim() === "") {
+      setInputValue("");
+      setThemeColor("#0B0C10");
+      return;
+    }
+    if (!val.startsWith("#")) {
+      val = "#" + val;
+    }
+    setInputValue(val);
+    if (/^#([0-9A-Fa-f]{3}){1,2}$/.test(val)) {
+      setThemeColor(val);
+      updateColorTheme(val); 
+    }
+  };
+
+  const pickColor = async () => {
+    if (!window.EyeDropper) {
+      alert("EyeDropper API non supportée sur ce navigateur.");
+      return;
+    }
+
+    try {
+      const eyeDropper = new window.EyeDropper();
+      const result = await eyeDropper.open();
+      setThemeColor(result.sRGBHex);
+      setInputValue(result.sRGBHex);
+      updateColorTheme(result.sRGBHex); 
+    } catch (e) {
+      console.log("Sélection annulée ou erreur", e);
+    }
+  };
+
+  const discordify = (hex) => {
+    const [h, s, l] = chroma(hex).hsl();
+    const newHue = (h + 320) % 360;
+    const newSat = Math.min(1, s * 1.8);
+    const newLight = Math.max(0, l * 0.4);
+    return chroma.hsl(newHue, newSat, newLight).hex();
+  };
+
+  const lightify = (hex) => {
+    const [h, s, l] = chroma(hex).hsl();
+    const newSat = s * 0.3 + 0.3;
+    const newLight = l * 0.5 + 0.5;
+    return chroma.hsl(h, newSat, newLight).hex();
+  };
+
+  const applyThemeColors = (baseHex) => {
+    let base;
+
+    if (theme === "dark") {
+      base = colorTheme ? discordify(baseHex) : discordify("#0B0C10");
+      const variants = {
+        "--background-color": chroma(base).darken(0.1).hex(),
+        "--secondary-color": chroma(base).brighten(0.05).hex(),
+        "--primary-color": chroma(base).darken(0.6).rgb().join(","),
+        "--separation-color": chroma(base).brighten(0.5).hex(),
+        "--primary-text": chroma(base).brighten(4.4).hex(),
+        "--shadow-color": chroma(base).darken(0.6).hex(),
+      };
+      Object.entries(variants).forEach(([key, val]) =>
+        document.documentElement.style.setProperty(key, val)
+      );
+    } else {
+      base = colorTheme ? lightify(baseHex) : lightify("#bababaff");
+      const lightTheme = {
+        "--background-color": base,
+        "--secondary-color": chroma(base).brighten(0.3).hex(),
+        "--primary-color": chroma(base).brighten(0.5).rgb().join(","),
+        "--separation-color": chroma(base).darken(0.3).hex(),
+        "--primary-text": chroma(base).darken(4.4).hex(),
+        "--shadow-color": chroma(base).darken(0.3).hex(),
+      };
+      Object.entries(lightTheme).forEach(([key, val]) =>
+        document.documentElement.style.setProperty(key, val)
+      );
+    }
+  };
+
+  useEffect(() => {
+    const baseColor = colorTheme || "#0B0C10";
+    applyThemeColors(baseColor);
+  }, [themeColor, theme, colorTheme]);
+
+  if (!menuVisible) return null;
+
+  return ReactDOM.createPortal(
+    <div>
+      {menuVisible && (
+        <div className={styles.ThemeContainer}>
+          <div>
+            <div className={styles.TopContainer}>
+            <div className={styles.Title}>Personnaliser le thème</div>
+            <div onClick={onClose}>
+              <CloseIcon className={styles.BackButton} />
+            </div>
+          </div>
+
+          {/* Apparence */}
+          <div className={styles.ItemContainer}>
+            <div className={styles.TitleItem}>Apparence</div>
+            <div className={styles.AspectContainer}>
+              <div
+                onClick={() => updateTheme("dark")}
+                className={`${styles.AspectItem} ${
+                  theme === "dark" ? styles.Selected : ""
+                }`}
+              >
+                <div className={styles.NameAspectContainer}>Mode sombre</div>
+                <DarkThemeIcon className={styles.AspectIcon} />
+              </div>
+              <div
+                onClick={() => updateTheme("light")}
+                className={`${styles.AspectItem} ${
+                  theme === "light" ? styles.Selected : ""
+                }`}
+              >
+                <div className={styles.NameAspectContainer}>Mode clair</div>
+                <LightThemeIcon className={styles.AspectIcon} />
+              </div>
+            </div>
+          </div>
+
+          {/* Couleurs */}
+          <div className={styles.ItemContainer}>
+            <div className={styles.ItemTitleContainer}>
+              <div className={styles.TitleItem}>Couleurs</div>
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  checked={!!colorTheme}
+                  onChange={() =>
+                    updateColorTheme(colorTheme ? "" : themeColor)
+                  }
+                />
+                <span className="slider">
+                  <span className="icon">
+                    {colorTheme ? (
+                      <ColorPaletteIcon size={14} />
+                    ) : (
+                      <ColorPickerIcon size={14} />
+                    )}
+                  </span>
+                </span>
+              </label>
+            </div>
+            <div className={styles.ColorPicker}>
+              <HexColorPicker
+                color={themeColor}
+                onChange={(color) => {
+                  setThemeColor(color);
+                  setInputValue(color);
+                  updateColorTheme(color);
+                }}
+              />
+            </div>
+            <div className={styles.ColorToolsContainer}>
+              <div
+                className={styles.ActiveColor}
+                style={{ backgroundColor: inputValue }}
+              ></div>
+              <input
+                type="text"
+                value={inputValue}
+                maxLength={7}
+                onChange={(e) => handleHexInput(e.target.value)}
+                className={styles.HexInput}
+                placeholder="#0B0C10"
+              />
+              <ColorPickerIcon
+                className={styles.PipetteButton}
+                onClick={pickColor}
+              />
+            </div>
+          </div>
+          </div>
+          {/* <div onClick={()=> SaveColor()} className={styles.SaveButton}>
+            Sauvegarde
+          </div> */}
+        </div>
+      )}
+    </div>,
+    document.body
+  );
+}

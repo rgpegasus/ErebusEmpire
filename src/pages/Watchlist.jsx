@@ -1,1 +1,0 @@
-export { Watchlist } from '@features/profile/pages/anime/Watchlist';

@@ -1,1 +1,0 @@
-export { LoaderProvider, useLoader} from '@context/loader-context/LoaderContext';

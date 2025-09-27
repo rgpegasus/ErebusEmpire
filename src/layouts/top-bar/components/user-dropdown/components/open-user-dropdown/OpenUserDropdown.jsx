@@ -1,7 +1,6 @@
 import React, { useContext } from "react";
+import { ProfileIcon, DownArrowIcon} from "@utils/dispatchers/Icons";
 import { UserContext } from '@context/user-context/UserContext';
-import { ProfilIcon } from "@utils/dispatchers/Icons";
-import { ChevronDown } from "lucide-react";
 import styles from "./OpenUserDropdown.module.css";
 
 const OpenUserDropdown = ({ onClick }) => {
@@ -10,11 +9,11 @@ const OpenUserDropdown = ({ onClick }) => {
   return (
     <div className={styles.Container} onClick={onClick}>
       {profileImage ? (
-        <img src={profileImage} alt="Profil" className={styles.ProfileImg} draggable="false" />
+        <img src={profileImage} alt="Profile" className={styles.ProfileImg} draggable="false" />
       ) : (
-        <ProfilIcon className={styles.ProfileImg} />
+        <ProfileIcon className={styles.ProfileImg} />
       )}
-      <ChevronDown className={styles.Arrow} />
+      <DownArrowIcon className={styles.Arrow} />
     </div>
   );
 };

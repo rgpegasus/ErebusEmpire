@@ -11,8 +11,7 @@ function ImgLoader({ anime, src }) {
       {!loaded && <div className={styles.ImageLoader} />}
       
       <img
-        draggable="false"
-        src={src? src : anime.cover || anime.animeCover || ErebusIcon}
+        src={src? src : anime?.cover || anime?.animeCover || ErebusIcon}
         alt={`Bannière de ${anime?.title}`}
         className={`${styles.Cover} ${loaded ? styles.loaded : styles.hidden}`}
         onLoad={() => setLoaded(true)}

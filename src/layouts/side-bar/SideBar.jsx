@@ -1,6 +1,5 @@
 import React from 'react';
-import { ErebusIcon } from '@utils/dispatchers/Pictures';
-import { CatalogIcon, DownloadIcon } from '@utils/dispatchers/Icons';
+import { CatalogIcon, DownloadIcon, ErebusIcon } from '@utils/dispatchers/Icons';
 import LogoErebus from './components/logo-erebus/LogoErebus';
 import Navigation from './components/navigation/Navigation';
 
@@ -13,7 +12,7 @@ const SideBar = () => {
       {/* Liens du menu */}
       <Navigation
         to="/erebus-empire/home"
-        icon={ErebusIcon}
+        icon={<ErebusIcon />}
         label="Accueil"
       />
       {/* Lien du catalogue */}

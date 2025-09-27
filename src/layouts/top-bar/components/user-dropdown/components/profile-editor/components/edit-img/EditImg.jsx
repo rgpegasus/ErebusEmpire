@@ -1,7 +1,8 @@
 import React, {useState, useCallback, useRef, useEffect} from "react";
+import OverlayPortal from "@components/overlay-portal/OverlayPortal";
 import Cropper from 'react-easy-crop';
 import styles from './EditImg.module.css'
-import OverlayPortal from "@components/overlay-portal/OverlayPortal";
+
 
 const EditImg = ({imageSrc, setImageSrc, crop, setCrop, zoom, setZoom, onSave, setIsCropping}) => {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);

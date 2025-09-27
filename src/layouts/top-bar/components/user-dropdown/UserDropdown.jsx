@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { HistoryIcon, DiscordIcon, WatchlistIcon, DonateIcon, AlreadySeenIcon, SettingsIcon, OnHoldIcon, FavoriteIcon} from '@utils/dispatchers/Icons'
-
+import { HistoryIcon, DiscordIcon, WatchlistIcon, DonateIcon, AlreadySeenIcon, SettingsIcon, OnHoldIcon, FavoriteIcon } from '@utils/dispatchers/Icons'
 import OverlayPortal from '@components/overlay-portal/OverlayPortal';
 import Navigation from './components/navigation/Navigation';
 import OpenUserDropdown from './components/open-user-dropdown/OpenUserDropdown';
@@ -41,39 +40,39 @@ function UserDropdown() {
                   <ProfileEditor editMode={editMode} setEditMode={setEditMode} setIsCropping={setIsCropping}/>
                   <div className='UserDropdownSeparation'></div>
                   <Navigation
-                    to="/erebus-empire/profile/settings"
+                    to="/erebus-empire/settings"
                     icon={<SettingsIcon />}
                     label="Paramètres"
                     onNavigate={() => setMenuVisible(false)}
                   />
-                  {/* <Navigation to="/erebus-empire/profile/switchAccount" icon={SwitchAccountIcon} label="Changer de profil" onNavigate={() => setMenuVisible(false)}/> */}
+                  {/* <Navigation to="/erebus-empire/switchAccount" icon={SwitchAccountIcon} label="Changer de profil" onNavigate={() => setMenuVisible(false)}/> */}
                   <div className='UserDropdownSeparation'></div>
                   <Navigation
-                    to="/erebus-empire/profile/favorites"
+                    to="/erebus-empire/favorites"
                     icon={<FavoriteIcon />}
                     label="Favoris"
                     onNavigate={() => setMenuVisible(false)}
                   />
                   <Navigation
-                    to="/erebus-empire/profile/watchlist"
+                    to="/erebus-empire/watchlist"
                     icon={<WatchlistIcon />}
                     label="Watchlist"
                     onNavigate={() => setMenuVisible(false)}
                   />
                   <Navigation
-                    to="/erebus-empire/profile/history"
+                    to="/erebus-empire/history"
                     icon={<HistoryIcon />}
                     label="En cours"
                     onNavigate={() => setMenuVisible(false)}
                   />
                   <Navigation
-                    to="/erebus-empire/profile/onHold"
+                    to="/erebus-empire/onHold"
                     icon={<OnHoldIcon />}
                     label="En attente"
                     onNavigate={() => setMenuVisible(false)}
                   />
                   <Navigation
-                    to="/erebus-empire/profile/alreadySeen"
+                    to="/erebus-empire/alreadySeen"
                     icon={<AlreadySeenIcon />}
                     label="Déjà Vu"
                     onNavigate={() => setMenuVisible(false)}
@@ -85,12 +84,12 @@ function UserDropdown() {
                     label="Discord"
                     onNavigate={() => setMenuVisible(false)}
                   />
-                  {/* <Navigation
-                    to="https://www.paypal.com/donate?hosted_button_id=rgpegasus_pro"
+                  <Navigation
+                    to="https://paypal.me/rgpegasuspro"
                     icon={<DonateIcon />}
                     label="Soutenir"
                     onNavigate={() => setMenuVisible(false)}
-                  /> */}
+                  />
                   {/* <Navigation icon={LogOutIcon} label="Se déconnecter" onClick={() => {console.log('Déconnexion activée'); }} onNavigate={() => setMenuVisible(false)}/> */}
               </div>
             </OverlayPortal>

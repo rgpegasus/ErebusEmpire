@@ -1,7 +1,6 @@
 import React, { useState, useContext } from 'react';
+import { ProfileIcon, SmallErebusIcon } from '@utils/dispatchers/Icons';
 import { UserContext } from '@context/user-context/UserContext';
-import { SmallErebusIcon } from '@utils/dispatchers/Pictures';
-import { ProfilIcon } from '@utils/dispatchers/Icons';
 import EditImg from './components/edit-img/EditImg';
 import styles from './ProfileEditor.module.css';
 
@@ -71,7 +70,7 @@ function ProfileEditor({ editMode, setEditMode, setIsCropping }) {
         <div onClick={handleProfileClick}>
           {profileImage
             ? <img src={profileImage} alt="Profil" className={`${styles.ProfileImg} ${editMode ? styles.editable : ''}`} draggable="false" />
-            : <ProfilIcon className={`${styles.ProfileImg} ${editMode ? styles.editable : ''}`} />
+            : <ProfileIcon className={`${styles.ProfileImg} ${editMode ? styles.editable : ''}`} />
           }
 
           <input
@@ -112,7 +111,7 @@ function ProfileEditor({ editMode, setEditMode, setIsCropping }) {
           </div>
 
           <div className={styles.AppContainer}>
-            <img src={SmallErebusIcon} alt="app" draggable="false" className={styles.AppLogo} />
+            <SmallErebusIcon className={styles.AppLogo} />
             <h1 className={styles.AppTitle}>Erebus Empire</h1>
           </div>
         </div>

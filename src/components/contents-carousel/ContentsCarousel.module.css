@@ -1,0 +1,258 @@
+.CarouselTitle {
+  margin: 0 50px 30px 50px;
+  padding: 0px 30px 20px 30px;
+  font-family: var(--font-main);
+  color: var(--primary-text);
+  text-transform: uppercase;
+  font-size: 25px;
+  border-bottom: 5px solid var(--logo-color);
+  font-weight: var(--title-weight);
+  display: inline-block;
+}
+
+.CarouselContainer {
+  margin: 0 50px;
+  border-radius: 7px;
+  display: flex;
+  padding: 0 40px;
+  background-color: var(--secondary-color);
+  box-shadow: -2px 5px 10px var(--shadow-color);
+  position: relative;
+}
+
+/* Navigation */
+.NavigationContainer {
+  z-index: 10;
+  background: none;
+  display: flex;
+  align-items: center;
+  border: none;
+  padding: 0;
+}
+.NavigationIcon {
+  cursor: pointer;
+  height: 50px;
+  width: auto;
+  color: var(--logo-color);
+}
+
+/* Embla wrapper */
+.ContentsWrapper {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Embla container */
+.ContentsContainer {
+  display: flex;
+  gap: 30px;
+  will-change: transform;
+  touch-action: pan-y;
+  margin: 0 auto;
+  padding: 70px 20px;
+  box-sizing: border-box;
+}
+
+/* Chaque slide */
+.emblaSlide {
+  flex: 0 0 auto;
+  width: 250px;
+  display: flex;
+  justify-content: center;
+  
+}
+
+
+/* Ton item (carte) */
+.Item {
+  cursor: pointer;
+  border-radius: 10px;
+  transition: 0.2s ease;
+  height: 325px;
+  background-color: var(--background-color);
+  border: 2px solid var(--logo-color);
+  box-shadow: -2px 5px 10px var(--shadow-color);
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.Item:hover {
+  transform: scale3d(1.1, 1.1, 1);
+}
+.Item.ShiftDelete {
+  background-color: rgb(255, 39, 39);
+  border: 2px solid red;
+  cursor: not-allowed;
+}
+.Item.ShiftDelete:hover {
+  transform: scale(1.05);
+  background-color: rgb(255, 0, 0);
+}
+
+/* Image & overlay */
+.Cover {
+  display: flex;
+  width: 100%;
+  height: 150px;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  border-radius: 7px 7px 0 0;
+  overflow: hidden;
+}
+.Cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+.CoverTitle {
+  position: absolute;
+  font-size: 21px;
+  text-transform: uppercase;
+  font-weight: var(--main-title-weight);
+  text-align: center;
+  font-family: var(--font-main);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #E6EAF0;
+  white-space: normal;
+  max-width: 90%;
+  z-index: 2;
+}
+.CoverContainer {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Texte infos */
+.Information {
+  color: #E6EAF0;
+  font-family: var(--font-main);
+  text-align: center;
+  width: 100%;
+}
+.Separation {
+  width: 150px;
+  margin: 0 auto 30px auto;
+  border-bottom: 1px solid var(--separation-color);
+}
+.Language {
+  background-color: var(--logo-color);
+  margin: 0 auto;
+  text-transform: uppercase;
+  font-size: 16px;
+  font-weight: var(--little-title-weight);
+  padding: 10px 20px;
+  border-radius: 5px;
+  box-shadow: -1px 3px 5px var(--shadow-color);
+  display: inline-block;
+}
+
+/* Aucun résultat */
+.ResultNone {
+  margin: 0 50px;
+  border-radius: 7px;
+  padding: 70px 40px;
+  background-color: var(--secondary-color);
+  height: 325px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.ResultNoneMessage {
+  color: var(--primary-text);
+  text-transform: uppercase;
+  font-family: var(--font-main);
+  font-size: 30px;
+  font-weight: var(--title-weight);
+}
+
+/* Responsive */
+@media (max-width:1920px) {
+  .CarouselTitle {
+    font-size: 23px;
+    padding: 0px 20px 16px 20px;
+    border-bottom: 4px solid var(--logo-color);
+  }
+  .CarouselContainer {
+    padding: 0 30px;
+    box-shadow: -1px 3px 5px var(--shadow-color);
+  }
+  .ContentsContainer {
+    gap: 25px;
+    padding: 50px 0;
+  }
+  .emblaSlide {
+    width: 200px;
+  }
+  .Item {
+    width: 100%;
+    height: 280px;
+    box-shadow: -1px 3px 5px var(--shadow-color);
+  }
+  .Cover {
+    height: 120px;
+  }
+  .CoverTitle {
+    font-size: 18px;
+  }
+  .Language {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+  .ResultNone {
+    padding: 50px 30px;
+    height: 280px;
+  }
+  .ResultNoneMessage {
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .CarouselTitle {
+    font-size: 21px;
+    padding: 0px 15px 12px 15px;
+    border-bottom: 3px solid var(--logo-color);
+  }
+  .CarouselContainer {
+    padding: 0 20px;
+  }
+  .ContentsContainer {
+    gap: 20px;
+    padding: 40px 0;
+  }
+  .emblaSlide {
+    width: 180px;
+  }
+  .Item {
+    height: 250px;
+  }
+  .Cover {
+    height: 100px;
+  }
+  .CoverTitle {
+    font-size: 16px;
+  }
+  .Language {
+    font-size: 12px;
+    padding: 6px 14px;
+  }
+  .ResultNone {
+    padding: 40px 20px;
+    height: 250px;
+  }
+  .ResultNoneMessage {
+    font-size: 22px;
+  }
+}

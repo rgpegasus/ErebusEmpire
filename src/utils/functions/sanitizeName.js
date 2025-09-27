@@ -1,4 +1,4 @@
-function SanitizeName(name) {
+function sanitizeName(name) {
   return name
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-zA-Z0-9 ]/g, '')
@@ -8,4 +8,4 @@ function SanitizeName(name) {
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(''); 
 }
-export { SanitizeName };
+export { sanitizeName };

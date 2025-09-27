@@ -3,9 +3,10 @@ import { HashRouter as Router, Routes, Route, useLocation, Navigate, useNavigate
 import MenuBar from "@layouts/side-bar/SideBar";
 import ToolBar from '@layouts/tool-bar/ToolBar';
 import TopBar from '@layouts/top-bar/TopBar';
-import { LoaderProvider, Catalog, Home, Download, Season, Episode, Settings, SwitchAccount, Favorites, Watchlist, History, OnHold, AlreadySeen, Profile } from '@utils/dispatchers/Page';
+import Theme from '@layouts/theme/Theme'
+import { LoaderProvider, Catalog, Home, Download, Season, Episode, Settings, SwitchAccount, Favorites, Watchlist, History, OnHold, AlreadySeen, Profile, NotFound } from '@utils/dispatchers/Page';
 import { UserProvider } from '@context/user-context/UserContext';
-import { NotFound } from '@utils/dispatchers/Page'
+
 const Logger = () => {
   const location = useLocation();
   console.log("🧭 Chemin actuel :", location.pathname + location.search);
@@ -13,6 +14,10 @@ const Logger = () => {
 };
 
 const App = () => {
+  const [showTheme, setShowTheme] = React.useState(false);
+  const openTheme = () => setShowTheme(true);
+  const closeTheme = () => setShowTheme(false);
+
   useEffect(() => {
     window.electron.ipcRenderer.on('log-from-main', (_, msg) => {
       console.log('[FROM MAIN]', msg);
@@ -58,22 +63,23 @@ const App = () => {
           {/* <LoginPage/> */}
           <Logger />
           <MenuBar />
+          <Theme visible={showTheme} onClose={closeTheme} />
           <DeepLinkHandler /> 
-          <div>
+          <div> 
             <TopBar /> 
             <Routes>
               <Route path="/" element={<Navigate to="/erebus-empire/home" />} />
               <Route path="/erebus-empire/home" element={<Home/>} />
               <Route path="/erebus-empire/catalogue" element={<Catalog/>} />
               <Route path="/erebus-empire/downloads" element={<Download/>} />
-              <Route path="/erebus-empire/profile/settings" element={<Settings/>} />
-              <Route path="/erebus-empire/profile" element={<Profile/>} />
-              <Route path="/erebus-empire/profile/switchAccount" element={<SwitchAccount/>} />
-              <Route path="/erebus-empire/profile/favorites" element={<Favorites/>} />
-              <Route path="/erebus-empire/profile/watchlist" element={<Watchlist/>} />
-              <Route path="/erebus-empire/profile/history" element={<History/>} />
-              <Route path="/erebus-empire/profile/onHold" element={<OnHold/>} /> 
-              <Route path="/erebus-empire/profile/alreadySeen" element={<AlreadySeen/>} />
+              <Route path="/erebus-empire/settings" element={<Settings openTheme={openTheme} />} />
+              <Route path="/erebus-empire/settings/profile" element={<Profile/>} />
+              <Route path="/erebus-empire/switchAccount" element={<SwitchAccount/>} />
+              <Route path="/erebus-empire/favorites" element={<Favorites/>} />
+              <Route path="/erebus-empire/watchlist" element={<Watchlist/>} />
+              <Route path="/erebus-empire/history" element={<History/>} />
+              <Route path="/erebus-empire/onHold" element={<OnHold/>} /> 
+              <Route path="/erebus-empire/alreadySeen" element={<AlreadySeen/>} />
               <Route path="/erebus-empire/anime/:animeId/:seasonId?" element={<Season/>} />
               <Route path="/erebus-empire/anime/:animeId/:seasonId/:episodeId" element={<Episode/>} />
               <Route path="*" element={<NotFound />} />

@@ -1,0 +1,54 @@
+.Container {
+  margin: 0 20px;
+  height: 80px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+}
+
+.Title {
+  display: inline-block;
+  white-space: nowrap;
+  font-size: 17px;
+  font-weight: var(--title-weight);
+  color: var(--primary-text);
+  transform: translateX(0);
+}
+
+/* Animation au hover */
+.Container:hover .ScrollableTitle {
+  animation: scroll-text var(--scroll-duration) linear forwards;
+}
+
+@keyframes scroll-text {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(var(--scroll-distance));
+  }
+}
+.Container.Centered {
+  justify-content: center;
+}
+
+
+@media (max-width:1920px) {
+  .Container {
+    height: 70px; 
+  }
+  .Title {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .Container {
+    height: 60px;
+  }
+  .Title {
+    font-size: 14px;
+  }  
+}

@@ -1,6 +1,5 @@
 import.meta.glob([
-  '@styles/**/*.css',
-  '@features/**/styles/**/*.css',
-  '@layouts/**/styles/*.css',
+  '@styles/*.css',
+  '@features/**/*.css',
   '@layouts/**/*.css'
 ], { eager: true });

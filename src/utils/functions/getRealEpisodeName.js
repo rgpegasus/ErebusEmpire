@@ -1,4 +1,5 @@
 import { toSlug } from '@utils/functions/toSlug'
+import { sanitizeName } from '@utils/functions/sanitizeName'
 
 async function getRealEpisodeName (episodeInfo) {
     const { url: animeUrl, episode } = episodeInfo;
@@ -16,9 +17,10 @@ async function getRealEpisodeName (episodeInfo) {
     }
     if (!embedData || embedData.length === 0) return null;
     const seasonId = animeUrl.split("/").slice(5, 6).join("/");
-    const episodeFakeName = episode.toLowerCase();
-    const episodeMatch = episodeFakeName.match(/e(pisode)?\s*(\d+)/i); 
-    const episodeNumber = episodeMatch ? episodeMatch[2] : null;
+    const episodeFakeName = sanitizeName(episode);
+    const episodeMatch = episodeFakeName.match(/episode(\d+)/i);
+    const episodeNumber = episodeMatch ? episodeMatch[1] : null;
+
   
     let typeToSearch = 'episode';
     if (episodeFakeName.includes('oav') || episodeFakeName.includes('ova')) typeToSearch = 'oav';

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { MaximizeIcon, MinimizeIcon, WindowScreenIcon, ReloadIcon, CloseIcon, ShareIcon } from '@utils/dispatchers/Icons'
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FaRegWindowMaximize, FaRegWindowRestore, FaRegWindowMinimize } from "react-icons/fa";
-import { MdClose } from "react-icons/md";
 import styles from './ToolBar.module.css'
+
 
 export default function ToolBar() {
   const [show, setShow] = useState(false);
@@ -11,12 +11,10 @@ export default function ToolBar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Mettre à jour la barre avec la route actuelle
   useEffect(() => {
     setUrl(location.pathname);
   }, [location]);
 
-  // Gérer apparition / disparition en fonction de la souris
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (e.clientY <= 5) {
@@ -35,7 +33,6 @@ export default function ToolBar() {
       window.removeEventListener('mousemove', handleMouseLeave);
     };
   }, []);
-
   const minimize = () => window.electronAPI.minimize();
   const toggleFullScreen = () => {
     window.electronAPI.toggleFullScreen();
@@ -50,7 +47,8 @@ export default function ToolBar() {
 
   return (
     <div className={`${styles.Container} ${show ? styles.visible : ''}`} style={{ WebkitAppRegion: 'drag' }}>
-      <div style={{ WebkitAppRegion: 'no-drag' }}>
+      <div onClick={()=> window.location.reload()} className={styles.ContainerButton}><ReloadIcon className={styles.Button}/></div>
+      <div className={styles.InputContainer} style={{ WebkitAppRegion: 'no-drag' }}>
         <form onSubmit={handleUrlSubmit}>
           <input
             className={styles.Input}
@@ -59,14 +57,22 @@ export default function ToolBar() {
             onChange={(e) => setUrl(e.target.value)}
             onClick={(e) => e.target.select()}
           />
+          <ShareIcon
+            className={styles.ShareButton}
+            onClick={() => {
+              navigator.clipboard.writeText("erebusempire:/" + url)
+                .then(() => alert("Lien copié !"))
+                .catch(err => console.error("Impossible de copier :", err));
+            }}
+          />
         </form>
       </div>
       <div className={styles.ActionButtons} style={{ WebkitAppRegion: 'no-drag' }}>
-        <div className={styles.ContainerButton} onClick={minimize}><FaRegWindowMinimize className={styles.Button} /></div>
+        <div className={styles.ContainerButton} onClick={minimize}><MinimizeIcon className={styles.Button} /></div>
         <div className={styles.ContainerButton} onClick={toggleFullScreen}>
-          {isFullScreen ? <FaRegWindowMaximize className={styles.Button} /> : <FaRegWindowRestore className={styles.Button} />}
+          {isFullScreen ? <MaximizeIcon className={styles.Button} /> : <WindowScreenIcon className={styles.Button} />}
         </div>
-        <div className={styles.ContainerButton} onClick={close}><MdClose className={styles.Button} /></div>
+        <div className={styles.ContainerButton} onClick={close}><CloseIcon className={styles.Button} /></div>
       </div>
     </div>
   );

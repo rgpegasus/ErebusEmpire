@@ -1,0 +1,275 @@
+.DownloadAnime-box {
+  margin: 0 50px 30px;
+  border-radius: 7px;
+  display: flex;
+  padding: 30px 40px;
+  background-color: var(--secondary-color);
+  box-shadow: -2px 5px 10px var(--shadow-color);
+}
+.DownloadAnime-item {
+  display: flex;
+  max-width: 100%;
+  align-items: center;
+}
+.DownloadAnime-item-img {
+  background-color: #0B0C10;
+  width: 125px;
+  height: 200px;
+  border-radius: 7px;
+  box-shadow: -2px 5px 10px var(--shadow-color);
+}
+.DownloadAnime-item-img img {
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
+  object-fit: cover;
+  border-radius: 7px;
+}
+.DownloadAnime-info {
+  margin-top: 20px;
+  margin-left: 40px;
+  max-width: calc(100% - 165px);
+  height: 180px;
+}
+.DownloadAnime-info h2 {
+  font-size: 35px;
+  font-family: var(--font-main);
+  font-weight: var(--title-weight);
+  color: var(--primary-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.padding-scroll-on {
+  padding-bottom: 31px ;
+}
+.padding-scroll-off {
+  padding-bottom: 59px ;
+}
+
+.DownloadAnime-season {
+  width: fit-content;
+  height: 25px;
+  margin: 15px;
+  margin-top: 0px;
+  font-size: 18px;
+  font-family: var(--font-main);
+  color: var(--primary-text);
+  font-weight: var(--little-title-weight);
+}
+.DownloadAnime-select {
+  margin:  15px;
+  margin-top: 0px;
+  height: 25px;
+  background-color: var(--secondary-color);
+  color: var(--primary-text);
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-main);
+  font-weight: var(--little-title-weight);
+  font-size: 18px;
+  cursor: pointer;
+  outline: none;
+}
+.DownloadAnime-select:focus {
+  border:none;
+}
+.DownloadAnime-episode-list {
+  display: flex;
+  width: 100%;
+  border-radius: 8px;
+  gap: 20px; 
+  padding-bottom: 17px;
+  overflow-x: auto;
+}
+
+
+.DownloadAnime-episode-list::-webkit-scrollbar {
+  height: 12px;
+}
+.DownloadAnime-episode-list::-webkit-scrollbar-track {
+  background-color: var(--background-color);
+  border-radius: 0 0 7px 7px;
+}
+.DownloadAnime-episode-list::-webkit-scrollbar-thumb {
+  background-color: var(--logo-color);
+  border-radius: 7px;
+  cursor: grab;
+  border: 2px solid var(--secondary-color);
+}
+.DownloadAnime-episode-list::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(153, 110, 53, 0.75);
+}
+
+.DownloadAnime-episode-item {
+  flex-shrink: 0;
+  background-color: var(--logo-color);
+  border-radius: 7px;
+  padding: 10px 15px;
+  cursor: pointer;
+  box-shadow: -2px 5px 10px var(--shadow-color);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  transform-origin: center;  
+}
+
+
+.DownloadAnime-episode-item h4 {
+  font-size: 15px;
+  text-transform: uppercase;
+  font-weight: var(--button-weight);
+  font-family: var(--font-main);
+  color: #E6EAF0;
+}
+.DownloadAnime-episode-item:hover {
+  transform: scale3d(1.02, 1.02, 1);
+}
+.video-player {
+  margin-top: 3rem;
+  overflow: hidden;
+}
+
+.DownloadProgress {
+  position: relative;
+  background: #2d2d2d;
+  height: 22px;
+  margin-top: 6px;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.ProgressBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: #996e35;
+  transition: width 0.2s;
+}
+
+.ProgressText {
+  position: relative;
+  z-index: 1;
+  color: white;
+  padding-left: 8px;
+  font-size: 0.85em;
+}
+
+.DownloadAnime-episode-item.shift-delete {
+  background-color: rgb(255, 39, 39);
+  cursor: not-allowed;
+  border: 2px solid red;
+  padding: 9px 14px;
+}
+.DownloadAnime-episode-item.shift-delete:hover {
+  background-color: rgb(255, 0, 0);
+  transition: 0.2s ease;
+  transform: scale3d(1.02, 1.02, 1);
+}
+
+@media (max-width:1920px) {
+  .DownloadAnime-box {
+    padding: 25px 35px;
+    box-shadow: -1px 3px 5px var(--shadow-color);
+  }
+  .DownloadAnime-item-img {
+    width: 100px;
+    height: 160px;
+    box-shadow: -1px 3px 5px var(--shadow-color);
+  }
+  .DownloadAnime-info h2 {
+    font-size: 30px
+  }
+  .DownloadAnime-info {
+    max-width: calc(100% - 135px);
+    margin-left: 35px;
+    margin-top: 15px;
+    height: 145px;
+  }
+  .padding-scroll-on {
+    padding-bottom: 18px ;
+  }
+  .padding-scroll-off {
+    padding-bottom: 41px ;
+  }
+  .DownloadAnime-season {
+    height: 20px;
+    margin: 13px;
+    margin-top: 0px;
+    font-size: 16px;
+  }
+  .DownloadAnime-select {
+    height: 20px;
+    margin: 13px;
+    margin-top: 0px;
+    font-size: 16px;
+  }
+  .DownloadAnime-episode-list {
+    gap: 15px; 
+    padding-bottom: 13px;
+  }
+  .DownloadAnime-episode-item {
+    padding: 9px 13px;
+    box-shadow: -1px 3px 5px var(--shadow-color);
+  }
+  .DownloadAnime-episode-item h4 {
+    font-size: 14px;
+  }
+  .DownloadAnime-episode-list::-webkit-scrollbar {
+    height: 10px;
+  }
+}
+
+
+
+@media (max-width: 1200px) {
+  .DownloadAnime-box {
+    padding: 20px 30px
+  }
+  .DownloadAnime-item-img {
+    width: 88px;
+    height: 140px;
+  }
+  .DownloadAnime-info h2 {
+    font-size: 24px
+  }
+  .DownloadAnime-info {
+    max-width: calc(100% - 118px);
+    margin-left: 30px;
+    margin-top: 15px;
+    height: 125px;
+  }
+  .padding-scroll-on {
+    padding-bottom: 19px ;
+  }
+  .padding-scroll-off {
+    padding-bottom: 39px ;
+  }
+  .DownloadAnime-season {
+    height: 15px;
+    margin: 11px;
+    margin-top: 0px;
+    font-size: 14px;
+  }
+  .DownloadAnime-select {
+    height: 15px;
+    margin: 12px;
+    margin-top: 0px;
+    font-size: 14px;
+  }
+  .DownloadAnime-episode-list {
+    gap: 10px; 
+    padding-bottom: 12px;
+  }
+  .DownloadAnime-episode-item {
+    padding: 8px 11px;
+  }
+  .DownloadAnime-episode-item h4 {
+    font-size: 13px;
+  }
+  .DownloadAnime-episode-list::-webkit-scrollbar {
+    height: 8px;
+  }
+}

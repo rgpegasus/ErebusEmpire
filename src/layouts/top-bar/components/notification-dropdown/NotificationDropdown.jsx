@@ -3,9 +3,8 @@ import { NotificationIcon } from '@utils/dispatchers/Icons'
 import { getRealEpisodeName } from '@utils/functions/getRealEpisodeName'
 import { useLoader } from '@utils/dispatchers/Page';
 import { useNavigate } from 'react-router-dom';
-import styles from './NotificationDropdown.module.css';
 import ImgLoader from '@components/img-loader/ImgLoader';
-
+import styles from './NotificationDropdown.module.css';
 
 const NotificationDropdown = () => {
   const [notif, setNotif] = useState(localStorage.getItem('notif') || 'on');

@@ -4,17 +4,16 @@
   box-sizing: border-box;
 }
 body {  
-  user-select: none;
   background-color: var(--background-color);                    
 }
 
 .MainPage {
-overflow-y: auto; 
-margin-left:var(--size-menu); 
-margin-top: var(--size-top-bar);
-width:calc(100vw - var(--size-menu));
-height: calc(100vh - var(--size-top-bar)); 
-position: fixed;
+  overflow-y: auto; 
+  margin-left:var(--size-menu); 
+  margin-top: var(--size-top-bar);
+  width:calc(100vw - var(--size-menu));
+  height: calc(100vh - var(--size-top-bar)); 
+  position: fixed;
 }
 .EpisodesPage {
   position: absolute; 

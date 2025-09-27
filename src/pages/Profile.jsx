@@ -1,1 +1,0 @@
-export { Profile } from '@features/profile/pages/user/Profile';
