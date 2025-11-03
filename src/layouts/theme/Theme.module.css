@@ -1,31 +1,31 @@
 .ThemeContainer {
     z-index: 1;
     position: fixed; 
-    top:var(--size-top-bar);
-    right: 0;
-    background-color: var(--secondary-color);
-    height: calc(100% - var(--size-top-bar));
+    top:calc(var(--size-topbar) + 15px);
+    right: 50px;
+    background-color: var(--color-secondary);
     width: 15%;
-    box-shadow: 0 0 20px var(--shadow-color);
-    padding: 25px 15px;
+    box-shadow: 0 0 20px var(--color-shadow);
+    padding: 40px 50px;
+    border-radius: 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 .BackButton {
-  color: var(--primary-text);
+  color: var(--color-text-primary);
   cursor: pointer;
   width: 25px;
   height: 25px;
 }
 .BackButton:hover {
-  color: var(--logo-color);
+  color: var(--color-logo);
 }
 .Title {
     font-size: 16px;
-    font-family: var(--font-main);
-    font-weight: var(--main-title-weight);
-    color: var(--primary-text);
+    font-family: var(--font-family-main);
+    font-weight: var(--extra-bold);
+    color: var(--color-text-primary);
 }
 .TopContainer {
     justify-content: space-between;
@@ -39,20 +39,20 @@
     gap: 15px;
 }
 .TitleItem {
-    font-family: var(--font-main);
+    font-family: var(--font-family-main);
     font-size: 15px;
-    color: var(--primary-text);
+    color: var(--color-text-primary);
     opacity: 0.8;
-    font-weight: var(--little-title-weight);
+    font-weight: var(--semi-bold);
 }
 .AspectContainer {
     display: flex;
     align-items: center;
     width: 100%;
     flex-direction: row;
-    background-color: var(--background-color);
+    background-color: var(--color-background);
     border-radius: 7px;
-    border: 1px solid var(--separation-color);
+    border: 1px solid var(--color-separation);
     gap: 4px;
     padding: 4px;
 }
@@ -66,7 +66,7 @@
     border: 1px solid transparent;
 }
 .AspectItem:hover {
-    background-color: var(--secondary-color);
+    background-color: var(--color-secondary);
 }
 
 .AspectItem.Selected {
@@ -74,22 +74,22 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    background-color: var(--secondary-color);
+    background-color: var(--color-secondary);
     border-radius: 7px;
-    border: 1px solid var(--separation-color);
+    border: 1px solid var(--color-separation);
 }
 .NameAspectContainer {
     position: absolute;
     top:83px;
-    background-color: var(--background-color);
+    background-color: var(--color-background);
     padding: 10px;
     font-size: 14px;
     border-radius: 7px;
-    border: 1px solid var(--separation-color);
-    font-family: var(--font-main);
+    border: 1px solid var(--color-separation);
+    font-family: var(--font-family-main);
     font-weight: var(--main-text-weight);
-    box-shadow: -2px 5px 10px var(--shadow-color);
-    color: var(--primary-text);
+    box-shadow: -2px 5px 10px var(--color-shadow);
+    color: var(--color-text-primary);
     opacity: 0;
 }
 .AspectItem:hover .NameAspectContainer {
@@ -118,9 +118,9 @@
     align-items: center;
     width: 100%;
     flex-direction: row;
-    background-color: var(--secondary-color);
+    background-color: var(--color-secondary);
     border-radius: 7px;
-    border: 1px solid var(--separation-color);
+    border: 1px solid var(--color-separation);
     gap: 4px;
     padding: 10px;
     gap:10px
@@ -129,7 +129,7 @@
     width: 30px;
     height: 30px;
     border-radius: 5px;
-    border: 1px solid var(--separation-color);
+    border: 1px solid var(--color-separation);
 }
 .HexInput {
     all: unset;
@@ -142,21 +142,20 @@
 .PipetteButton {
     width: 17px;
     height: 17px;
-    color: var(--primary-text);
+    color: var(--color-text-primary);
     cursor: pointer;
 }
 .PipetteButton:hover {
-    color: var(--logo-color);
+    color: var(--color-logo);
 }
 .SaveButton {
     color: #E6EAF0;
-    background-color: var(--logo-color);
+    background-color: var(--color-logo);
     text-align: center;
     padding: 10px;
-    font-family: var(--font-main);
+    font-family: var(--font-family-main);
     font-size: 15px;
-    font-weight: var(--little-title-weight);
-    /* text-transform: uppercase; */
+    font-weight: var(--semi-bold);
     letter-spacing: 1px;
     border-radius: 7px;
     margin: 0 10%;

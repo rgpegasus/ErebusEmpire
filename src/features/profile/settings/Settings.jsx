@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { UserContext } from '@context/user-context/UserContext';
 import { useNavigate } from 'react-router-dom';
+import { PinIcon, UnpinIcon, ProfileIcon } from '@utils/dispatchers/Icons';
 import { ChevronRight, Rocket, BatteryLow, Bell, LucideBellOff } from 'lucide-react';
-import { FaUserCircle } from "react-icons/fa";
-
 
 
 
@@ -20,7 +19,7 @@ import { FaUserCircle } from "react-icons/fa";
   };
 
 export const Settings = ({ openTheme }) => {
-  const { username, profileImage } = useContext(UserContext);
+  const { username, profileImage, toolBar, updateToolBar } = useContext(UserContext);
   const [usageTime, setUsageTimeState] = useState(getUsageTime());
   const navigate = useNavigate();
 
@@ -37,7 +36,6 @@ export const Settings = ({ openTheme }) => {
   const [isNotif, setIsNotif] = useState(() => {
     return localStorage.getItem('notif') !== 'off';
   });
-
   useEffect(() => {
     localStorage.setItem('perf', isPerf ? 'full' : 'eco');
   }, [isPerf]);
@@ -48,10 +46,17 @@ export const Settings = ({ openTheme }) => {
   
   
   const togglePerf = () => setIsPerf(prev => !prev);
+  const togglePin = () => {
+    updateToolBar(!toolBar)
+  }
   const toggleNotif = () => setIsNotif(prev => !prev);
 
   return (
     <div className="MainPage">
+      <div className='Space'></div>
+      <div className='Space'></div>
+      <div className='Space'></div>
+      <div className='Space'></div>
       <div className='Space'></div>
       <h1 className="CategorieTitle">Paramètres</h1>          
       <div className='SettingsPage'>
@@ -61,7 +66,7 @@ export const Settings = ({ openTheme }) => {
               {profileImage? (
                 <img src={profileImage} alt="Profil" className="Settings-profile-img" draggable="false" />
               ):(
-                <FaUserCircle className='Settings-profile-img'/>
+                <ProfileIcon className='Settings-profile-img'/>
               )}
               <div className="Settings-username">{username}</div>
             </div>
@@ -87,6 +92,15 @@ export const Settings = ({ openTheme }) => {
             </label>
           </div> */}
           <div className="setting-item">
+            <span className="setting-label">Fixer la barre d'outils</span>
+            <label className="switch">
+              <input type="checkbox" checked={toolBar} onChange={togglePin} />
+              <span className="slider">
+                <span className="icon">{toolBar ? <PinIcon size={14} /> : <UnpinIcon size={14} />}</span>
+              </span>
+            </label>
+          </div>
+          <div className="setting-item">
             <span className="setting-label">Notifications</span>
             <label className="switch">
               <input type="checkbox" checked={isNotif} onChange={toggleNotif} />
@@ -95,6 +109,7 @@ export const Settings = ({ openTheme }) => {
               </span>
             </label>
           </div>
+          
           {/* <div className="setting-item">
             <span className="setting-label">Langue d'affichage</span>
           </div> */}

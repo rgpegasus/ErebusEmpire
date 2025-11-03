@@ -1,0 +1,120 @@
+.Container {
+    margin: 50px;
+    margin-top: 25px
+}
+
+.EmblaViewport {
+  overflow: hidden; 
+  margin-top: -70px;
+  width: 100%;
+  border-bottom: 2px solid rgba(var(--color-logo-rgb), 0.1);
+}
+
+.EmblaContainer {
+  display: flex;
+  gap: 100px;
+}
+.SeasonContainer {
+  margin: 0 50px;
+}
+.SeasonItem {
+  flex: 0 0 auto;
+  font-size: 35px;
+  line-height: 0.8;
+  font-family: var(--font-family-main);
+  font-weight: var(--medium);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  letter-spacing: 3px;
+  padding-bottom: 25px;
+}
+.SeasonItem:hover {
+    color: var(--color-logo);
+}
+.ActiveSeason { 
+  color: var(--color-logo); 
+  border-bottom: 5px solid var(--color-logo);
+   border-bottom-left-radius: 5px; 
+  border-bottom-right-radius: 5px;
+}
+
+
+@media (max-width: 1920px) {
+  .Container {
+    margin: calc(50px * 0.75);
+    margin-top: calc(25px * 0.75)
+  }
+  .EmblaViewport {
+    margin-top: calc(-70px * 0.75);
+    border-bottom: calc(2px * 0.75) solid rgba(var(--color-logo-rgb), 0.1);
+  }
+  .EmblaContainer {
+    gap: calc(100px * 0.75);
+  }
+  .SeasonContainer {
+    margin: 0 calc(50px * 0.75);
+  }
+  .SeasonItem {
+    font-size: calc(35px * 0.75);
+    letter-spacing: calc(3px * 0.75);
+    padding-bottom: calc(25px * 0.75);
+  }
+  .ActiveSeason { 
+    border-bottom: calc(5px * 0.75) solid var(--color-logo);
+    border-bottom-left-radius: calc(5px * 0.75); 
+    border-bottom-right-radius: calc(5px * 0.75);
+  }
+}
+@media (max-width: 1300px) {
+  .Container {
+    margin: calc(50px * 0.6);
+    margin-top: calc(25px * 0.6)
+  }
+  .EmblaViewport {
+    margin-top: calc(-70px * 0.6);
+    border-bottom: calc(2px * 0.6) solid rgba(var(--color-logo-rgb), 0.1);
+  }
+  .EmblaContainer {
+    gap: calc(100px * 0.6);
+  }
+  .SeasonContainer {
+    margin: 0 calc(50px * 0.6);
+  }
+  .SeasonItem {
+    font-size: calc(35px * 0.6);
+    letter-spacing: calc(3px * 0.6);
+    padding-bottom: calc(25px * 0.6);
+  }
+  .ActiveSeason { 
+    border-bottom: calc(5px * 0.6) solid var(--color-logo);
+    border-bottom-left-radius: calc(5px * 0.6); 
+    border-bottom-right-radius: calc(5px * 0.6);
+  }
+}
+@media (max-width: 960px) {
+  .Container {
+    margin: calc(50px * 0.5);
+    margin-top: calc(25px * 0.5)
+  }
+  .EmblaViewport {
+    margin-top: calc(-70px * 0.5);
+    border-bottom: calc(2px * 0.5) solid rgba(var(--color-logo-rgb), 0.1);
+  }
+  .EmblaContainer {
+    gap: calc(100px * 0.5);
+  }
+  .SeasonContainer {
+    margin: 0 calc(50px * 0.5);
+  }
+  .SeasonItem {
+    font-size: calc(35px * 0.5);
+    letter-spacing: calc(3px * 0.5);
+    padding-bottom: calc(25px * 0.5);
+  }
+  .ActiveSeason { 
+    border-bottom: calc(5px * 0.5) solid var(--color-logo);
+    border-bottom-left-radius: calc(5px * 0.5); 
+    border-bottom-right-radius: calc(5px * 0.5);
+  }
+}

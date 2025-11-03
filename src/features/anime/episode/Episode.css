@@ -1,7 +1,7 @@
 .ScansContainer {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    width: 50%;
     align-items: center;
     transition: width 0.2s ease;
 }
@@ -13,4 +13,7 @@
 }
 .ImgScans {
     width: 100%;
+}
+.Test {
+    color: white;
 }

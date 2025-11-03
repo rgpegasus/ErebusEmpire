@@ -9,21 +9,12 @@ const CHECK_INTERVAL_MS = 1000 * 60 * 10;
 async function checkNewEpisodes() {
   
   try {
-    // fs.appendFileSync(filePath, "[Debug] Début du check\n");
     const latestEpisodes = await scraper.getLatestEpisodes(["vostfr", "vf"]);
-    // fs.appendFileSync(filePath, `[Debug] Épisodes récupérés : ${JSON.stringify(latestEpisodes, null, 2)}\n`);
     if (!latestEpisodes || latestEpisodes.length === 0) return;
 
     const animeOnHold = await animeData.loadAll("animeOnHold");
-    // fs.appendFileSync(filePath, `[Debug] Épisodes récupérés : ${JSON.stringify(animeOnHold, null, 2)}\n`);
     if (!animeOnHold) return;
-
-
-    // 🔄 Charger la liste déjà notifiée (tableau)
     const alreadyNotifiedList = (await animeData.loadAll("notifiedEpisodes")) || [];
-    // fs.appendFileSync(filePath, `[Debug] Contenu de notifiedEpisodes : ${JSON.stringify(alreadyNotifiedList, null, 2)}\n`);
-
-    // 🔍 Création d'une map pour accès rapide
     const watchMap = Object.values(animeOnHold).reduce((acc, anime) => {
       acc[anime.animeTitle.toLowerCase()] = anime;
       return acc;

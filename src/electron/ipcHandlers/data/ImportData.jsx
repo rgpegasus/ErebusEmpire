@@ -22,10 +22,7 @@ function ImportData() {
     const baseFolder = path.join(app.getPath('appData'), 'Erebus Empire', 'userData');
 
     try {
-      // Crée le dossier de destination principal s'il n'existe pas
       fs.mkdirSync(baseFolder, { recursive: true });
-
-      // Si c'est un fichier .zip
       if (ext === '.zip') {
         const zip = new JSZip();
         const fileData = fs.readFileSync(filePath);
@@ -58,8 +55,6 @@ function ImportData() {
           const dirPath = path.dirname(targetFilePath);
 
           fs.mkdirSync(dirPath, { recursive: true });
-
-          // Si le fichier existe déjà, le remplacer
           fs.writeFileSync(targetFilePath, fileData);
         }
 
@@ -69,8 +64,6 @@ function ImportData() {
           devUnlocked
         };
       }
-
-      // Si c'est exactement le fichier "unlock-dev.txt"
       const baseName = path.basename(filePath);
       if (baseName === 'unlock-dev.txt') {
         const devDir = path.join(baseFolder, 'dev');
@@ -84,8 +77,6 @@ function ImportData() {
           devUnlocked: true
         };
       }
-
-      // Sinon, fichier générique => dossier 'other'
       const otherDir = path.join(baseFolder, 'other');
       fs.mkdirSync(otherDir, { recursive: true });
       const targetPath = path.join(otherDir, baseName);

@@ -5,7 +5,7 @@ import fs from 'fs';
 import { exec } from 'child_process';
 import { sanitizeName } from '@utils/functions/sanitizeName';
 
-const userDataFolder = join(app.getPath('appData'), 'Erebus Empire', 'userData', 'animeDownload');
+const userDataFolder = join(app.getPath('appData'), 'Erebus Empire', 'userData','localStorage', 'animeDownload');
 
 function DownloadEpisode() {
   ipcMain.handle('download-video', async (event, videoUrl, metaData) => {
@@ -23,13 +23,9 @@ function DownloadEpisode() {
     const episodePath = join(seasonFolder, `${sanitizeName(episodeTitle)}.mp4`);
     const coverPath = join(animeFolder, 'cover.jpg');
     const dataJsonPath = join(animeFolder, 'animeData.json');
-
-    // Création des dossiers si nécessaire
     [userDataFolder, animeFolder, seasonFolder].forEach((f) => {
       if (!fs.existsSync(f)) fs.mkdirSync(f, { recursive: true });
     });
-
-    // Téléchargement de la cover si elle n'existe pas
     if (!fs.existsSync(coverPath)) {
       try {
         const res = await fetch(animeCover);
@@ -39,8 +35,6 @@ function DownloadEpisode() {
         console.warn("Impossible de télécharger la cover :", err);
       }
     }
-
-    // Création/MAJ du fichier animeData.json
     const animeData = fs.existsSync(dataJsonPath)
       ? JSON.parse(fs.readFileSync(dataJsonPath, 'utf-8'))
       : {};
@@ -55,7 +49,6 @@ function DownloadEpisode() {
     };
     fs.writeFileSync(dataJsonPath, JSON.stringify(animeData, null, 2));
 
-    // Commande yt-dlp
   const command = `"${ytDlpPath}" \
   --ffmpeg-location "${ffmpegPath}" \
   --force-overwrites \

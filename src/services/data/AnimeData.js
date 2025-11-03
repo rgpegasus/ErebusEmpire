@@ -2,7 +2,7 @@ import { ipcMain, app } from 'electron';
 import fs from 'fs';
 import path from 'path';
 
-const baseFolder = path.join(app.getPath('appData'), 'erebus-empire', 'userData', 'anime', 'localStorage');
+const baseFolder = path.join(app.getPath('appData'), 'Erebus Empire', 'userData', 'localStorage', 'anime');
 
 function getFilePath(fileKey) {
   return path.join(baseFolder, `${fileKey}.json`);

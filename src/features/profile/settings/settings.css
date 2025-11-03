@@ -3,7 +3,7 @@
 }
 .SettingsGroupe{
   border-radius: 20px;
-  background-color: var(--secondary-color);
+  background-color: var(--color-secondary);
 }
 .setting-item {
   display: flex;
@@ -12,21 +12,21 @@
   padding: 0px 30px;
   height: 75px;
   
-  /* box-shadow: -2px 5px 10px var(--shadow-color); */
-  border-bottom: 2px solid var(--background-color) ;
+  /* box-shadow: -2px 5px 10px var(--color-shadow); */
+  border-bottom: 2px solid var(--color-background) ;
 }
 .Settings-usage-time {
-  font-family: var(--font-main);
-  color: var(--primary-text);
+  font-family: var(--font-family-main);
+  color: var(--color-text-primary);
   font-size: 15px;
-  font-weight: var(--little-title-weight);
+  font-weight: var(--semi-bold);
 }
 .Settings-profile-img {
   border-radius: 50%;
   height: 100px;
   width: auto;
-  color: var(--logo-color);
-  border: 2px solid var(--logo-color);
+  color: var(--color-logo);
+  border: 2px solid var(--color-logo);
 }
 .ColorTheme-Button {
   appearance: none;
@@ -46,7 +46,7 @@
 
 /* rend l’aperçu rond */
 .ColorTheme-Button::-webkit-color-swatch {
-  border: 2px solid var(--separation-color);
+  border: 2px solid var(--color-separation);
   border-radius: 25px;
 }
 
@@ -62,9 +62,9 @@
 }
 
 .Settings-username {
-  color:var(--logo-color);
-  font-family: var(--font-main);
-  font-weight: var(--little-title-weight);
+  color:var(--color-logo);
+  font-family: var(--font-family-main);
+  font-weight: var(--semi-bold);
   font-size:  25px;
 }
 .Settings-InfoUser {
@@ -73,13 +73,13 @@
   gap:20px;
 }
 .Settings-ChevronIcon {
-  color: var(--logo-color);
+  color: var(--color-logo);
 }
 .setting-label {
   font-size: 20px;
-  font-weight: var(--little-title-weight);
-  color:var(--primary-text);
-  font-family: var(--font-main);
+  font-weight: var(--semi-bold);
+  color:var(--color-text-primary);
+  font-family: var(--font-family-main);
 }
 
 .switch {
@@ -96,9 +96,9 @@
 }
 
 .slider {
-  background-color: var(--background-color);
+  background-color: var(--color-background);
   border-radius: 34px;
-  box-shadow: -2px 5px 10px var(--shadow-color);
+  box-shadow: -2px 5px 10px var(--color-shadow);
   position: absolute;
   cursor: pointer;
   inset: 0;
@@ -112,25 +112,25 @@
   transform: translateY(-50%);
   width: 24px;
   height: 24px;
-  background: var(--primary-text);
+  background: var(--color-text-primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: left 0.3s;
-  color: var(--background-color);
+  color: var(--color-background);
 }
 
 .switch input:checked + .slider {
-  background-color: var(--logo-color);
+  background-color: var(--color-logo);
 }
 .setting-item:last-child {
   border-bottom: none;
 }
 .switch input:checked + .slider .icon {
   left: 26px;
-  background: var(--primary-text);
-  color: var(--background-color);
+  background: var(--color-text-primary);
+  color: var(--color-background);
 }
 
 .setting-item .buttons-wrapper {
@@ -139,24 +139,24 @@
 }
 
 .data-button {
-  box-shadow: -2px 5px 10px var(--shadow-color);
+  box-shadow: -2px 5px 10px var(--color-shadow);
   display: flex;
   align-items: center;
   padding: 10px 18px;
   gap:10px;
   font-size: 16px;
-  background-color: var(--primary-text);
-  color: var(--background-color);
+  background-color: var(--color-text-primary);
+  color: var(--color-background);
   border: none;
   border-radius: 12px;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.2s;
-  font-family: var(--font-main);
+  font-family: var(--font-family-main);
 }
 
 .data-button:hover {
   opacity: 0.8;
-  background-color: var(--logo-color);
+  background-color: var(--color-logo);
   transform: translateY(-2px);
 }
 
@@ -164,26 +164,26 @@
 @media (max-width: 1920px) {
   .SettingsGroupe {
     box-shadow: none;
-    /* box-shadow: -1px 3px 5px var(--shadow-color); */
+    /* box-shadow: -1px 3px 5px var(--color-shadow); */
   }
   .data-button {
         box-shadow: none;
-    /* box-shadow: -1px 3px 5px var(--shadow-color); */
+    /* box-shadow: -1px 3px 5px var(--color-shadow); */
   }
   .slider { 
         box-shadow: none;
-    /* box-shadow: -1px 3px 2px var(--shadow-color); */
+    /* box-shadow: -1px 3px 2px var(--color-shadow); */
   }
 }
 
 .BackButton {
-  color: var(--logo-color);
+  color: var(--color-logo);
   margin: 30px;
   cursor: pointer;
 }
 .Settings-input-code {
-  background-color: var(--background-color);
-  border: 2px solid var(--logo-color);
+  background-color: var(--color-background);
+  border: 2px solid var(--color-logo);
   border-radius: 13px;
   padding: 10px 20px;
 }

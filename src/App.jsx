@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation, Navigate, useNavigate } from 'react-router-dom';
-import MenuBar from "@layouts/side-bar/SideBar";
 import ToolBar from '@layouts/tool-bar/ToolBar';
 import TopBar from '@layouts/top-bar/TopBar';
 import Theme from '@layouts/theme/Theme'
@@ -56,19 +55,18 @@ const App = () => {
 
 
   return (
-    <UserProvider>
-      <Router>
-        <ToolBar />
-        <LoaderProvider>
+    <LoaderProvider>
+      <UserProvider>
+        <Router>
+          <ToolBar />
           {/* <LoginPage/> */}
           <Logger />
-          <MenuBar />
           <Theme visible={showTheme} onClose={closeTheme} />
           <DeepLinkHandler /> 
           <div> 
             <TopBar /> 
             <Routes>
-              <Route path="/" element={<Navigate to="/erebus-empire/home" />} />
+              <Route path="/" element={<Navigate to="/erebus-empire/home" replace />} />
               <Route path="/erebus-empire/home" element={<Home/>} />
               <Route path="/erebus-empire/catalogue" element={<Catalog/>} />
               <Route path="/erebus-empire/downloads" element={<Download/>} />
@@ -80,14 +78,14 @@ const App = () => {
               <Route path="/erebus-empire/history" element={<History/>} />
               <Route path="/erebus-empire/onHold" element={<OnHold/>} /> 
               <Route path="/erebus-empire/alreadySeen" element={<AlreadySeen/>} />
-              <Route path="/erebus-empire/anime/:animeId/:seasonId?" element={<Season/>} />
-              <Route path="/erebus-empire/anime/:animeId/:seasonId/:episodeId" element={<Episode/>} />
+              <Route path="/erebus-empire/:animeId/:seasonId?" element={<Season/>} />
+              <Route path="/erebus-empire/:animeId/:seasonId/:episodeId" element={<Episode/>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
-        </LoaderProvider> 
-      </Router>
-    </UserProvider> 
+        </Router>
+      </UserProvider> 
+    </LoaderProvider> 
   );
 }
 

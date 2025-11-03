@@ -1,24 +1,66 @@
 .Container {
-    z-index: 99;
-    height: var(--size-top-bar);
-    width: calc(100vw - var(--size-menu));
-    margin-left: var(--size-menu);
-    background-color: rgb(var(--primary-color));
-    box-shadow: 0px 3px 10px var(--shadow-color);
-    position: fixed;
-    margin-top: 0;
-    display: flex;
-    align-items: center;
-    justify-content: end; 
-    border-bottom: 1px solid var(--separation-color);
-  } 
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 25px 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 100;
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  transition: ease all 0.3s;
+}
+
+.PinToolBar {
+  top: 40px;
+}
+.Container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  z-index: -1;
+
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.5) 70%,
+    transparent 100%
+  );
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: cover;
+
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.5) 70%,
+    transparent 100%
+  );
+  mask-repeat: no-repeat;
+  mask-size: cover;
+}
 
 .Categories {
-    display: flex;
+  display: flex;
+  gap: 0px;
+}
+
+@media (max-width: 1920px) {
+  .Container {
+    padding: calc(25px * 0.75) calc(50px * 0.75);
   }
-  @media (max-width:1920px) {
-    .Container {
-      justify-content: space-between;
-      box-shadow: 0px 2px 6px var(--shadow-color);
-    }    
+}
+@media (max-width: 1300px) {
+  .Container {
+    padding: calc(25px * 0.6) calc(50px * 0.6);
   }
+}
+@media (max-width: 960px) {
+  .Container {
+    padding: calc(25px * 0.5) calc(50px * 0.5);
+  }
+}

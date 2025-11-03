@@ -1,9 +1,9 @@
 body, html {
   margin: 0;
   padding: 0;
-  font-family: var(--font-main);
-  background-color: var(--background-color);
-  color: var(--primary-text);
+  font-family: var(--font-family-main);
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
   height: 100%;
 }
 
@@ -12,41 +12,41 @@ body, html {
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: radial-gradient(circle at center, var(--secondary-color), black);
+  background: radial-gradient(circle at center, var(--color-secondary), black);
 }
 .gradient-overlay {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background: radial-gradient(circle at center, var(--secondary-color), rgba(0, 0, 0, 0));
+  background: radial-gradient(circle at center, var(--color-secondary), rgba(0, 0, 0, 0));
   opacity: 0.5; 
 }
 
 .login-form {
   z-index: 1;
-  background: var(--secondary-color);
+  background: var(--color-secondary);
   opacity: 0.9;
   padding: 40px;
   border-radius: 10px;
   width: 100%;
   max-width: 400px;
-  box-shadow: 0 0 30px var(--shadow-color);
-  color: var(--primary-text);
+  box-shadow: 0 0 30px var(--color-shadow);
+  color: var(--color-text-primary);
 }
 
 .title {
   font-size: 2rem;
   text-align: center;
   margin-bottom: 10px;
-  color: var(--logo-color);
+  color: var(--color-logo);
   letter-spacing: 2px;
-  font-weight: var(--main-title-weight);
+  font-weight: var(--extra-bold);
 }
 
 form h2 {
   text-align: center;
   margin-bottom: 20px;
-  font-weight: var(--title-weight);
+  font-weight: var(--bold);
 }
 
 input[type="email"],
@@ -54,10 +54,10 @@ input[type="password"],
 .password-wrapper input {
   width: 100%;
   padding: 12px;
-  background: var(--third-color);
-  border: 1px solid var(--separation-color);
+  background: var(--color-surface);
+  border: 1px solid var(--color-separation);
   border-radius: 5px;
-  color: var(--primary-text);
+  color: var(--color-text-primary);
   font-size: 1rem;
 }
 
@@ -75,7 +75,7 @@ input[type="email"] {
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--primary-text);
+  color: var(--color-text-primary);
   cursor: pointer;
 }
 
@@ -87,11 +87,11 @@ input[type="email"] {
   margin-top: 8px;
   cursor: pointer;
   transition: 0.2s ease;
-  font-weight: var(--button-weight);
+  font-weight: var(--bold);
 }
 
 .btn.primary {
-  background: var(--logo-color);
+  background: var(--color-logo);
   border: none;
   color: white;
 }
@@ -101,7 +101,7 @@ input[type="email"] {
 }
 
 .btn.secondary {
-  background: var(--separation-color);
+  background: var(--color-separation);
   color: white;
   border: none;
 }
@@ -112,12 +112,12 @@ input[type="email"] {
 
 .btn.tertiary {
   background: none;
-  color: var(--third-color);
-  border: 1px solid var(--separation-color);
+  color: var(--color-surface);
+  border: 1px solid var(--color-separation);
 }
 
 .btn.tertiary:hover {
-  background: var(--third-color);
+  background: var(--color-surface);
   color: white;
 }
 
@@ -126,7 +126,7 @@ input[type="email"] {
   justify-content: space-between;
   margin-top: 10px;
   font-size: 0.85rem;
-  color: var(--primary-text);
+  color: var(--color-text-primary);
 }
 
 .options label {
@@ -136,7 +136,7 @@ input[type="email"] {
 }
 
 .options a {
-  color: var(--primary-text);
+  color: var(--color-text-primary);
   text-decoration: none;
 }
 

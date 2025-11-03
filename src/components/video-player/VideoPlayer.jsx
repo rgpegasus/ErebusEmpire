@@ -33,9 +33,9 @@ export const ErebusPlayer = ({
   reprodutionList = [],
   onTimeUpdate = undefined, 
   overlayEnabled = true,
-  primaryColor = 'var(--logo-color)',
-  secundaryColor = 'var(--primary-text)',
-  fontFamily = 'var(--font-main)',
+  primaryColor = 'var(--color-logo)',
+  secundaryColor = 'var(--color-text-primary)',
+  fontFamily = 'var(--font-family-main)',
   availableLanguages=undefined,
   currentLanguage=undefined,
   onChangeLanguage = undefined,
@@ -417,7 +417,8 @@ const handleControlClick = (e) => {
 
     if (isHLS) {
       if (Hls.isSupported()) {
-        const hls = new Hls();
+        const hls = new Hls(); 
+        
         hls.loadSource(currentSource);
         hls.attachMedia(videoRef.current);
         hls.on(Hls.Events.MANIFEST_PARSED, () => {

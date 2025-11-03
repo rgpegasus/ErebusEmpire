@@ -29,7 +29,7 @@ export default function Theme({ visible = false, onClose }) {
     onClose();
   }
   useEffect(() => {
-    const episodeRoute = /^\/erebus-empire\/anime\/[^/]+\/[^/]+\/[^/]+$/;
+    const episodeRoute = /^\/erebus-empire\/[^/]+\/[^/]+\/[^/]+$/;
     if (episodeRoute.test(location.pathname)) {
       onClose();
     }
@@ -63,7 +63,7 @@ export default function Theme({ visible = false, onClose }) {
       setInputValue(result.sRGBHex);
       updateColorTheme(result.sRGBHex); 
     } catch (e) {
-      console.log("Sélection annulée ou erreur", e);
+      console.error("Sélection annulée ou erreur", e);
     }
   };
 
@@ -88,12 +88,20 @@ export default function Theme({ visible = false, onClose }) {
     if (theme === "dark") {
       base = colorTheme ? discordify(baseHex) : discordify("#0B0C10");
       const variants = {
-        "--background-color": chroma(base).darken(0.1).hex(),
-        "--secondary-color": chroma(base).brighten(0.05).hex(),
-        "--primary-color": chroma(base).darken(0.6).rgb().join(","),
-        "--separation-color": chroma(base).brighten(0.5).hex(),
-        "--primary-text": chroma(base).brighten(4.4).hex(),
-        "--shadow-color": chroma(base).darken(0.6).hex(),
+        "--color-background": chroma(base).darken(0.1).hex(),
+        "--color-background-rgb": chroma(base).darken(0.1).rgb().join(","),
+        "--color-secondary": chroma(base).brighten(0.05).hex(),
+        "--color-secondary-rgb": chroma(base).brighten(0.05).rgb().join(","),
+        "--color-primary": chroma(base).darken(0.6).rgb().join(","),
+        "--color-primary-rgb": chroma(base).darken(0.6).rgb().join(","),
+        "--color-separation": chroma(base).brighten(0.5).hex(),
+        "--color-separation-rgb": chroma(base).brighten(0.5).rgb().join(","),
+        "--color-text-primary": chroma(base).brighten(4.4).hex(),
+        "--color-text-primary-rgb": chroma(base).brighten(4.4).rgb().join(","),
+        "--color-text-secondary": "#FFF",
+        "--color-text-secondary-rgb": "255, 255, 255",
+        "--color-shadow": chroma(base).darken(0.6).hex(),
+        "--color-shadow-rgb": chroma(base).darken(0.6).rgb().join(","),
       };
       Object.entries(variants).forEach(([key, val]) =>
         document.documentElement.style.setProperty(key, val)
@@ -101,12 +109,20 @@ export default function Theme({ visible = false, onClose }) {
     } else {
       base = colorTheme ? lightify(baseHex) : lightify("#bababaff");
       const lightTheme = {
-        "--background-color": base,
-        "--secondary-color": chroma(base).brighten(0.3).hex(),
-        "--primary-color": chroma(base).brighten(0.5).rgb().join(","),
-        "--separation-color": chroma(base).darken(0.3).hex(),
-        "--primary-text": chroma(base).darken(4.4).hex(),
-        "--shadow-color": chroma(base).darken(0.3).hex(),
+        "--color-background": chroma(base).darken(0.05).hex(),
+        "--color-background-rgb": chroma(base).darken(0.05).rgb().join(","),
+        "--color-secondary": chroma(base).brighten(0.3).hex(),
+        "--color-secondary-rgb": chroma(base).brighten(0.3).rgb().join(","),
+        "--color-primary": chroma(base).brighten(0.5).hex(),
+        "--color-primary-rgb": chroma(base).brighten(0.5).rgb().join(","),
+        "--color-separation": chroma(base).darken(0.3).hex(),
+        "--color-separation-rgb": chroma(base).darken(0.3).rgb().join(","),
+        "--color-text-primary": chroma(base).darken(4.4).hex(),
+        "--color-text-primary-rgb": chroma(base).darken(4.4).rgb().join(","),
+        "--color-text-secondary": "#000",
+        "--color-text-secondary-rgb": "1, 1, 1",
+        "--color-shadow": chroma(base).darken(0.3).hex(),
+        "--color-shadow-rgb": chroma(base).darken(0.3).rgb().join(","),
       };
       Object.entries(lightTheme).forEach(([key, val]) =>
         document.documentElement.style.setProperty(key, val)

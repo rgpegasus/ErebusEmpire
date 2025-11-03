@@ -3,14 +3,14 @@ import fs from 'fs';
 import path from 'path';
 
 function SaveAnimeCoverTemp(animeData) {
-  const baseFolder = path.join(app.getPath('appData'), 'erebus-empire', 'userData', 'anime', 'sessionStorage');
+  const baseFolder = path.join(app.getPath('appData'), 'Erebus Empire', 'userData', 'sessionStorage', 'anime');
   const filePath = path.join(baseFolder, 'animeCover.json');
   fs.mkdirSync(baseFolder, { recursive: true });
   fs.writeFileSync(filePath, JSON.stringify(animeData, null, 2), 'utf-8');
 }
 
 function LoadAnimeCoverTemp() {
-  const baseFolder = path.join(app.getPath('appData'), 'erebus-empire', 'userData', 'anime', 'sessionStorage');
+  const baseFolder = path.join(app.getPath('appData'), 'Erebus Empire', 'userData', 'sessionStorage', 'anime');
   const filePath = path.join(baseFolder, 'animeCover.json');
   try {
     if (!fs.existsSync(filePath)) {

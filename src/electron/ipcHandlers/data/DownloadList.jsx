@@ -1,7 +1,7 @@
 import { ipcMain, app} from 'electron';
 import path from 'path';
 import fs from 'fs';
-const userDataFolder = path.join(app.getPath('appData'), 'Erebus Empire', 'userData', 'animeDownload');
+const userDataFolder = path.join(app.getPath('appData'), 'Erebus Empire', 'userData', 'localStorage', 'animeDownload');
 
 function DownloadList() {
   ipcMain.handle('get-downloads', async (event) => {

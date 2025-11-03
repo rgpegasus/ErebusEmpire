@@ -1,0 +1,298 @@
+.ProfileEditorContainer {
+  width: 550px;
+  padding: 35px 50px;
+  font-family: var(--font-family-main);
+  color: var(--color-text-primary);
+  display: flex;
+}
+.ProfileEditor {
+  display: flex;
+  gap: 25px;
+  align-items: center;
+}
+
+.ProfileImg {
+  width: 115px;
+  height: 115px;
+  color: var(--color-logo);
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--color-logo);
+}
+.ProfileImg.editable,
+.ProfileName.editable {
+  cursor: pointer;
+}
+
+.InputEdit {
+  display: none;
+}
+.AppContainer {
+  display: flex;
+  gap: 10px;
+  align-items: end;
+  width: 225px;
+  opacity: 0.9;
+}
+.AppLogo {
+  width: 19px;
+  height: auto;
+  color: var(--color-logo);
+}
+.AppTitle {
+  font-size: 12px;
+  text-transform: uppercase;
+  font-family: var(--font-family-main);
+  font-weight: var(--bold);
+  letter-spacing: 2px;
+}
+.InputName {
+  background-color: transparent;
+  border: none;
+  color: var(--color-text-primary);
+  align-items: center;
+  text-align: center;
+  font-family: var(--font-family-main);
+  font-weight: var(--regular);
+  font-size: 20px;
+  outline: none;
+}
+.EditOption {
+  background: none;
+  padding-bottom: 7px;
+  border: none;
+  border-bottom: 1px solid var(--color-separation);
+  color: var(--color-text-primary);
+  text-align: center;
+  cursor: pointer;
+  font-family: var(--font-family-main);
+  font-weight: var(--medium);
+  font-size: 15px;
+  transition: ease all 0.3s;
+}
+.EditOption:hover {
+  color: var(--color-logo);
+}
+.EditOption:last-child {
+  border-bottom: none;
+  padding-bottom: 0px;
+}
+.EditContainer {
+  position: absolute;
+  background: var(--color-secondary);
+  border-radius: 7px;
+  padding: 7px 15px;
+  z-index: 102;
+  display: flex;
+  width: 185px;
+  gap: 10px;
+  flex-direction: column;
+  box-shadow: -2px 5px 10px var(--color-shadow);
+  border-bottom: 1px solid var(--color-separation);
+  border-right: 1px solid var(--color-separation);
+  margin-left: -35px;
+  margin-top: -30px;
+}
+
+.NameContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: start;
+}
+.ProfileName {
+  color: var(--color-logo);
+  font-family: var(--font-family-main);
+  font-weight: var(--semi-bold);
+  letter-spacing: 1px;
+  font-size: 30px;
+  word-break: break-word;
+  white-space: normal;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+.EditContainerButton {
+  width: 100%;
+  display: flex;
+  justify-content: end;
+}
+.EditButton {
+  cursor: pointer;
+  margin-top: 15px;
+  font-size: 20px;
+}
+
+@media (max-width: 1920px) {
+  .EditButton {
+    margin-top: calc(15px * 0.75);
+    font-size: calc(20px * 0.75);
+  }
+
+  .ProfileEditorContainer {
+    width: calc(550px * 0.75);
+    padding: calc(35px * 0.75) calc(50px * 0.75);
+  }
+  .ProfileEditor {
+    gap: calc(25px * 0.75);
+  }
+
+  .ProfileImg {
+    width: calc(115px * 0.75);
+    height: calc(115px * 0.75);
+    border: calc(3px * 0.75) solid var(--color-logo);
+  }
+  .AppContainer {
+    gap: calc(10px * 0.75);
+    width: calc(225px * 0.75);
+  }
+  .AppLogo {
+    width: calc(19px * 0.75);
+  }
+  .AppTitle {
+    font-size: calc(12px * 0.75);
+    letter-spacing: calc(2px * 0.75);
+  }
+  .InputName {
+    font-size: calc(20px * 0.75);
+  }
+  .EditOption {
+    padding-bottom: calc(7px * 0.75);
+    font-size: calc(15px * 0.75);
+  }
+  .EditOption:last-child {
+    padding-bottom: 0px;
+  }
+  .EditContainer {
+    border-radius: calc(7px * 0.75);
+    padding: calc(7px * 0.75) calc(15px * 0.75);
+    width: calc(185px * 0.75);
+    gap: calc(10px * 0.75);
+    box-shadow: calc(-2px * 0.75) calc(5px * 0.75) calc(10px * 0.75) var(--color-shadow);
+    border-bottom: calc(1px * 0.75) solid var(--color-separation);
+    border-right: calc(1px * 0.75) solid var(--color-separation);
+    margin-left: calc(-35px * 0.75);
+    margin-top: calc(-30px * 0.75);
+  }
+
+  .NameContainer {
+    gap: calc(5px * 0.75);
+  }
+  .ProfileName {
+    letter-spacing: calc(1px * 0.75);
+    font-size: calc(30px * 0.75);
+  }
+}
+@media (max-width: 1300px) {
+  .EditButton {
+    margin-top: calc(15px * 0.6);
+    font-size: calc(20px * 0.6);
+  }
+
+  .ProfileEditorContainer {
+    width: calc(550px * 0.6);
+    padding: calc(35px * 0.6) calc(50px * 0.6);
+  }
+  .ProfileEditor {
+    gap: calc(25px * 0.6);
+  }
+
+  .ProfileImg {
+    width: calc(115px * 0.6);
+    height: calc(115px * 0.6);
+    border: calc(3px * 0.6) solid var(--color-logo);
+  }
+  .AppContainer {
+    gap: calc(10px * 0.6);
+    width: calc(225px * 0.6);
+  }
+  .AppLogo {
+    width: calc(19px * 0.6);
+  }
+  .AppTitle {
+    font-size: calc(12px * 0.6);
+    letter-spacing: calc(2px * 0.6);
+  }
+  .InputName {
+    font-size: calc(20px * 0.6);
+  }
+  .EditOption {
+    padding-bottom: calc(7px * 0.6);
+    font-size: calc(15px * 0.6);
+  }
+  .EditContainer {
+    border-radius: calc(7px * 0.6);
+    padding: calc(7px * 0.6) calc(15px * 0.6);
+    width: calc(185px * 0.6);
+    gap: calc(10px * 0.6);
+    box-shadow: calc(-2px * 0.6) calc(5px * 0.6) calc(10px * 0.6) var(--color-shadow);
+    border-bottom: calc(1px * 0.6) solid var(--color-separation);
+    border-right: calc(1px * 0.6) solid var(--color-separation);
+    margin-left: calc(-35px * 0.6);
+    margin-top: calc(-30px * 0.6);
+  }
+
+  .NameContainer {
+    gap: calc(5px * 0.6);
+  }
+  .ProfileName {
+    letter-spacing: calc(1px * 0.6);
+    font-size: calc(30px * 0.6);
+  }
+}
+@media (max-width: 960px) {
+  .EditButton {
+    margin-top: calc(15px * 0.5);
+    font-size: calc(20px * 0.5);
+  }
+
+  .ProfileEditorContainer {
+    width: calc(550px * 0.5);
+    padding: calc(35px * 0.5) calc(50px * 0.5);
+  }
+  .ProfileEditor {
+    gap: calc(25px * 0.5);
+  }
+
+  .ProfileImg {
+    width: calc(115px * 0.5);
+    height: calc(115px * 0.5);
+    border: calc(3px * 0.5) solid var(--color-logo);
+  }
+  .AppContainer {
+    gap: calc(10px * 0.5);
+    width: calc(225px * 0.5);
+  }
+  .AppLogo {
+    width: calc(19px * 0.5);
+  }
+  .AppTitle {
+    font-size: calc(12px * 0.5);
+    letter-spacing: calc(2px * 0.5);
+  }
+  .InputName {
+    font-size: calc(20px * 0.5);
+  }
+  .EditOption {
+    padding-bottom: calc(7px * 0.5);
+    font-size: calc(15px * 0.5);
+  }
+  .EditContainer {
+    border-radius: calc(7px * 0.5);
+    padding: calc(7px * 0.5) calc(15px * 0.5);
+    width: calc(185px * 0.5);
+    gap: calc(10px * 0.5);
+    box-shadow: calc(-2px * 0.5) calc(5px * 0.5) calc(10px * 0.5) var(--color-shadow);
+    border-bottom: calc(1px * 0.5) solid var(--color-separation);
+    border-right: calc(1px * 0.5) solid var(--color-separation);
+    margin-left: calc(-35px * 0.5);
+    margin-top: calc(-30px * 0.5);
+  }
+
+  .NameContainer {
+    gap: calc(5px * 0.5);
+  }
+  .ProfileName {
+    letter-spacing: calc(1px * 0.5);
+    font-size: calc(30px * 0.5);
+  }
+}

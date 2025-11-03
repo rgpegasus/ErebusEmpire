@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useLoader } from '@utils/dispatchers/Page';
-import { SearchIcon } from '@utils/dispatchers/Icons';
-import ImgLoader from '@components/img-loader/ImgLoader';
 import styles from './Catalog.module.css';
-
+import {LoginPageBackground} from "@utils/dispatchers/Pictures"
+import BackgroundCover from "@components/background-cover/BackgroundCover"
+import ContentsCarousel from '@components/contents-carousel/ContentsCarousel';
 export const Catalog = () => {
-  const [listAnime, setListAnime] = useState([]);
-  const [input, setInput] = useState('');
+  const [animeList, setAnimeList] = useState([]);
   const [hasNext, setHasNext] = useState(true);
 
   const { setLoading } = useLoader();
@@ -33,7 +32,7 @@ export const Catalog = () => {
       );
 
       const firstThreePages = results.slice(0, 1).flat().filter(Boolean);
-      setListAnime(firstThreePages);
+      setAnimeList(firstThreePages);
       setHasNext((results[1] || []).length > 0);
     } catch (error) {
       console.error("Erreur lors du chargement des données :", error);
@@ -43,7 +42,6 @@ export const Catalog = () => {
   };
 
   useEffect(() => {
-    setInput(query);
     fetchData(page, query);
     document.querySelector('.MainPage')?.scrollTo({ top: 0, behavior: 'instant' });
   }, [page, query]);
@@ -54,16 +52,6 @@ export const Catalog = () => {
     } catch {
       return '';
     }
-  };
-
-  const handleSearch = () => {
-    const trimmed = input.trim();
-    setSearchParams({ page: '1', ...(trimmed && { q: trimmed }) });
-  };
-
-  const handleClear = () => {
-    setInput('');
-    setSearchParams({ page: '1' });
   };
 
   const handlePageChange = (delta) => {
@@ -81,59 +69,28 @@ export const Catalog = () => {
 
   return (
     <div className='MainPage'>
-      <div className='Space'></div>
-      <div className="CategorieTitle">Catalogue d'animé :</div>
-      <div className={styles.CatalogContainer}> 
-        <div className={styles.SearchContainer}>
-          <SearchIcon className={styles.SearchIcon} />
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            placeholder="RECHERCHER..."
-            className={styles.SearchBar}
-          />
-          {input.trim() !== '' && (
-            <span className={styles.ClearSearchIcon} onClick={handleClear}>✖</span>
-          )}
-        </div>
-
-        <div className='Space'></div>
-        {listAnime.length > 0 ? (
-          <div className={styles.ResultsContainer}>
-            {listAnime.map((anime, i) => (
-              <div key={anime.title || i} className={styles.ItemContainer}>
-                <div className={styles.CoverContainer}>
-                  <h3 className={styles.Title}>{anime.title}</h3>
-                  <div className={styles.Img}>
-                    <ImgLoader
-                      key={anime.title + anime.cover}
-                      anime={anime}
-                    />
-                  </div>
-                  <div
-                    onClick={() => navigate(`/erebus-empire/anime/${getAnimeId(anime.url)}/`)}
-                    className={styles.SeeButton}
-                  >
-                    voir
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className={styles.ResultNone}>
-           <p className={styles.ResultNoneMessage}>Aucun animé disponible</p>
-          </div>
-        )}
-
+      <BackgroundCover 
+        coverInfo = {LoginPageBackground}
+        whileWatching = {false}
+        isAnime = {false}
+      />
+      <div className={styles.Container}>
+        <ContentsCarousel
+          data={animeList}
+          title={"Catalogue"}
+          onClickEpisode={(anime) => navigate(`/erebus-empire/${getAnimeId(anime.url)}/`)}
+          getEpisodeCover={(anime) => anime.cover}
+          getAnimeTitle={(anime) => anime.title}
+          enableShiftDelete={true}
+          isSeason={true}
+          searchBy={"title"}
+          onDeleteEpisode={(anime) => deleteAnime(anime)}
+        />
         <div className={styles.NavigationContainer}>
           <button className={styles.NavigationButton} onClick={() => handlePageChange(-1)} disabled={page <= 1}>Précédent</button>
           <button className={styles.NavigationButton} onClick={() => handlePageChange(1)} disabled={!hasNext}>Suivant</button>
         </div>
       </div>
-      <div className='Space'></div>
     </div>
   );
 };

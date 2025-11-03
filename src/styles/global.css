@@ -2,149 +2,62 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  user-select: none;
 }
-body {  
-  background-color: var(--background-color);                    
+body {
+  background-color: var(--color-background);
 }
 
 .MainPage {
-  overflow-y: auto; 
-  margin-left:var(--size-menu); 
-  margin-top: var(--size-top-bar);
-  width:calc(100vw - var(--size-menu));
-  height: calc(100vh - var(--size-top-bar)); 
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100vw;
+  height: 100vh;
   position: fixed;
 }
-.EpisodesPage {
-  position: absolute; 
-  top: var(--size-top-bar);
-  left: var(--size-menu);
-  right: 0;
-  bottom: 0;
-  overflow: hidden; 
-  margin: 0 !important;
-  width: unset;
-  height: unset;
-}
+
 .MainPage::-webkit-scrollbar {
   width: 12px;
+  transition: all ease 0.3;
 }
 .MainPage::-webkit-scrollbar-track {
-  background-color: rgba(var(--primary-color), 0.8);
+  background-color: rgba(var(--color-primary-rgb), 0.8);
   border-radius: 0 0 7px 7px;
 }
 .MainPage::-webkit-scrollbar-thumb {
-  background-color: var(--logo-color);
+  background-color: var(--color-logo);
   border-radius: 7px;
   cursor: grab;
-  border: 2px solid var(--secondary-color);
+  border: 2px solid var(--color-secondary);
 }
 .MainPage::-webkit-scrollbar-thumb:hover {
   background-color: rgba(153, 110, 53, 0.75);
-}
-
-
-/* Bannière pour le menu et les saisons */
-.AnimeCover {
-margin: 0;
-letter-spacing: 1px;
-margin-bottom: 50px;
-width: auto;
-height: calc(100vw /3.5);
-display: flex;
-justify-content: center;
-align-items: center;
-position: relative;
-}
-.AnimeCover {
-  background-color: #0B0C10;
-}
-
-.AnimeCover h2{
-position: absolute;
-color: #D1D7E0;
-text-transform: uppercase;
-font-size: 50px;
-text-align: center;
-font-weight: var(--main-title-weight);
-font-family: var(--font-main);
-max-width: 90%;
-}
-
-.AnimeCover-img {
-opacity: 0.4;
-width: 100%;
-height: 100%;
-object-fit: cover;
-border-bottom-right-radius: 10px;
-border-bottom-left-radius: 10px;
-border-bottom: 1px solid var(--separation-color);
-}
-
-
-.AnimeCover::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  z-index: 1;
-  width: 100%;
-  height: 40%; 
-  background: linear-gradient(to bottom, transparent, var(--background-color));
-  pointer-events: none;
-}
-
-.AnimeCover-button {
-  position: absolute;
-  color: #D1D7E0;
-  opacity: 0.8;
-  z-index: 2;
-  font-weight: var(--main-title-weight);
-  font-family: var(--font-main);
-  border-radius: 10px;
-  text-transform: uppercase;
-  margin-top: 15vw;
-  font-size: 30px;
-  padding: 10px 30px;
-  cursor: pointer;
-  box-shadow: -2px 5px 10px rgba(0, 0, 0, 0.7)
-}
-.AnimeCover-button:hover {
-  opacity: 1;
-  background-color: #996e35;
 }
 .Space {
   height: 50px;
 }
 .CategorieTitle {
-margin: 0 50px 30px 50px;
-padding: 0px 30px;
-padding-bottom: 20px;
-font-family: var(--font-main);
-color:var(--primary-text);
-text-transform: uppercase;
-font-size: 25px;
-border-bottom: 5px solid var(--logo-color);
-font-weight: var(--title-weight);
-display: inline-block;
+  margin: 0 50px 30px 50px;
+  padding: 0px 30px;
+  padding-bottom: 20px;
+  font-family: var(--font-family-main);
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  font-size: 25px;
+  border-bottom: 5px solid var(--color-logo);
+  font-weight: var(--bold);
+  display: inline-block;
 }
 
 @media (max-width: 1920px) {
   .MainPage::-webkit-scrollbar {
     width: 10px;
   }
-  .AnimeCover h2{
-    font-size: 40px;
-  }
-  .AnimeCover-button{
-    font-size: 25px;
-    padding: 9px 25px;
-  }
   .CategorieTitle {
     font-size: 23px;
     padding: 0px 20px;
     padding-bottom: 16px;
-    border-bottom: 4px solid var(--logo-color);
+    border-bottom: 4px solid var(--color-logo);
   }
   .Space {
     height: 43px;
@@ -158,14 +71,7 @@ display: inline-block;
     font-size: 21px;
     padding: 0px 15px;
     padding-bottom: 12px;
-    border-bottom: 3px solid var(--logo-color);
-  }
-  .AnimeCover h2{
-    font-size: 30px;
-  }
-  .AnimeCover-button{
-    font-size: 18px;
-    padding: 8px 18px;
+    border-bottom: 3px solid var(--color-logo);
   }
   .Space {
     height: 36px;

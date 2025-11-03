@@ -1,0 +1,44 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "plugins": ["react", "react-hooks", "prettier", "import", "perfectionist"],
+  "rules": {
+    "prettier/prettier": "error",
+
+    // Tri des imports automatiquement
+    "import/order": [
+      "error",
+      {
+        "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
+        "newlines-between": "always",
+        "alphabetize": { "order": "asc", "caseInsensitive": true }
+      }
+    ],
+
+    // Plugin perfectionist → pour ranger objets, hooks, etc.
+    "perfectionist/sort-imports": [
+      "error",
+      { "type": "natural", "groups": ["react", "external", "internal", "sibling", "index"] }
+    ],
+    "perfectionist/sort-objects": ["error", { "type": "asc" }],
+    "perfectionist/sort-jsx-props": ["error", { "type": "asc" }],
+
+    // Pour être sûr que les hooks soient au bon endroit
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  }
+}

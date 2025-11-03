@@ -1,65 +1,132 @@
 :root {
-  --logo-color: #996e35;     
-  --primary-color: 3, 5, 8; 
-  --secondary-color: #13151C;      
-  --background-color: #0B0C10;     
-  --separation-color:#424242;
-  --third-color:#525151; 
-  --primary-text:#d1d7e0 ;
-  --shadow-color:#05060A ;
-  --size-menu: 325px;  
-  --size-top-bar:50px;
-  --font-main: "Montserrat", sans-serif;
-  --main-title-weight:800;
-  --title-weight : 700;
-  --little-title-weight : 600;
-  --main-text-weight : 500;
-  --button-weight:700;
-  --text-weight: 400;
-  --little-text-weight:300;
-  --tollbar-color: #ce9595;
-  --first-size: 1500px;
-}
-:root.light-theme {
-  --primary-color: 220, 220, 220; 
-  --secondary-color: #e9e3e3;
-  --tollbar-color: #dc9696;
-  --background-color: #D2D2D2;
-  --separation-color: #ad9d9d;
-  --third-color: #DADADA;
-  --primary-text: #1A1A1A;
-  --shadow-color: #989696;
-  --logo-color: #ae7f43;  
+  /* Logo */
+  --color-logo: #be873d;
+  --color-logo-rgb: 153, 110, 53;
+
+  /* Primary */
+  --color-primary: #030508;
+  --color-primary-rgb: 3, 5, 8;
+
+  /* Secondary */
+  --color-secondary: #13151c;
+  --color-secondary-rgb: 19, 21, 28;
+
+  /* Background */
+  --color-background: #0b0c10;
+  --color-background-rgb: 11, 12, 16;
+
+  /* Separation */
+  --color-separation: #424242;
+  --color-separation-rgb: 66, 66, 66;
+
+  /* Surface */
+  --color-surface: #525151;
+  --color-surface-rgb: 82, 81, 81;
+
+  /* Text Primary */
+  --color-text-primary: #d1d7e0;
+  --color-text-primary-rgb: 209, 215, 224;
+
+  /* Text Secondary */
+  --color-text-secondary: #fff;
+  --color-text-secondary-rgb: 255, 255, 255;
+
+  /* Shadow */
+  --color-shadow: #07050a;
+  --color-shadow-rgb: 7, 5, 10;
+
+  /* Toolbar */
+  --color-toolbar: #ce9595;
+  --color-toolbar-rgb: 206, 149, 149;
+
+  /* Button */
+  --color-button: #13151c;
+  --color-button-rgb: 19, 21, 28;
+
+  /* Sizes */
+  --size-topbar: 175px;
+
+  /* Fonts */
+  --font-family-main: 'Montserrat', sans-serif;
+  --font-family-secondary: 'Inter', sans-serif;
+  --extra-bold: 800;
+  --bold: 700;
+  --semi-bold: 600;
+  --medium: 500;
+  --regular: 400;
 }
 
+:root.light-theme {
+  /* Primary */
+  --color-primary: #dcdcdc;
+  --color-primary-rgb: 220, 220, 220;
+
+  /* Secondary */
+  --color-secondary: #e9e3e3;
+  --color-secondary-rgb: 233, 227, 227;
+
+  /* Background */
+  --color-background: #d2d2d2;
+  --color-background-rgb: 210, 210, 210;
+
+  /* Separation */
+  --color-separation: #ad9d9d;
+  --color-separation-rgb: 173, 157, 157;
+
+  /* Surface */
+  --color-surface: #dadada;
+  --color-surface-rgb: 218, 218, 218;
+
+  /* Text Primary */
+  --color-text-primary: #1a1a1a;
+  --color-text-primary-rgb: 26, 26, 26;
+
+  /* Text Secondary */
+  --color-text-secondary: #000;
+  --color-text-secondary-rgb: 1, 1, 1;
+
+  /* Shadow */
+  --color-shadow: #989696;
+  --color-shadow-rgb: 152, 150, 150;
+
+  /* Toolbar */
+  --color-toolbar: #dc9696;
+  --color-toolbar-rgb: 220, 150, 150;
+}
 
 @font-face {
   font-family: 'Montserrat';
-  src: url('@resources/fonts/Montserrat-ExtraBold.ttf') format('truetype');
+  src: url('@resources/fonts/montserrat/ExtraBold.ttf') format('truetype');
   font-weight: 800;
 }
 @font-face {
   font-family: 'Montserrat';
-  src: url('@resources/fonts/Montserrat-Bold.ttf') format('truetype');
+  src: url('@resources/fonts/montserrat/Bold.ttf') format('truetype');
   font-weight: 700;
 }
 @font-face {
   font-family: 'Montserrat';
-  src: url('@resources/fonts/Montserrat-SemiBold.ttf') format('truetype');
+  src: url('@resources/fonts/montserrat/SemiBold.ttf') format('truetype');
   font-weight: 600;
 }
 @font-face {
   font-family: 'Montserrat';
-  src: url('@resources/fonts/Montserrat-Medium.ttf') format('truetype');
+  src: url('@resources/fonts/montserrat/Medium.ttf') format('truetype');
   font-weight: 500;
 }
 @font-face {
   font-family: 'Montserrat';
-  src: url('@resources/fonts/Montserrat-Regular.ttf') format('truetype');
+  src: url('@resources/fonts/montserrat/Regular.ttf') format('truetype');
   font-weight: 400;
 }
 @font-face {
   font-family: 'Montserrat';
-  src: url('@resources/fonts/Montserrat-Light.ttf') format('truetype');
+  src: url('@resources/fonts/montserrat/Light.ttf') format('truetype');
   font-weight: 300;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('@resources/fonts/inter/Medium.ttf') format('truetype');
+  font-weight: 400;
 }

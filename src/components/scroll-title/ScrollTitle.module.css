@@ -1,24 +1,25 @@
 .Container {
-  margin: 0 20px;
-  height: 80px;
   overflow: hidden;
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
   position: relative;
+  width: 100%;
 }
 
 .Title {
   display: inline-block;
   white-space: nowrap;
-  font-size: 17px;
-  font-weight: var(--title-weight);
-  color: var(--primary-text);
   transform: translateX(0);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 100%; 
+}
+.ScrollableTitle {
+  width: auto;         
 }
 
-/* Animation au hover */
 .Container:hover .ScrollableTitle {
+  text-overflow: unset; 
+  overflow: visible;
   animation: scroll-text var(--scroll-duration) linear forwards;
 }
 
@@ -30,25 +31,4 @@
     transform: translateX(var(--scroll-distance));
   }
 }
-.Container.Centered {
-  justify-content: center;
-}
 
-
-@media (max-width:1920px) {
-  .Container {
-    height: 70px; 
-  }
-  .Title {
-    font-size: 15px;
-  }
-}
-
-@media (max-width: 1200px) {
-  .Container {
-    height: 60px;
-  }
-  .Title {
-    font-size: 14px;
-  }  
-}

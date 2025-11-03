@@ -1,21 +1,29 @@
-import React from 'react';
-import UserDropdown from './components/user-dropdown/UserDropdown';
-import OpenSideBar from './components/open-side-bar/OpenSideBar';
-import SearchAnime from './components/search-anime/SearchAnime';
-import NotificationDropdown from './components/notification-dropdown/NotificationDropdown';
-import styles from './TopBar.module.css'
- 
+import React, { useContext, useState, useEffect } from "react"
+import styles from "./TopBar.module.css"
+import LogoErebus from "./components/logo-erebus/LogoErebus"
+import SearchAnime from "@layouts/dropdown/search-anime/SearchAnime"
+import UserDropdown from "@layouts/dropdown/user/User"
+import { UserContext } from "@context/user-context/UserContext"
 function TopBar() {
+  const { toolBar } = useContext(UserContext)
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (e.clientY <= 5) setShow(true)
+      if (e.clientY > 60) setShow(false)
+    }
+    window.addEventListener("mousemove", handleMouseMove)
+    return () => window.removeEventListener("mousemove", handleMouseMove)
+  }, [])
   return (
-    <div className={styles.Container}> 
-      <OpenSideBar/>
+    <div className={`${styles.Container} ${toolBar || show ? styles.PinToolBar : ""}`}>
+      <LogoErebus />
       <div className={styles.Categories}>
-        <NotificationDropdown/>
-        <SearchAnime/>
-        <UserDropdown/>
+        <SearchAnime />
+        <UserDropdown />
       </div>
-    </div>  
-  );
+    </div>
+  )
 }
 
-export default TopBar;
+export default TopBar

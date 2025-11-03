@@ -1,0 +1,27 @@
+.Container {
+  margin: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 150px;
+}
+
+@media (max-width: 1920px) {
+  .Container {
+    margin: calc(50px * 0.75);
+    gap: calc(150px * 0.75);
+  }
+}
+
+@media (max-width: 1300px) {
+  .Container {
+    margin: calc(50px * 0.6);
+    gap: calc(150px * 0.6);
+  }
+}
+
+@media (max-width: 960px) {
+  .Container {
+    margin: calc(50px * 0.5);
+    gap: calc(150px * 0.5);
+  }
+}

@@ -1,16 +1,14 @@
 import React, { createContext, useContext, useState } from 'react';
-import { Loader } from '@utils/dispatchers/Page';
+import { Loader} from '@features/loader/Loader';
+
 
 const LoaderContext = createContext();
 
 export const LoaderProvider = ({ children }) => {
-
   const [loadingCount, setLoadingCount] = useState(0);
 
   const setLoading = (isLoading) => {
-    setLoadingCount(count => {
-      return isLoading ? count + 1 : Math.max(count - 1, 0);
-    });
+    setLoadingCount((count) => (isLoading ? count + 1 : Math.max(count - 1, 0)));
   };
 
   return (
@@ -21,4 +19,10 @@ export const LoaderProvider = ({ children }) => {
   );
 };
 
-export const useLoader = () => useContext(LoaderContext);
+export const useLoader = () => {
+  const ctx = useContext(LoaderContext);
+  if (!ctx) {
+    throw new Error("useLoader doit être utilisé à l'intérieur d'un LoaderProvider");
+  }
+  return ctx;
+};

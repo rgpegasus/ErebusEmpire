@@ -1,0 +1,151 @@
+.Logo {
+  color: var(--color-logo);
+  width: 30px;
+  height: auto;
+  margin-right: 35px;
+} 
+
+.LogoImg {
+  width: 30px;
+  height: 30px;
+  margin-right: 25px;
+}
+.Link {
+  width: 100%;
+  display: flex;
+  text-decoration: none; 
+  padding: 17px 50px;
+  height: 100%;
+  align-items: center;
+}
+.Label {
+  font-size: 20px;
+  color: var(--color-text-primary);
+  font-family: var(--font-family-main);
+  font-weight: var(--semi-bold);
+  letter-spacing: 1.5px;
+  transform: scaleY(1.1);
+}
+.OngletBoxClick {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  cursor: pointer;
+  padding: 17px 50px;
+}
+.OngletBox {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  cursor: pointer;
+}
+
+.OngletBox:last-child,
+.OngletBoxClick:last-child {
+  margin: 0 0 20px 0;
+}
+.OngletBoxSelect,
+.OngletBoxClick:hover,
+.OngletBox:hover {
+  background-color: var(--color-separation);
+}
+
+
+.Logo {
+  width: 30px;
+  margin-right: 35px;
+} 
+
+.LogoImg {
+  width: 30px;
+  height: 30px;
+  margin-right: 25px;
+}
+.Link {
+  padding: 17px 50px;
+}
+.Label {
+  font-size: 20px;
+  letter-spacing: 1.5px;
+}
+.OngletBoxClick {
+  padding: 17px 50px;
+}
+
+
+
+@media (max-width: 1920px) {
+  .Logo {
+    width: calc(30px * 0.75);
+    margin-right: calc(35px * 0.75);
+  } 
+  .LogoImg {
+    width: calc(30px * 0.75);
+    height: calc(30px * 0.75);
+    margin-right: calc(25px * 0.75);
+  }
+  .Link {
+    padding: calc(17px * 0.75) calc(50px * 0.75);
+  }
+  .Label {
+    font-size: calc(20px * 0.75);
+    letter-spacing: calc(1.5px * 0.75);
+  }
+  .OngletBoxClick {
+    padding: calc(17px * 0.75) calc(50px * 0.75);
+  }
+  .OngletBox:last-child,
+  .OngletBoxClick:last-child {
+    margin: 0 0 calc(20px * 0.75) 0;
+  }
+}
+@media (max-width: 1300px) {
+  .Logo {
+    width: calc(30px * 0.6);
+    margin-right: calc(35px * 0.6);
+  } 
+  .LogoImg {
+    width: calc(30px * 0.6);
+    height: calc(30px * 0.6);
+    margin-right: calc(25px * 0.6);
+  }
+  .Link {
+    padding: calc(17px * 0.6) calc(50px * 0.6);
+  }
+  .Label {
+    font-size: calc(20px * 0.6);
+    letter-spacing: calc(1.5px * 0.6);
+  }
+  .OngletBoxClick {
+    padding: calc(17px * 0.6) calc(50px * 0.6);
+  }
+  .OngletBox:last-child,
+  .OngletBoxClick:last-child {
+    margin: 0 0 calc(20px * 0.6) 0;
+  }
+}
+@media (max-width: 960px) {
+  .Logo {
+    width: calc(30px * 0.5);
+    margin-right: calc(35px * 0.5);
+  } 
+  .LogoImg {
+    width: calc(30px * 0.5);
+    height: calc(30px * 0.5);
+    margin-right: calc(25px * 0.5);
+  }
+  .Link {
+    padding: calc(17px * 0.5) calc(50px * 0.5);
+  }
+  .Label {
+    font-size: calc(20px * 0.5);
+    letter-spacing: calc(1.5px * 0.5);
+  }
+  .OngletBoxClick {
+    padding: calc(17px * 0.5) calc(50px * 0.5);
+  }
+  .OngletBox:last-child,
+  .OngletBoxClick:last-child {
+    margin: 0 0 calc(20px * 0.5) 0;
+  }
+}

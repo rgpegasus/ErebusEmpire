@@ -2,25 +2,35 @@ import { toSlug } from '@utils/functions/toSlug'
 import { sanitizeName } from '@utils/functions/sanitizeName'
 
 async function getRealEpisodeName (episodeInfo) {
-    const { url: animeUrl, episode } = episodeInfo;
-    console.log(animeUrl, episode, "caca")
-    const animeId = animeUrl.split("/").slice(4, 5).join("/");
+    let { url: animeUrl, episode } = episodeInfo;
+    
     let embedData = [];
     let seasonTitle = "null"; 
+    if (animeUrl.startsWith("/catalogue")) {
+      animeUrl = "https://anime-sama.org"+animeUrl
+    }  
+    const animeId = animeUrl.split("/").slice(4, 5).join("/");
+    console.log(animeUrl)
     try {
-      const data = await window.electron.ipcRenderer.invoke('get-episodes', animeUrl, true, true);
-      const { animeInfo, episodes } = data;
+      const { animeInfo, episodes } = await window.electron.ipcRenderer.invoke(
+        "get-episodes",
+        animeUrl,
+        true,
+        true,
+      )
       embedData = episodes
       seasonTitle = animeInfo.seasonTitle
     } catch (err) {
       console.error("Erreur récupération embed:", err);
     }
+
+    
+   
     if (!embedData || embedData.length === 0) return null;
     const seasonId = animeUrl.split("/").slice(5, 6).join("/");
     const episodeFakeName = sanitizeName(episode);
     const episodeMatch = episodeFakeName.match(/episode(\d+)/i);
     const episodeNumber = episodeMatch ? episodeMatch[1] : null;
-
   
     let typeToSearch = 'episode';
     if (episodeFakeName.includes('oav') || episodeFakeName.includes('ova')) typeToSearch = 'oav';
@@ -57,8 +67,8 @@ async function getRealEpisodeName (episodeInfo) {
   
     const episodeSlug = matchedEmbed ? toSlug(matchedEmbed.title) : null;
     const finalPath = episodeSlug
-      ? `/erebus-empire/anime/${animeId}/${seasonId}/${episodeSlug}`
-      : `/erebus-empire/anime/${animeId}/${seasonId}`;
+      ? `/erebus-empire/${animeId}/${seasonId}/${episodeSlug}`
+      : `/erebus-empire/${animeId}/${seasonId}`;
   
     return {
       path: finalPath,

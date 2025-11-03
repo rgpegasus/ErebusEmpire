@@ -1,0 +1,682 @@
+
+.Container {
+    position: relative;    
+}
+.ElementsContainer {
+    padding: 0 50px;
+}
+.CoverMask  {
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.5) 30%, rgba(0, 0, 0, 1) 40%);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: cover;
+
+    mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.5) 30%, rgba(0, 0, 0, 1) 40%);
+    mask-repeat: no-repeat;
+    mask-size: cover;
+}
+.Cover  {
+    object-fit: cover;
+    object-position: bottom;
+    width: 100vw;
+    height: 1000px;
+    -webkit-mask-image: linear-gradient(to bottom,  rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.3) 53%, transparent 100%);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: cover;
+
+    mask-image: linear-gradient(to bottom,  rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.3) 53%, transparent 100%);
+    mask-repeat: no-repeat;
+    mask-size: cover;
+}
+
+.IsAnime {
+    object-position: center;
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 40%, transparent 100%);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: cover;
+
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 40%, transparent 100%);
+    mask-repeat: no-repeat;
+    mask-size: cover;
+}
+.WhileWatching {
+    position: absolute;
+    top: 250px;
+    font-family: var(--font-family-main);
+    font-size: 30px;
+    font-weight: var(--semi-bold);
+    letter-spacing: -1px;
+    color: var(--color-text-primary);
+}
+.AnimeTitle {
+    position: absolute;
+    top: 300px;      
+    width: 1750px;
+    overflow: hidden;
+    white-space: nowrap;   
+    transform: scaleY(0.9); 
+}
+
+.AnimeTitle h2 {
+    font-family: var(--font-family-main);
+    font-size: 90px;
+    font-weight: var(--extra-bold);
+    letter-spacing: -3px;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    text-shadow: 0 0 15px rgba(var(--color-shadow-rgb), 0.75);
+    transition: ease all 0.3s;
+}
+.TitleHover:hover h2 {
+    opacity: 0.75;
+    text-shadow: 0 0 15px rgba(var(--color-logo-rgb), 0.75);
+    cursor: pointer;
+    color: var(--color-logo);
+}
+.AltTitles {
+    position: absolute;
+    top: 400px;      
+    font-family: var(--font-family-secondary);
+    font-size: 30px;
+    font-weight: var(--medium);
+    opacity: 0.6;
+    line-height: 0.8;
+}
+
+.Buttons {
+    position: absolute;
+    top:450px;
+    display: flex;
+    flex-direction: row;
+    gap:50px
+}
+.SeeContainer {
+    background-color: var(--color-logo);
+    display: flex;
+    flex-direction: row;
+    cursor: pointer;
+    gap: 33px;
+    padding: 25px 35px;
+    justify-content: center;
+    border-radius: 30px;
+    align-items: center;
+    box-shadow: 0 0 10px 5px rgba(var(--color-shadow-rgb), 0.75);
+    transition: ease all 0.3s;
+}
+.SeeContainer:hover {
+    opacity: 0.7
+}
+.SeeIcon {
+    color: rgba(255, 255, 255, 0.75);
+    height: 30px;
+    width: auto;
+}
+.SeeTitle {
+    font-family: var(--font-family-main);
+    font-size: 40px;
+    color: rgba(255, 255, 255, 0.75);
+    font-weight: var(--bold);
+    line-height: 0.8;
+}
+.AddContainer {
+    opacity: 0.75;
+    background-color: rgba(11, 12, 16, 0.75);
+    border-radius: 30px;
+    padding: 25px 35px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    gap: 33px;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 0 0 3px #FFF, 
+                0 0 10px 5px rgba(7, 5, 10, 0.5);
+    transition: ease all 0.3s;
+}
+.AddContainer:hover {
+    opacity: 0.45
+}
+.AddTitle {
+    font-family: var(--font-family-main);
+    font-size: 40px;
+    color: #FFF;
+    font-weight: var(--bold);
+    line-height: 0.8;
+}
+.AddIcon {
+    color: #FFF;
+    height: 30px;
+    width: auto;
+}
+.GenresContainer {
+    position: absolute;
+    top: 620px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.GenresTitle,
+.GenresTxt,
+.LessSynopsisTxt, 
+.MoreSynopsisTxt {
+    font-family: var(--font-family-secondary);
+    font-size: 30px;
+    font-weight: var(--medium);
+    line-height: 0.8; 
+}
+.GenresTxt {
+    opacity: 0.6;
+}
+.MoreSynopsisContainer {
+    width: 1500px;
+    height: 115px;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to bottom,  rgba(0, 0, 0, 1) 0%,  rgba(0, 0, 0, 0.45) 65%, transparent 95%);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: cover;
+
+    mask-image: linear-gradient(to bottom,  rgba(0, 0, 0, 1) 0%,  rgba(0, 0, 0, 0.45) 65%, transparent 95%);
+    mask-repeat: no-repeat;
+    mask-size: cover;
+}
+.LessSynopsisContainer {
+    width: 1500px;
+    display: flex;
+}
+.LessSynopsisTxt, 
+.MoreSynopsisTxt {    
+    line-height: 36px; 
+}
+.DetailsContainer {
+    left: 150px;
+    margin-top: -25px;
+    display: flex;
+    flex-direction: row;
+    cursor: pointer;
+    align-items: center;
+    gap: 50px;
+}
+.DetailsContainer:hover .DetailsTitle, 
+.DetailsContainer:hover .MoreDetailsIcon,
+.DetailsContainer:hover .LessDetailsIcon {
+    color: var(--color-text-secondary);
+    opacity: 0.9;
+}
+.DetailsTitle {
+    color: var(--color-logo);
+    font-family: var(--font-family-main);
+    font-size: 25px;
+    font-weight: va(--bold);
+    text-transform: uppercase;
+    transition: ease all 0.3s;
+    margin-left: 100px;
+}
+.MoreDetailsIcon {
+    color: var(--color-logo);
+    height: 15px;
+    width: auto;
+    transition: ease all 0.3s;
+}
+.LessDetailsIcon {
+    color: var(--color-logo);
+    height: 15px;
+    width: auto;
+    transform: rotate(180deg);
+    transition: ease all 0.3s;
+}
+
+.MoreSynopsisGlobalContainer,
+.LessSynopsisGlobalContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+    z-index: 1000; 
+    pointer-events: auto;  
+}
+
+.LessSynopsisGlobalContainer {
+    backdrop-filter: blur(3px); 
+    -webkit-backdrop-filter: blur(3px); 
+}
+.IsNotAnime {
+    pointer-events: none;
+}
+.SynopsisWrapper {
+  width: 100%;
+  transition: height 0.3s ease;
+}
+    
+.SynopsisContent {
+  position: absolute;
+  top: 685px;
+}
+
+.AddDropdown {
+  position: absolute;
+  background-color: var(--color-secondary);
+  border-radius: 8px;
+  right: -175px;
+  margin-top: -25px;
+  padding: 10px 15px;
+  z-index: 10;
+  font-size: 20px;
+  box-shadow: 2px 2px 5px rgba(var(--color-shadow-rgb), 0.5);
+}
+.AddDropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 5px;
+  color: var(--color-text-primary);
+}
+
+.CustomCheckbox {
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+  border: 1px solid var(--color-logo);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.2s;
+  background: var(--color-background);
+  position: relative;
+}
+
+.CustomCheckbox::after {
+  content: "";
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  width: 8px;
+  height: 5px;
+  border: solid white;
+  border-width: 0 0 1.5px 2.25px;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.HiddenAddDropdown:checked + .CustomCheckbox {
+  background: var(--color-logo);
+}
+
+.HiddenAddDropdown:checked + .CustomCheckbox::after {
+  opacity: 1; 
+}
+
+.HiddenAddDropdown {
+  display: none;
+}
+
+
+@media (max-width: 1920px) {
+    .ElementsContainer {
+        padding: 0 calc(50px * 0.75);
+    }
+    .Cover  {
+        height: calc(1000px * 0.75);
+    }
+    .WhileWatching {
+        top: calc(250px * 0.75);
+        font-size: calc(30px * 0.75);
+    }
+    .AnimeTitle {
+        top: calc(300px * 0.75);      
+        width: calc(1750px * 0.75);
+        
+    }
+    .AnimeTitle h2 {
+        font-size: calc(90px * 0.75);
+    }
+    .AltTitles {
+        top: calc(400px * 0.75);      
+        font-size: calc(30px * 0.75);
+    }
+    .Buttons {
+        top:calc(450px * 0.75);
+        gap:calc(50px * 0.75)
+    }
+    .SeeContainer {
+        gap: calc(33px * 0.75);
+        padding: calc(25px * 0.75) calc(35px * 0.75);
+        border-radius: calc(30px * 0.75);
+        box-shadow: 0 0 calc(10px * 0.75) calc(5px * 0.75) rgba(var(--color-shadow-rgb), 0.75);
+    }
+    .SeeIcon {
+        height: calc(30px * 0.75);
+    }
+    .SeeTitle {
+        font-size: calc(40px * 0.75);
+    }
+    .AddContainer {
+        border-radius: calc(30px * 0.75);
+        gap: calc(33px * 0.75);
+        padding: calc(25px * 0.75) calc(35px * 0.75);
+        box-shadow: inset 0 0 0 calc(3px * 0.75) var(--color-text-secondary), 
+                    0 0 calc(10px * 0.75) calc(5px * 0.75) rgba(var(--color-shadow-rgb), 0.5);
+    }
+    .AddTitle {
+        font-size: calc(40px * 0.75);
+    }
+    .AddIcon {
+        height: calc(30px * 0.75);
+    }
+    .GenresContainer {
+        top: calc(620px * 0.75);
+        gap: calc(10px * 0.75);
+    }
+
+    .GenresTitle,
+    .GenresTxt,
+    .LessSynopsisTxt, 
+    .MoreSynopsisTxt {
+        font-size: calc(30px * 0.75);
+    }
+
+    .MoreSynopsisContainer {
+        width: calc(1500px * 0.75);
+        height: calc(115px * 0.75);
+    }
+    .LessSynopsisContainer {
+        width: calc(1500px * 0.75);
+    }
+    .LessSynopsisTxt, 
+    .MoreSynopsisTxt {    
+        line-height: calc(36px * 0.75); 
+    }
+    .DetailsContainer {
+        left: calc(150px * 0.75);
+        margin-top: calc(-25px * 0.75);
+        gap: calc(50px * 0.75);
+    }
+
+    .DetailsTitle {
+        font-size: calc(25px * 0.75);
+        margin-left: calc(100px * 0.75);
+    }
+    .LessDetailsIcon,
+    .MoreDetailsIcon {
+        height: calc(15px * 0.75);
+    }
+
+    .MoreSynopsisGlobalContainer,
+    .LessSynopsisGlobalContainer {
+        gap: calc(50px * 0.75);
+    }
+
+    .SynopsisContent {
+        top: calc(685px * 0.75);
+    }
+
+    .AddDropdown {
+        border-radius: calc(8px * 0.75);
+        right: calc(-175px * 0.75);
+        margin-top: calc(-25px * 0.75);
+        padding: calc(10px * 0.75) calc(15px * 0.75);
+        font-size: calc(20px * 0.75);
+    }
+    .AddDropdownItem {
+        gap: calc(15px * 0.75);
+        margin-bottom: calc(5px * 0.75);
+    }
+
+    .CustomCheckbox {
+        width: calc(15px * 0.75);
+        height: calc(15px * 0.75);
+        border: calc(1px * 0.75) solid var(--color-logo);
+        border-radius: calc(4px * 0.75);
+    }
+    .CustomCheckbox::after {
+        width: calc(8px * 0.75);
+        height: calc(5px * 0.75);
+        border-width: 0 0 calc(1.5px * 0.75) calc(2.25px * 0.75)px;
+    }
+}
+
+@media (max-width: 1300px) {
+    .ElementsContainer {
+        padding: 0 calc(50px *0.6);
+    }
+    .Cover  {
+        height: calc(1000px *0.6);
+    }
+    .WhileWatching {
+        top: calc(250px *0.6);
+        font-size: calc(30px *0.6);
+    }
+    .AnimeTitle {
+        top: calc(300px *0.6);      
+        width: calc(1750px *0.6);
+        
+    }
+    .AnimeTitle h2 {
+        font-size: calc(90px *0.6);
+    }
+    .AltTitles {
+        top: calc(400px *0.6);      
+        font-size: calc(30px *0.6);
+    }
+    .Buttons {
+        top:calc(450px *0.6);
+        gap:calc(50px *0.6)
+    }
+    .SeeContainer {
+        gap: calc(33px *0.6);
+        padding: calc(25px *0.6) calc(35px *0.6);
+        border-radius: calc(30px *0.6);
+        box-shadow: 0 0 calc(10px *0.6) calc(5px *0.6) rgba(var(--color-shadow-rgb), 0.75);
+    }
+    .SeeIcon {
+        height: calc(30px *0.6);
+    }
+    .SeeTitle {
+        font-size: calc(40px *0.6);
+    }
+    .AddContainer {
+        border-radius: calc(30px *0.6);
+        gap: calc(33px *0.6);
+        padding: calc(25px *0.6) calc(35px *0.6);
+        box-shadow: inset 0 0 0 calc(3px *0.6) var(--color-text-secondary), 
+                    0 0 calc(10px *0.6) calc(5px *0.6) rgba(var(--color-shadow-rgb), 0.5);
+    }
+    .AddTitle {
+        font-size: calc(40px *0.6);
+    }
+    .AddIcon {
+        height: calc(30px *0.6);
+    }
+    .GenresContainer {
+        top: calc(620px *0.6);
+        gap: calc(10px *0.6);
+    }
+
+    .GenresTitle,
+    .GenresTxt,
+    .LessSynopsisTxt, 
+    .MoreSynopsisTxt {
+        font-size: calc(30px *0.6);
+    }
+
+    .MoreSynopsisContainer {
+        width: calc(1500px *0.6);
+        height: calc(115px *0.6);
+    }
+    .LessSynopsisContainer {
+        width: calc(1500px *0.6);
+    }
+    .LessSynopsisTxt, 
+    .MoreSynopsisTxt {    
+        line-height: calc(36px *0.6); 
+    }
+    .DetailsContainer {
+        left: calc(150px *0.6);
+        margin-top: calc(-25px *0.6);
+        gap: calc(50px *0.6);
+    }
+
+    .DetailsTitle {
+        font-size: calc(25px *0.6);
+        margin-left: calc(100px *0.6);
+    }
+    .LessDetailsIcon,
+    .MoreDetailsIcon {
+        height: calc(15px *0.6);
+    }
+
+    .MoreSynopsisGlobalContainer,
+    .LessSynopsisGlobalContainer {
+        gap: calc(50px *0.6);
+    }
+
+    .SynopsisContent {
+        top: calc(685px *0.6);
+    }
+
+    .AddDropdown {
+        border-radius: calc(8px *0.6);
+        right: calc(-175px *0.6);
+        margin-top: calc(-25px *0.6);
+        padding: calc(10px *0.6) calc(15px *0.6);
+        font-size: calc(20px * 0.6);
+    }
+    .AddDropdownItem {
+        gap: calc(15px *0.6);
+        margin-bottom: calc(5px *0.6);
+    }
+
+    .CustomCheckbox {
+        width: calc(15px *0.6);
+        height: calc(15px *0.6);
+        border: calc(1px *0.6) solid var(--color-logo);
+        border-radius: calc(4px *0.6);
+    }
+    .CustomCheckbox::after {
+        width: calc(8px *0.6);
+        height: calc(5px *0.6);
+        border-width: 0 0 calc(1.5px *0.6) calc(2.25px *0.6)px;
+    }
+}
+
+@media (max-width: 960px) {
+    .ElementsContainer {
+        padding: 0 calc(50px * 0.5);
+    }
+    .Cover  {
+        height: calc(1000px * 0.5);
+    }
+    .WhileWatching {
+        top: calc(250px * 0.5);
+        font-size: calc(30px * 0.5);
+    }
+    .AnimeTitle {
+        top: calc(300px * 0.5);      
+        width: calc(1750px * 0.5);
+        
+    }
+    .AnimeTitle h2 {
+        font-size: calc(90px * 0.5);
+    }
+    .AltTitles {
+        top: calc(400px * 0.5);      
+        font-size: calc(30px * 0.5);
+    }
+    .Buttons {
+        top:calc(450px * 0.5);
+        gap:calc(50px * 0.5)
+    }
+    .SeeContainer {
+        gap: calc(33px * 0.5);
+        padding: calc(25px * 0.5) calc(35px * 0.5);
+        border-radius: calc(30px * 0.5);
+        box-shadow: 0 0 calc(10px * 0.5) calc(5px * 0.5) rgba(var(--color-shadow-rgb), 0.75);
+    }
+    .SeeIcon {
+        height: calc(30px * 0.5);
+    }
+    .SeeTitle {
+        font-size: calc(40px * 0.5);
+    }
+    .AddContainer {
+        border-radius: calc(30px * 0.5);
+        gap: calc(33px * 0.5);
+        padding: calc(25px * 0.5) calc(35px * 0.5);
+        box-shadow: inset 0 0 0 calc(3px * 0.5) var(--color-text-secondary), 
+                    0 0 calc(10px * 0.5) calc(5px * 0.5) rgba(var(--color-shadow-rgb), 0.5);
+    }
+    .AddTitle {
+        font-size: calc(40px * 0.5);
+    }
+    .AddIcon {
+        height: calc(30px * 0.5);
+    }
+    .GenresContainer {
+        top: calc(620px * 0.5);
+        gap: calc(10px * 0.5);
+    }
+
+    .GenresTitle,
+    .GenresTxt,
+    .LessSynopsisTxt, 
+    .MoreSynopsisTxt {
+        font-size: calc(30px * 0.5);
+    }
+
+    .MoreSynopsisContainer {
+        width: calc(1500px * 0.5);
+        height: calc(115px * 0.5);
+    }
+    .LessSynopsisContainer {
+        width: calc(1500px * 0.5);
+    }
+    .LessSynopsisTxt, 
+    .MoreSynopsisTxt {    
+        line-height: calc(36px * 0.5); 
+    }
+    .DetailsContainer {
+        left: calc(150px * 0.5);
+        margin-top: calc(-25px * 0.5);
+        gap: calc(50px * 0.5);
+    }
+
+    .DetailsTitle {
+        font-size: calc(25px * 0.5);
+        margin-left: calc(100px * 0.5);
+    }
+    .LessDetailsIcon,
+    .MoreDetailsIcon {
+        height: calc(15px * 0.5);
+    }
+
+    .MoreSynopsisGlobalContainer,
+    .LessSynopsisGlobalContainer {
+        gap: calc(50px * 0.5);
+    }
+
+    .SynopsisContent {
+        top: calc(685px * 0.5);
+    }
+
+    .AddDropdown {
+        border-radius: calc(8px * 0.5);
+        right: calc(-175px * 0.5);
+        margin-top: calc(-25px * 0.5);
+        padding: calc(10px * 0.5) calc(15px * 0.5);
+        font-size: calc(20px * 0.5);
+    }
+    .AddDropdownItem {
+        gap: calc(15px * 0.5);
+        margin-bottom: calc(5px * 0.5);
+    }
+
+    .CustomCheckbox {
+        width: calc(15px * 0.5);
+        height: calc(15px * 0.5);
+        border: calc(1px * 0.5) solid var(--color-logo);
+        border-radius: calc(4px * 0.5);
+    }
+    .CustomCheckbox::after {
+        width: calc(8px * 0.5);
+        height: calc(5px * 0.5);
+        border-width: 0 0 calc(1.5px * 0.5) calc(2.25px * 0.5)px;
+    }
+}

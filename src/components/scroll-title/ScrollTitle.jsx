@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './ScrollTitle.module.css';
 
-const SCROLL_SPEED = 100; // px/sec
+const SCROLL_SPEED = 100;
 
 const ScrollTitle = ({ title }) => {
   const titleRef = useRef(null);
@@ -31,7 +31,7 @@ useEffect(() => {
 
   return (
     <div
-      className={`${styles.Container} ${shouldScroll ? styles.Scrollable : styles.Centered}`}
+      className={`${styles.Container} ${shouldScroll ? styles.Scrollable : ""}`}
       ref={wrapperRef}
     >
       <h2

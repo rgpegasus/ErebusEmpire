@@ -1,0 +1,93 @@
+.Global {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.Overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.855);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 0;
+  opacity: 0;
+  transition: all ease 0.1s;
+}
+
+.Container {
+  position: absolute;
+  top: 150px;
+  right: 50px;
+  background-color: var(--color-secondary);
+  color: var(--color-text-primary);
+  border-radius: 20px;
+  box-shadow: -2px 5px 10px rgba(var(--color-shadow-rgb), 0.75);
+  z-index: 100;
+  min-width: 140px;
+  transition: all ease 0.3s;
+  opacity: 0;
+}
+.MenuVisible {
+  opacity: 1;
+}
+.PinToolBar {
+  top: calc(40px + 150px);
+}
+.Separation {
+  width: 100%;
+  margin: 10px 0;
+  border-bottom: 1.5px solid var(--color-separation);
+}
+
+@media (max-width: 1920px) {
+  .Container {
+    border-radius: calc(20px * 0.75);
+    box-shadow: calc(-2px * 0.75) calc(5px * 0.75) calc(10px * 0.75) var(--color-shadow);
+    min-width: calc(140px * 0.75);
+    top: calc(150px * 0.75);
+    right: calc(50px * 0.75);
+  }
+  .PinToolBar {
+    top: calc(40px + 150px * 0.75);
+  }
+  .Separation {
+    margin: calc(10px * 0.75) 0;
+    border-bottom: calc(1.5px * 0.75) solid var(--color-separation);
+  }
+}
+@media (max-width: 1300px) {
+  .Container {
+    border-radius: calc(20px * 0.6);
+    box-shadow: calc(-2px * 0.6) calc(5px * 0.6) calc(10px * 0.6) var(--color-shadow);
+    min-width: calc(140px * 0.6);
+    top: calc(150px * 0.6);
+    right: calc(50px * 0.6);
+  }
+  .PinToolBar {
+    top: calc(40px + 150px * 0.6);
+  }
+  .Separation {
+    margin: calc(10px * 0.6) 0;
+    border-bottom: calc(1.5px * 0.6) solid var(--color-separation);
+  }
+}
+@media (max-width: 960px) {
+  .Container {
+    border-radius: calc(20px * 0.5);
+    box-shadow: calc(-2px * 0.5) calc(5px * 0.5) calc(10px * 0.5) var(--color-shadow);
+    min-width: calc(140px * 0.5);
+    top: calc(150px * 0.5);
+    right: calc(50px * 0.5);
+  }
+  .PinToolBar {
+    top: calc(40px + 150px * 0.5);
+  }
+  .Separation {
+    margin: calc(10px * 0.5) 0;
+    border-bottom: calc(1.5px * 0.5) solid var(--color-separation);
+  }
+}

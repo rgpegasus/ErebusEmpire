@@ -1,9 +1,9 @@
 .container {
   text-align: left;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   position: relative;
-  background: var(--third-color);
+  background: var(--color-surface);
   overflow: hidden;
   user-select: none;
 }
@@ -17,6 +17,7 @@
 
 .container.hide-video video {
   opacity: 0;
+  cursor: auto;
 }
 
 video {
@@ -46,7 +47,7 @@ video {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: var(--logo-color);
+  background: var(--color-logo);
   margin: auto 5px;
 }
 
@@ -109,7 +110,7 @@ video {
   font-weight: bold;
   text-align: left;
   font-size: 3em;
-  color: var(--logo-color);
+  color: var(--color-logo);
   margin: 25px 0;
 }
 
@@ -159,18 +160,18 @@ video {
 }
 
 .video-pre-loading h1 {
-  color: var(--primary-text);
+  color: var(--color-text-primary);
   font-size: 1.5em;
   font-weight: bold;
 }
 
 .video-pre-loading h2 {
-  color: var(--primary-text);
+  color: var(--color-text-primary);
   font-size: 1.1em;
 }
 
 .video-pre-loading svg {
-  color: var(--primary-text);
+  color: var(--color-text-primary);
   opacity: 0.5;
   margin-left: auto;
   font-size: 4em;
@@ -375,7 +376,7 @@ video {
   border-radius: 5px;
   background: linear-gradient(
     93deg,
-    var(--logo-color) var(--progress),
+    var(--color-logo) var(--progress),
     #fff var(--progress)
   );
   -webkit-appearance: none;
@@ -402,7 +403,7 @@ video {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: var(--logo-color);
+  background: var(--color-logo);
   cursor: grab;
   outline: none !important;
   border-color: transparent;
@@ -418,7 +419,7 @@ video {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: var(--logo-color);
+  background: var(--color-logo);
   cursor: pointer;
   outline: none !important;
   border-color: transparent;
@@ -442,7 +443,7 @@ video {
 
 
 .volume-controller .box {
-  background: var(--background-color);
+  background: var(--color-background);
   padding: 10px 18px;
   display: flex;
   border-radius: 5px;
@@ -462,7 +463,7 @@ video {
   background: #999;
   background: linear-gradient(
     93deg,
-    var(--logo-color) var(--percentVolume),
+    var(--color-logo) var(--percentVolume),
     #fff var(--percentVolume)
   );
   width: 70px;
@@ -474,7 +475,7 @@ video {
   width: 13px;
   height: 13px;
   border-radius: 50%;
-  background: var(--logo-color);
+  background: var(--color-logo);
   cursor: grab;
 }
 
@@ -486,7 +487,7 @@ video {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: var(--logo-color);
+  background: var(--color-logo);
 }
 
 
@@ -546,7 +547,7 @@ video {
 }
 
 .item-list-reproduction-container > div:first-child {
-  background: var(--logo-color);
+  background: var(--color-logo);
   display: flex;
   flex-direction: column;
   border-radius: 5px;
@@ -574,7 +575,7 @@ video {
 
 /* Scrollbar styles */
 .item-list-reproduction-container .list-list-reproduction::-webkit-scrollbar-track {
-  background-color: var(--secondary-color);
+  background-color: var(--color-secondary);
 }
 
 .item-list-reproduction-container .list-list-reproduction::-webkit-scrollbar {
@@ -582,23 +583,23 @@ video {
 }
 
 .item-list-reproduction-container .list-list-reproduction::-webkit-scrollbar-thumb {
-  background: var(--logo-color);
+  background: var(--color-logo);
 }
 
 .item-list-reproduction-container .item-list-reproduction {
-  background: var(--background-color);
+  background: var(--color-background);
   display: flex;
   flex-direction: row;
   font-size: 14px;
   padding: 10px;
-  color:var(--primary-text);
+  color:var(--color-text-primary);
   cursor: pointer;
   transition: all 0.2s ease-out;
   align-items: center;
 }
 .item-list-reproduction-container .selected,
 .item-list-reproduction-container .item-list-reproduction:hover {
-  background: var(--secondary-color);
+  background: var(--color-secondary);
 }
 .item-list-reproduction-container .item-list-reproduction .percent {
   height: 3px;
@@ -621,7 +622,7 @@ video {
   padding: 0 20px;
   font-weight: var(--title-weight);
   font-size: 18px;
-  color: var(--logo-color);
+  color: var(--color-logo);
   margin-bottom: 15px;
 }
 
@@ -633,13 +634,13 @@ video {
 .close-button {
   background: none;
   border: none;
-  color: var(--primary-text);
+  color: var(--color-text-primary);
   font-size: 20px;
   cursor: pointer;
 }
 
 .close-button:hover {
-  color: var(--logo-color);
+  color: var(--color-logo);
 }
 
 .settings-overlay {
@@ -661,10 +662,10 @@ video {
   max-width: 350px;
   height: 100%;
   padding: 20px 0;
-  background-color: var(--background-color);
-  color: var(--primary-text);
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
   z-index: 4;
-  box-shadow: -4px 0 10px var(--shadow-color);
+  box-shadow: -4px 0 10px var(--color-shadow);
   animation: slideIn 0.3s ease-out forwards;
 }
 
@@ -675,8 +676,8 @@ video {
 
 
 .SettingsMenuTop {
-  font-family: var(--font-main);
-  color: var(--primary-text);
+  font-family: var(--font-family-main);
+  color: var(--color-text-primary);
   display: flex;
   padding: 20px;
 }
@@ -691,7 +692,7 @@ video {
   height: 60px;
   border-radius: 25%;
   object-fit: cover;
-  border: 2px solid var(--logo-color);
+  border: 2px solid var(--color-logo);
 }
 
 .SettingsMenuTop-title {
@@ -704,9 +705,9 @@ video {
 }
 
 .SettingsMenuTop-animeTitle {
-  color: var(--logo-color);
-  font-family: var(--font-main);
-  font-weight: var(--little-title-weight );
+  color: var(--color-logo);
+  font-family: var(--font-family-main);
+  font-weight: var(--regular);
   letter-spacing: 1px;
   font-size: 15px;
   word-break: break-word;
@@ -717,7 +718,7 @@ video {
 .SettingsMenuTop-subTitle {
   font-size: 10px;
   text-transform: uppercase;
-  font-family: var(--font-main);
+  font-family: var(--font-family-main);
   font-weight: var(--title-weight);
   letter-spacing: 1.5px;
 }
@@ -733,28 +734,28 @@ video {
 .SettingsMenuSources-item {
   padding: 10px 16px;
   border: none;
-  background-color: var(--secondary-color);
-  color: var(--primary-text);
+  background-color: var(--color-secondary);
+  color: var(--color-text-primary);
   border-radius: 8px;
-  font-weight: var(--little-title-weight);
+  font-weight: var(--regular);
   width: calc(50% - 6px);
-  box-shadow: -1px 3px 5px var(--shadow-color);
+  box-shadow: -1px 3px 5px var(--color-shadow);
   transition: background 0.2s ease;
   user-select: none;
 }
 
 .SettingsMenuSources-item:hover {
-  background-color: var(--third-color);
+  background-color: var(--color-surface);
   transform: scale(1.05);
   cursor: pointer;
 } 
 .SettingsMenuSources-item.selected:hover {
-  background-color: var(--logo-color);
+  background-color: var(--color-logo);
   transform: scale(1);
   cursor:auto;
 } 
 .SettingsMenuSources-item.selected {
-  background-color: var(--logo-color);
+  background-color: var(--color-logo);
   color: #E6EAF0;
 }
 
@@ -780,14 +781,14 @@ video {
 .SettingsMenuLanguageItem-txt {
   font-size: 15px;
   margin-left: 7px;
-  color: var(--primary-text);
-  font-family: var(--font-main);
-  font-weight: var(--little-title-weight);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-main);
+  font-weight: var(--regular);
 }
 
 .SettingsMenuLanguageItem-img {
   width: 60px;
-  border: 2px solid var(--primary-text);
+  border: 2px solid var(--color-text-primary);
   border-radius: 10px;
   object-fit: cover;
 }
@@ -795,8 +796,8 @@ video {
   opacity: 1;
 }
 .SettingsMenuLanguageItem-txt.selected {
-  color: var(--logo-color);
+  color: var(--color-logo);
 }
 .SettingsMenuLanguageItem-img.selected {
-  border: 2px solid var(--logo-color)
+  border: 2px solid var(--color-logo)
 }

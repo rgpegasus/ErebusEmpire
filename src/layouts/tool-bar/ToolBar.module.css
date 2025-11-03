@@ -1,20 +1,22 @@
 .Container {
   position: fixed;
-  top: calc(-1 * var(--size-top-bar));
+  top: calc(-40px);
   left: 0;
   width: 100%;
   padding-left: 25px;
-  height: var(--size-top-bar);
-  background: var(--background-color);
-  border-bottom: 1px solid var(--separation-color);
-  color: #d1d7e0;
+  height: 40px;
+  background: var(--color-background);
+  border-bottom: 1px solid var(--color-separation);
   display: flex;
   align-items: center;
   justify-content: space-between;
   transition: top 0.3s ease;
   z-index: 9999;
 }
-
+.RightButtons {
+  display: flex;
+  flex-direction: row;
+}
 .Container.visible {
   top: 0;
 }
@@ -22,6 +24,16 @@
   width: calc(100vw/1.75);
   position: relative;
 }
+.InputPrefix {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  pointer-events: none; /* pour ne pas bloquer la saisie */
+  font-size: 0.9em;
+}
+
 .Input {
   width: 100%;
   padding: 6px 10px;
@@ -30,12 +42,11 @@
   font-size: 15px;
   outline: none;
   background: none;
-  color: var(--primary-text);
+  color: var(--color-text-primary);
 }
 .InputContainer:hover,
 .InputContainer:focus {
   background-color: #b5a38b;
-  opacity: 1;
   border-radius: 6px;
   opacity: 0.8;
 }
@@ -54,7 +65,7 @@
   display: none;
 }
 .ShareButton:hover {
-  color: var(--logo-color);
+  color: var(--color-logo);
 }
 
 .InputContainer:hover .ShareButton,
@@ -65,35 +76,56 @@
   display: flex;
   align-items: center;
   gap: 2px;
-  margin: 0 4px;
+  padding-left:25px;
+  padding-right: 5px;
+}
+.ActionButtons:first-child {
+  gap: 10px;
+  padding-right:25px;
+  border-right: 1px solid var(--color-separation);
+}
+.ContainerNavigation {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+.Arrow {
+  color: var(--color-text-primary);
+  height: 9px;
+  width: auto;
+}
+.Left {
+  transform: rotate(90deg); 
+}
+.Right {
+  transform: rotate(-90deg);
 }
 
 .ContainerButton {
-  width: calc(var(--size-top-bar)*0.8);
-  height: calc(var(--size-top-bar)*0.8);
+  width: 39px;
+  height:39px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.ContainerButton:hover {
+  background-color: var(--color-secondary);
+
 }
 .Button {
-  color: var(--primary-text);
-  height: 21px;
+  color: var(--color-text-primary);
+  height: 17px;
   width: auto;
 }
 
-.ContainerButton:hover {
-  background-color: var(--secondary-color);
-  border-radius: 4px;
-  cursor: pointer;
+
+
+.ActionButtons:last-child .ContainerButton:last-child:hover {
+  background: var(--color-logo);
 }
-.ContainerButton:hover .Button  {
-  color: var(--logo-color);
+.ActionButtons:last-child .ContainerButton:last-child:hover .Button  {
+  color: var(--color-text-primary);
 }
-.ContainerButton:last-child:hover {
-  background: var(--logo-color);
-  border-radius: 4px;
-  cursor: pointer;
-}
-.ContainerButton:last-child:hover .Button  {
-  color: var(--primary-text);
-}
+

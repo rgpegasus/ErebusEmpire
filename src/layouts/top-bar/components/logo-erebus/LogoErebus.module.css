@@ -1,0 +1,33 @@
+.Logo {
+    width: 300px;
+    height: auto;
+    cursor: pointer;
+    transition: all ease 0.3s;
+}
+.Logo:hover {
+    opacity: 0.7;
+}
+
+.Logo :global(.text) {
+    color: var(--color-text-primary);
+}
+
+.Logo :global(.logo) {
+    color: var(--color-logo);
+}
+
+@media (max-width: 1920px) {
+    .Logo {
+        width: calc(300px * 0.75);
+    }
+}
+@media (max-width: 1300px) {
+    .Logo {
+        width: calc(300px * 0.6);
+    }
+}
+@media (max-width: 960px) {
+    .Logo {
+        width: calc(300px * 0.5);
+    }
+}

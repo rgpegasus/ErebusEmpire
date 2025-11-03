@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron';
+import { app, shell, session, BrowserWindow, ipcMain } from 'electron';
 import { join } from 'path';
 import path from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
@@ -10,7 +10,25 @@ import { Client } from '@xhayper/discord-rpc';
 const clientId = '1366193765701783604';
 const rpc = new Client({ transport: { type: 'ipc' }, clientId });
 const scraper = new AnimeScraper("animesama");
-import { SearchAnime, RandomAnime, InfoAnime, SeasonsAnime, EpisodesSeason, UrlEpisode, LatestEpisodes, CatalogAnime, DownloadEpisode, DownloadList, DeleteDownloadEpisode, ExportData, ImportData, AvailableLanguages, ScansChapter, ScansImg } from '@utils/dispatchers/IpcHandler'; 
+import {
+  SearchAnime,
+  RandomAnime,
+  InfoAnime,
+  SeasonsAnime,
+  EpisodesSeason,
+  UrlEpisode,
+  LatestEpisodes,
+  LatestScans,
+  CatalogAnime,
+  DownloadEpisode,
+  DownloadList,
+  DeleteDownloadEpisode,
+  ExportData,
+  ImportData,
+  AvailableLanguages,
+  ScansChapter,
+  ScansImg,
+} from "@utils/dispatchers/IpcHandler" 
 import { AnimeCoverTemp, AnimeData } from '@utils/dispatchers/ServicesData'
 import { spawn } from 'child_process';
 
@@ -28,7 +46,7 @@ function launchBackgroundScript() {
 
 launchBackgroundScript();
 
-const sessionStorage = join(app.getPath('appData'), 'Erebus Empire', 'userData', 'anime', 'sessionStorage');
+const sessionStorage = join(app.getPath('appData'), 'Erebus Empire', 'userData', 'sessionStorage');
 
 let startTimestamp = null;
 let mainWindow = null;
@@ -73,20 +91,22 @@ function createWindow(route = '/') {
   mainWindow = new BrowserWindow({
     width: 1500,
     height: 1000,
-    minWidth: 1200,
-    minHeight: 720,
+    minWidth: 960,
+    minHeight: 540,
     show: false,
     autoHideMenuBar: false,
     frame: false,
-    titleBarStyle: 'hidden',
-    fullscreen: true,
-    ...(process.platform === 'linux' ? { icon: ErebusIcon } : {}),
+    titleBarStyle: "hidden",
+    fullscreen: false,
+    ...(process.platform === "linux" ? { icon: ErebusIcon } : {}),
     webPreferences: {
       webSecurity: false,
-      preload: join(__dirname, '../preload/preload.js'),
+      preload: join(__dirname, "../preload/preload.js"),
       sandbox: false,
-    }
-  });
+      nodeIntegration: true, // ← Active l’accès à require, __dirname, etc.
+      contextIsolation: false,
+    },
+  })
   
   if (process.defaultApp) {
     if (process.argv.length >= 2) {
@@ -107,8 +127,8 @@ function createWindow(route = '/') {
 
   mainWindow.on('ready-to-show', () => {
     if (mainWindow) {
+      mainWindow.maximize();
       mainWindow.show();
-      mainWindow.setFullScreen(true);
     }
   });
 
@@ -172,6 +192,11 @@ if (!gotTheLock) {
     }
   });
   app.whenReady().then(() => {
+    session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
+      details.requestHeaders["Referer"] = "https://vidmoly.net/"
+      details.requestHeaders["Origin"] = "https://vidmoly.net"
+      callback({ requestHeaders: details.requestHeaders })
+    })
     electronApp.setAppUserModelId('com.erebus-empire.app');
     app.on('browser-window-created', (_, window) => {
       optimizer.watchWindowShortcuts(window);
@@ -180,11 +205,7 @@ if (!gotTheLock) {
       ? deeplinkingUrl.replace('erebusempire://', '')
       : '/';
     createWindow(route);
-    // mainWindow.webContents.once('did-finish-load', () => {
-    //   if (deeplinkingUrl) {
-    //     mainWindow.webContents.send('deep-link', deeplinkingUrl);
-    //   }
-    // });
+
     ipcMain.on('update-rich-presence', (event, { anime, episode, cover, startTimestamp, endTimestamp}) => {
       if (!rpc || !rpc.user || typeof rpc.user.setActivity !== 'function') {
         console.warn('Rich Presence non prêt : rpc ou rpc.user non défini');
@@ -219,6 +240,7 @@ if (!gotTheLock) {
     EpisodesSeason(scraper);
     UrlEpisode();
     LatestEpisodes(scraper);
+    LatestScans(scraper)
     CatalogAnime(scraper);
     AvailableLanguages(scraper);
     ScansChapter(scraper);
@@ -256,9 +278,13 @@ if (!gotTheLock) {
   ipcMain.on('window-minimize', () => mainWindow.minimize());
 
   ipcMain.on('window-toggle-fullscreen', () => {
-    const isFull = mainWindow.isFullScreen();
-    mainWindow.setFullScreen(!isFull);
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow.maximize();
+    }
   });
+
 
   ipcMain.on('window-close', () => {
     mainWindow = null;

@@ -1,90 +1,82 @@
-import React, { useEffect, useState } from 'react';
-import { useLoader } from '@utils/dispatchers/Page';
-import LatestEpisodes from './components/LatestEpisodes';
-import WatchHistory from './components/WatchHistory';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react"
+import styles from "./Home.module.css"
+import { useLoader } from "@utils/dispatchers/Page"
+import BackgroundCover from "@components/background-cover/BackgroundCover"
+import LatestReleases from "./components/LatestReleases"
+import WatchHistory from "./components/WatchHistory"
 
 export const Home = () => {
-  const [anime, setAnime] = useState(null);
-  const [latestEpisodes, setLatestEpisodes] = useState([]);
-  
-  const { setLoading } = useLoader();
-  const [error, setError] = useState(null);  
-  const [dataLoaded, setDataLoaded] = useState(false); 
-  const navigate = useNavigate();
-
-useEffect(() => {
+  const [coverInfo, setCoverInfo] = useState(null)
+  const [latestReleases, setLatestReleases] = useState([])
+  const [dataLoaded, setDataLoaded] = useState(false)
+  const { setLoading } = useLoader()
+  const [contentType, setContentType] = useState("anime")
+  const [availableContentTypes, setAvailableContentTypes] = useState({
+    hasAnime: false,
+    hasManga: false, 
+  })
+  const [latestEpisodes, setLatestEpisodes] = useState([])
+  const [latestScans, setLatestScans] = useState([])
+  useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
+      setLoading(true)
       try {
-        let animeData = await animeCover.load();
+        let animeData = await animeCover.load()
+
         if (!animeData) {
-          animeData = await window.electron.ipcRenderer.invoke('random-anime');
-          animeCover.save(animeData);
-        } 
-        setAnime(animeData);
-        const episodes = await window.electron.ipcRenderer.invoke('get-latest-episode');
-        setLatestEpisodes(episodes || []);
+          const tempData = await window.electron.ipcRenderer.invoke("random-anime")
+          const tempInfo = await window.electron.ipcRenderer.invoke("info-anime", tempData.url)
+          const animeInfo = {
+            ...tempInfo,
+            url: tempData.url,
+          }
+          animeCover.save(animeInfo)
+          setCoverInfo(animeInfo)
+        } else {
+          setCoverInfo(animeData)
+        }
+
+        const episodes = await window.electron.ipcRenderer.invoke("get-latest-episode")
+        const scans = await window.electron.ipcRenderer.invoke("get-latest-scans")
+        setLatestReleases(episodes)
+        setLatestEpisodes(episodes)
+        setLatestScans(scans)
+        setAvailableContentTypes({
+          hasAnime: episodes.length > 0,
+          hasManga: scans.length > 0,
+        })
       } catch (err) {
-        console.error('Erreur lors du chargement:', err);
-        setError('Une erreur est survenue lors du chargement des données.');
+        console.error("Erreur lors du chargement:", err)
       } finally {
-        setLoading(false);
-        setDataLoaded(true);  
+        setLoading(false)
+        setDataLoaded(true)
       }
-    };
-    if (!dataLoaded) {
-      fetchData();
     }
+    if (!dataLoaded) {
+      fetchData()
+    }
+  }, [dataLoaded])
 
-    const handleFocus = () => {
-      if (!dataLoaded) {
-        fetchData();
+  const handleContentTypeChange = (newType) => {
+    setContentType(newType)    
+      if (newType === "anime") {   
+        setLatestReleases(latestEpisodes)
+      } else {
+        setLatestReleases(latestScans)
       }
-    };
-  
-    window.addEventListener('focus', handleFocus);
-  
-    return () => {
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, [dataLoaded]);  
-
-  const getAnimeId = (url) => {
-    const cleanUrl = new URL(url);
-    const pathname = cleanUrl.pathname.replace(/\/$/, '');
-    const parts = pathname.split('/').filter(Boolean);
-    return parts[parts.length - 1]; 
-  };
-
-  const handleClick = (url) => {
-    navigate(`/erebus-empire/anime/${getAnimeId(url)}/`);
-  };
-
-
-
+  }
   return (
-    <div className='MainPage'>
-      {error && <div className="error">{error}</div>}  
-      {anime?.cover ? (
-        <div className="AnimeCover">
-          <h2>{anime?.title}</h2>
-          <img
-            draggable="false"
-            src={anime?.cover}
-            alt={anime?.title}
-            className='AnimeCover-img'  
-          />
-          <div className='AnimeCover-button' onClick={() => handleClick(anime?.url)}>Regarder</div>
-        </div>
-      ) : (
-        <div className='Space'></div>
-      )}
-      <WatchHistory />
-      <div className='Space'></div>
-      <LatestEpisodes episodes={latestEpisodes} />
-      <div className='Space'></div>
+    <div className="MainPage">
+      <BackgroundCover coverInfo={coverInfo} whileWatching={false} isAnime={true} />
+      <div className={styles.Container}>
+        <WatchHistory />
+        <LatestReleases
+          latestReleases={latestReleases}
+          handleContentTypeChange={handleContentTypeChange}
+          contentType={contentType}
+          availableContentTypes={availableContentTypes}
+        />
+      </div>
     </div>
-  );
-};
-
+  )
+}

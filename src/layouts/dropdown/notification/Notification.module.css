@@ -1,0 +1,189 @@
+.ContainerButton {
+  width: 39px;
+  height:39px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ContainerButton:hover {
+  background-color: var(--color-secondary);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.ResultContainer {
+  background-color: rgba(var(--color-secondary-rgb), 0.75);
+  top: 150px;
+  overflow-y: auto; 
+  position: fixed;
+  right: 50px;
+  flex-direction: column;
+  display: flex;
+  border-radius: 20px;
+  box-shadow: -2px 5px 10px rgba(var(--color-shadow-rgb), 0.5);
+  height: auto;
+  max-height: 660px;
+}
+.PinToolBar {
+  top:calc(40px + 150px);
+}
+.ResultContainer::-webkit-scrollbar {
+  width: 0;
+}
+
+.Item {
+  border-radius: 20px;
+  text-align: start;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  gap: 20px;
+  padding: 20px;
+  border-top: 2px solid rgba(var(--color-logo-rgb), 0.5);
+}
+
+.Cover {
+  width: 90px;
+  height: 90px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 2px 2px 5px rgba(var(--color-shadow-rgb), 0.5);
+  transition: all ease 0.3s;
+  filter: brightness(0.9);
+}
+.EpisodeTitle,
+.AnimeTitle {
+  text-transform: uppercase;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  width: 425px;
+  font-size: 21px;
+  font-family: var(--font-family-main);
+  font-weight: var(--bold);
+  text-align: left;
+  text-overflow: ellipsis;
+  color: var(--color-text-secondary);
+  transition: all ease 0.3s;
+}
+.EpisodeTitle {
+  margin-top: 5px;
+  text-transform: none;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  font-weight: var(--semi-bold);
+  color: rgba(var(--color-text-secondary-rgb), 0.5);
+  font-size: 20px;
+}
+.ResultContainer:has(.Item:hover) .Item:not(:hover) .Cover {
+  filter: brightness(0.5);
+}
+.ResultContainer:has(.Item:hover) .Item:not(:hover) .EpisodeTitle,
+.ResultContainer:has(.Item:hover) .Item:not(:hover) .AnimeTitle {
+  opacity: 0.35;
+}
+
+@media (max-width: 1920px) {
+  .ResultContainer {
+    right: calc(50px * 0.75);
+    top: calc(150px * 0.75);
+    border-radius: calc(20px * 0.75);
+    box-shadow: calc(-2px * 0.75) calc(5px * 0.75) calc(10px * 0.75) rgba(var(--color-shadow-rgb), 0.5);
+    max-height: calc(660px * 0.75);
+  }
+  .Item {
+    border-radius: calc(20px * 0.75);
+    gap: calc(20px * 0.75);
+    padding: calc(20px * 0.75);
+    border-top: calc(2px * 0.75) solid rgba(var(--color-logo-rgb), 0.5);
+  }
+  .Cover {
+    width: calc(90px * 0.75);
+    height: calc(90px * 0.75);
+    border-radius: calc(20px * 0.75);
+    box-shadow: calc(2px * 0.75) calc(2px * 0.75) calc(5px * 0.75)
+      rgba(var(--color-shadow-rgb), 0.5);
+  }
+  .EpisodeTitle,
+  .AnimeTitle {
+    width: calc(425px * 0.75);
+    font-size: calc(21px * 0.75);
+  }
+  .EpisodeTitle {
+    margin-top: calc(5px * 0.75);
+    font-size: calc(20px * 0.75);
+  }
+  .PinToolBar {
+    top:calc(40px + 150px * 0.75);
+  }
+}
+@media (max-width: 1300px) {
+  .ResultContainer {
+    right: calc(50px * 0.6);
+    top: calc(150px * 0.6);
+    border-radius: calc(20px * 0.6);
+    box-shadow: calc(-2px * 0.6) calc(5px * 0.6) calc(10px * 0.6) rgba(var(--color-shadow-rgb), 0.5);
+    max-height: calc(660px * 0.6);
+  }
+  .Item {
+    border-radius: calc(20px * 0.6);
+    gap: calc(20px * 0.6);
+    padding: calc(20px * 0.6);
+    border-top: calc(2px * 0.6) solid rgba(var(--color-logo-rgb), 0.5);
+  }
+  .Cover {
+    width: calc(90px * 0.6);
+    height: calc(90px * 0.6);
+    border-radius: calc(20px * 0.6);
+    box-shadow: calc(2px * 0.6) calc(2px * 0.6) calc(5px * 0.6) rgba(var(--color-shadow-rgb), 0.5);
+  }
+  .EpisodeTitle,
+  .AnimeTitle {
+    width: calc(425px * 0.6);
+    font-size: calc(21px * 0.6);
+  }
+  .EpisodeTitle {
+    margin-top: calc(5px * 0.6);
+    font-size: calc(20px * 0.6);
+  }
+  .PinToolBar {
+    top:calc(40px + 150px * 0.6);
+  }
+}
+@media (max-width: 960px) {
+  .ResultContainer {
+    right: calc(50px * 0.5);
+    border-radius: calc(20px * 0.5);
+    top: calc(150px * 0.5);
+    box-shadow: calc(-2px * 0.5) calc(5px * 0.5) calc(10px * 0.5) rgba(var(--color-shadow-rgb), 0.5);
+    max-height: calc(660px * 0.5);
+  }
+  .Item {
+    border-radius: calc(20px * 0.5);
+    gap: calc(20px * 0.5);
+    padding: calc(20px * 0.5);
+    border-top: calc(2px * 0.5) solid rgba(var(--color-logo-rgb), 0.5);
+  }
+  .Cover {
+    width: calc(90px * 0.5);
+    height: calc(90px * 0.5);
+    border-radius: calc(20px * 0.5);
+    box-shadow: calc(2px * 0.5) calc(2px * 0.5) calc(5px * 0.5) rgba(var(--color-shadow-rgb), 0.5);
+  }
+  .EpisodeTitle,
+  .AnimeTitle {
+    width: calc(425px * 0.5);
+    font-size: calc(21px * 0.5);
+  }
+  .EpisodeTitle {
+    margin-top: calc(5px * 0.5);
+    font-size: calc(20px * 0.5);
+  }
+  .PinToolBar {
+    top:calc(40px + 150px * 0.5);
+  }
+}

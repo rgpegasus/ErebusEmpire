@@ -1,13 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const baseFolder = path.join(
-  process.env.APPDATA,
-  'erebus-empire',
-  'userData',
-  'anime',
-  'localStorage'
-);
+const baseFolder = path.join(process.env.APPDATA, 'Erebus Empire', 'userData', 'localStorage', 'anime');
 
 function getFilePath(fileKey) {
   return path.join(baseFolder, `${fileKey}.json`);

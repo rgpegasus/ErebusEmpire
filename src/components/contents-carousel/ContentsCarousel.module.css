@@ -1,258 +1,680 @@
-.CarouselTitle {
-  margin: 0 50px 30px 50px;
-  padding: 0px 30px 20px 30px;
-  font-family: var(--font-main);
-  color: var(--primary-text);
-  text-transform: uppercase;
-  font-size: 25px;
-  border-bottom: 5px solid var(--logo-color);
-  font-weight: var(--title-weight);
-  display: inline-block;
-}
-
-.CarouselContainer {
-  margin: 0 50px;
-  border-radius: 7px;
+.Container {
   display: flex;
-  padding: 0 40px;
-  background-color: var(--secondary-color);
-  box-shadow: -2px 5px 10px var(--shadow-color);
+  flex-direction: column;
+  gap: 33px;
+  width: 100%;
+  height: auto;
+}
+.CarouselTitle {
+  font-family: var(--font-family-main);
+  letter-spacing: 2px;
+  color: var(--color-text-primary);
+  font-size: 60px;
+  font-weight: var(--bold);
+  display: inline-block;
+  line-height: 0.8;
+}
+.ActionsElements {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+}
+.ActionsElements > * {
+  border-right: 3px solid rgba(var(--color-text-secondary-rgb), 0.5);
+  padding-right: 50px;
+  color: rgba(var(--color-text-primary-rgb), 0.5);
+  transition: ease all 0.3s;
+}
+.ActionsElements > *:hover{
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+.NoHover:hover {
+   color: rgba(var(--color-text-primary-rgb), 0.5);
+   cursor: auto;
+}
+.ActionsElements > *:last-child{
+  border-right: none;
+  padding-right: 0;
+}
+.ActionsContainer {
+  display: flex;
+  justify-content: space-between;
+}
+.ActionsIcons {
+  height: 30px;
+  width: auto;
+}
+.SortContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  gap: 25px;
+}
+.ActionsTitle {
+  font-family: var(--font-family-main);
+  font-size: 30px;
+  font-weight: var(--medium);
+}
+.CarouselContainer {
+  display: flex;
   position: relative;
 }
 
 /* Navigation */
 .NavigationContainer {
+  left: 0;
   z-index: 10;
-  background: none;
+  position: absolute;
+  height: 100%;
   display: flex;
   align-items: center;
   border: none;
-  padding: 0;
+  width: 100px;  
+  background-color: transparent;
+  transition: ease all 0.3s;
+}
+.NavigationContainer:last-child:not(:only-child) {
+  left:auto;
+  right: 0;
+  justify-content: flex-end; 
 }
 .NavigationIcon {
   cursor: pointer;
-  height: 50px;
+  height: 70px;
   width: auto;
-  color: var(--logo-color);
+  color: var(--color-logo);
 }
 
-/* Embla wrapper */
 .ContentsWrapper {
   position: relative;
   overflow: hidden;
   width: 100%;
-  margin: 0 auto;
+  margin: 0 0;
+  /* -webkit-mask-image: linear-gradient(to left,transparent 0%, rgba(0, 0, 0, 0.7) 10%,rgba(0, 0, 0, 0.7) 90%, transparent 100%);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: cover;
+  mask-image: linear-gradient(to left, transparent 0%, rgba(0, 0, 0, 0.7) 10%, rgba(0, 0, 0, 0.7) 90%, transparent  100%);
+  mask-repeat: no-repeat;
+  mask-size: cover; */
 }
 
-/* Embla container */
 .ContentsContainer {
   display: flex;
-  gap: 30px;
+  gap: 83px;
   will-change: transform;
   touch-action: pan-y;
   margin: 0 auto;
-  padding: 70px 20px;
   box-sizing: border-box;
 }
 
-/* Chaque slide */
-.emblaSlide {
-  flex: 0 0 auto;
-  width: 250px;
-  display: flex;
-  justify-content: center;
-  
-}
-
-
-/* Ton item (carte) */
 .Item {
   cursor: pointer;
-  border-radius: 10px;
   transition: 0.2s ease;
-  height: 325px;
-  background-color: var(--background-color);
-  border: 2px solid var(--logo-color);
-  box-shadow: -2px 5px 10px var(--shadow-color);
-  width: 100%;
-  overflow: hidden;
+  height: 340px;
+  width: 550px;
+  opacity: 1;
   position: relative;
-  z-index: 1;
+  transition: ease all 0.3s;
 }
 
-.Item:hover {
-  transform: scale3d(1.1, 1.1, 1);
+
+.NotActiveSlide {
+  opacity: 0.25;
+}
+
+.IsGrabing {
+  cursor: grab;
 }
 .Item.ShiftDelete {
   background-color: rgb(255, 39, 39);
-  border: 2px solid red;
   cursor: not-allowed;
 }
 .Item.ShiftDelete:hover {
-  transform: scale(1.05);
   background-color: rgb(255, 0, 0);
 }
-
-/* Image & overlay */
+.ElementsContainer {
+  margin: 25px;
+  top:0px;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: start;
+  height: calc(100% - 50px);
+  width: calc(100% - 50px);
+}
 .Cover {
   display: flex;
   width: 100%;
-  height: 150px;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  border-radius: 7px 7px 0 0;
-  overflow: hidden;
-}
-.Cover::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 1;
-}
-.CoverTitle {
-  position: absolute;
-  font-size: 21px;
-  text-transform: uppercase;
-  font-weight: var(--main-title-weight);
-  text-align: center;
-  font-family: var(--font-main);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: #E6EAF0;
-  white-space: normal;
-  max-width: 90%;
-  z-index: 2;
-}
-.CoverContainer {
   height: 100%;
+  object-fit: cover;
+  position: relative;
   overflow: hidden;
 }
 
-/* Texte infos */
-.Information {
-  color: #E6EAF0;
-  font-family: var(--font-main);
-  text-align: center;
-  width: 100%;
+.CoverDuration {
+  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, transparent 5px, rgba(0,0,0,1) 50%, transparent 100%);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, transparent 5px, rgba(0,0,0,1) 50%, transparent 100%);
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
 }
-.Separation {
-  width: 150px;
-  margin: 0 auto 30px auto;
-  border-bottom: 1px solid var(--separation-color);
+.CoverNoDuration {
+  -webkit-mask-image: linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 1) 50%, transparent 100%);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-image: linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 1) 50%, transparent 100%);
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+}
+
+
+.ProgressBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 5px;
+  width: 100%;
+  background: rgba(var(--color-text-primary),1);
+  overflow: hidden;
+}
+
+.ProgressFill {
+  height: 100%;
+  background: var(--color-logo); 
+  transition: width 0.3s ease;
+  border-radius: 0 2.5px 2.5px 0;
+}
+.RemainingMinutes {
+  background-color: rgba(var(--color-background-rgb),0.75);
+  padding: 5px 15px;
+  border-radius: 7px;
+  font-family: var(--font-family-main);
+  font-size: 20px;
+  font-weight: var(--extra-bold);
+  letter-spacing: 1px;
+  color: var(--color-text-primary);
 }
 .Language {
-  background-color: var(--logo-color);
-  margin: 0 auto;
-  text-transform: uppercase;
-  font-size: 16px;
-  font-weight: var(--little-title-weight);
-  padding: 10px 20px;
-  border-radius: 5px;
-  box-shadow: -1px 3px 5px var(--shadow-color);
-  display: inline-block;
+  position: absolute;
+  right: 0;
+  height: 40px;
+  width: auto;
+  border-radius: 7px;
+  border:  2px solid var(--color-logo);
 }
 
-/* Aucun résultat */
+
+.Information {
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+}
+.CoverTitle h2 {
+  font-size: 35px;
+  text-transform: uppercase;
+  font-weight: var(--extra-bold);
+  font-family: var(--font-family-main);
+  color: var(--color-text-secondary);
+  letter-spacing: 3px;
+  text-shadow: 0 4px 4px rgba(var(--color-shadow-rgb), 0.25);
+  transition: ease all 0.3s;
+}
+.CoverEpisodeTitle h2 {
+  font-size: 35px;
+  font-weight: var(--semi-bold);
+  font-family: var(--font-family-main);
+  color: var(--color-text-primary);
+  letter-spacing: 3px;
+}
+
+.PlayIconContainer {
+  background-color: var(--color-logo);
+  height: 70px;
+  position: absolute;
+  right: calc(50% - 35px);
+  top: calc(50% - 35px);
+  width: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 0 10px 5px rgba(var(--color-logo-rgb), 0.75);
+  opacity: 0;
+  transition: ease all 0.3s;
+}
+.PlayIconShow {
+  opacity: 1;
+}
+.PlayIcon {
+  color: var(--color-text-secondary);
+  height: 30px;
+  width: auto;
+}
+
 .ResultNone {
-  margin: 0 50px;
-  border-radius: 7px;
-  padding: 70px 40px;
-  background-color: var(--secondary-color);
-  height: 325px;
+  height: 340px;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: center; 
 }
 .ResultNoneMessage {
-  color: var(--primary-text);
+  color: var(--color-text-primary);
   text-transform: uppercase;
-  font-family: var(--font-main);
+  font-family: var(--font-family-main);
   font-size: 30px;
-  font-weight: var(--title-weight);
+  font-weight: var(--bold);
+}
+.SearchInput {
+  border: none;
+  background-color: transparent;
+  color: rgba(var(--color-text-primary-rgb), 0.5);
+  font-family: var(--font-family-main);
+  font-size: 30px;
+  font-weight: var(--medium);
+  outline: none;
+  transition: color 0.3s ease; 
+}
+.SearchInput::placeholder {
+  color: rgba(var(--color-text-primary-rgb), 0.5);
+  transition: color 0.3s ease; 
 }
 
-/* Responsive */
-@media (max-width:1920px) {
-  .CarouselTitle {
-    font-size: 23px;
-    padding: 0px 20px 16px 20px;
-    border-bottom: 4px solid var(--logo-color);
-  }
-  .CarouselContainer {
-    padding: 0 30px;
-    box-shadow: -1px 3px 5px var(--shadow-color);
-  }
-  .ContentsContainer {
-    gap: 25px;
-    padding: 50px 0;
-  }
-  .emblaSlide {
-    width: 200px;
-  }
-  .Item {
-    width: 100%;
-    height: 280px;
-    box-shadow: -1px 3px 5px var(--shadow-color);
-  }
-  .Cover {
-    height: 120px;
-  }
-  .CoverTitle {
-    font-size: 18px;
-  }
-  .Language {
-    font-size: 14px;
-    padding: 8px 16px;
-  }
-  .ResultNone {
-    padding: 50px 30px;
-    height: 280px;
-  }
-  .ResultNoneMessage {
-    font-size: 26px;
-  }
+.SortContainer:hover input,
+.SortContainer:hover .SearchInput::placeholder {
+  color: var(--color-text-primary);
 }
 
-@media (max-width: 1200px) {
+.FlagsContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 25px;
+  height: 100px;
+  align-items: center;
+  color: var(--color-text-primary);
+  font-size: 30px;
+  font-family: var(--font-family-main);
+  font-weight: var(--medium);
+  justify-content: center;
+}
+.GridWrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 550px);
+  justify-content: space-between;
+  gap:50px
+}
+
+.Flag {
+  height: 40px;
+  border: 2px solid var(--color-text-secondary);
+  border-radius: 7px;
+  object-fit: cover;
+  opacity: 0.25;
+} 
+.Flag:hover {
+  opacity: 1;
+}
+.Flag.Selected {
+  opacity: 1;
+  border: 2px solid var(--color-logo)
+}
+  .TitleHover:hover h2 {
+    opacity: 0.75;
+    cursor: pointer;
+    color: var(--color-logo);
+  }
+
+ 
+@media (max-width: 1920px) {
+  .ActionsTitle {
+    font-size: calc(30px * 0.75);
+  }
   .CarouselTitle {
-    font-size: 21px;
-    padding: 0px 15px 12px 15px;
-    border-bottom: 3px solid var(--logo-color);
+    font-size: calc(60px * 0.75);
+    letter-spacing: calc(2px * 0.75);
   }
-  .CarouselContainer {
-    padding: 0 20px;
+  .ActionsIcons {
+    height: calc(30px * 0.75);
   }
+  .ActionsElements {
+    gap: calc(50px * 0.75);
+  }
+  .ActionsElements > * {
+    border-right: calc(3px * 0.75) solid rgba(var(--color-text-secondary-rgb), 0.5);
+    padding-right: calc(50px * 0.75);
+  }
+  .SortContainer {
+    gap: calc(25px * 0.75);
+  }
+
+  .FlagsContainer {
+    gap: calc(25px * 0.75);
+    height: calc(100px * 0.75);
+    font-size: calc(30px * 0.75);
+  }
+  .Flag {
+    height: calc(40px * 0.75);
+    border: calc(2px * 0.75) solid var(--color-text-secondary);
+    border-radius: calc(7px * 0.75);
+  } 
+  .SearchInput {
+    font-size: calc(30px * 0.75);
+    width: calc(240px * 0.75);
+  }
+  .Flag.Selected {
+    border: calc(2px * 0.75) solid var(--color-logo)
+  }
+  .Container {
+    gap: calc(33px * 0.75);
+  }
+
+  .NavigationContainer {
+    width: calc(100px * 0.75);  
+  }
+  .NavigationIcon {
+    height: calc(70px * 0.75);
+  }
+
   .ContentsContainer {
-    gap: 20px;
-    padding: 40px 0;
-  }
-  .emblaSlide {
-    width: 180px;
+    gap: round(calc(83px * 0.75));
   }
   .Item {
-    height: 250px;
+    height: calc(340px * 0.75);
+    width: calc(550px * 0.75);
   }
-  .Cover {
-    height: 100px;
+  .ElementsContainer {
+    margin: calc(25px * 0.75);
+    height: calc(100% - (50px * 0.75));
+    width: calc(100% - (50px * 0.75));
   }
-  .CoverTitle {
-    font-size: 16px;
+
+  .ProgressBar {
+    height: calc(5px * 0.75);
+  }
+
+  .ProgressFill {
+    border-radius: 0 calc(2.5px * 0.75) calc(2.5px * 0.75) 0;
+  }
+  .RemainingMinutes {
+    padding: calc(5px * 0.75) calc(15px * 0.75);
+    border-radius: calc(7px * 0.75);
+    font-size: calc(20px * 0.75);
+    letter-spacing: calc(1px * 0.75);
   }
   .Language {
-    font-size: 12px;
-    padding: 6px 14px;
+    height: calc(40px * 0.75);
+    border-radius: calc(7px * 0.75);
+    border: calc(2px * 0.75) solid var(--color-logo);
+  }
+
+  .CoverTitle h2 {
+    font-size: calc(35px * 0.75);
+    letter-spacing: calc(3px * 0.75);
+    text-shadow: 0 calc(4px * 0.75) calc(4px * 0.75) rgba(var(--color-shadow-rgb), 0.25);
+  }
+  .CoverEpisodeTitle h2 {
+    font-size: calc(35px * 0.75);
+    letter-spacing: calc(3px * 0.75);
+  }
+
+  .PlayIconContainer {
+    height: calc(70px * 0.75);
+    right: calc(50% - (35px * 0.75));
+    top: calc(50% - (35px * 0.75));
+    width: calc(70px * 0.75);
+    box-shadow: 0 0 calc(10px * 0.75) calc(5px * 0.75) rgba(var(--color-logo-rgb), 0.75);
+  }
+
+  .PlayIcon {
+    height: calc(30px * 0.75);
   }
   .ResultNone {
-    padding: 40px 20px;
-    height: 250px;
+    height: calc(340px * 0.75);
   }
   .ResultNoneMessage {
-    font-size: 22px;
+    font-size: calc(30px * 0.75);
+  }
+
+  .GridWrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, calc(550px * 0.75));
+    gap: calc(50px * 0.75);
+  }
+}
+@media (max-width: 1300px) {
+  .ActionsTitle {
+    font-size: calc(30px * 0.6);
+  }
+  .CarouselTitle {
+    font-size: calc(60px * 0.6);
+    letter-spacing: calc(2px * 0.6);
+  }
+  .ActionsIcons {
+    height: calc(30px * 0.6);
+  }
+  .ActionsElements {
+    gap: calc(50px * 0.6);
+  }
+  .ActionsElements > * {
+    border-right: calc(3px * 0.6) solid rgba(var(--color-text-secondary-rgb), 0.5);
+    padding-right: calc(50px * 0.6);
+  }
+  .SortContainer {
+    gap: calc(25px * 0.6);
+  }
+
+  .FlagsContainer {
+    gap: calc(25px * 0.6);
+    height: calc(100px * 0.6);
+    font-size: calc(30px * 0.6);
+  }
+  .Flag {
+    height: calc(40px * 0.6);
+    border: calc(2px * 0.6) solid var(--color-text-secondary);
+    border-radius: calc(7px * 0.6);
+  } 
+  .SearchInput {
+    font-size: calc(30px * 0.6);
+    width: calc(240px * 0.6);
+  }
+  .Flag.Selected {
+    border: calc(2px * 0.6) solid var(--color-logo)
+  }
+  .Container {
+    gap: calc(33px * 0.6);
+  }
+
+  .NavigationContainer {
+    width: calc(100px * 0.6);  
+  }
+  .NavigationIcon {
+    height: calc(70px * 0.6);
+  }
+
+  .ContentsContainer {
+    gap: calc(83px * 0.6);
+  }
+
+  .Item {
+    height: calc(340px * 0.6);
+    width: calc(550px * 0.6);
+  }
+  .ElementsContainer {
+    margin: calc(25px * 0.6);
+    height: calc(100% - (50px * 0.6));
+    width: calc(100% - (50px * 0.6));
+  }
+
+  .ProgressBar {
+    height: calc(5px * 0.6);
+  }
+
+  .ProgressFill {
+    border-radius: 0 calc(2.5px * 0.6) calc(2.5px * 0.6) 0;
+  }
+  .RemainingMinutes {
+    padding: calc(5px * 0.6) calc(15px * 0.6);
+    border-radius: calc(7px * 0.6);
+    font-size: calc(20px * 0.6);
+    letter-spacing: calc(1px * 0.6);
+  }
+  .Language {
+    height: calc(40px * 0.6);
+    border-radius: calc(7px * 0.6);
+    border: calc(2px * 0.6) solid var(--color-logo);
+  }
+
+  .CoverTitle h2 {
+    font-size: calc(35px * 0.6);
+    letter-spacing: calc(3px * 0.6);
+    text-shadow: 0 calc(4px * 0.6) calc(4px * 0.6) rgba(var(--color-shadow-rgb), 0.25);
+  }
+  .CoverEpisodeTitle h2 {
+    font-size: calc(35px * 0.6);
+    letter-spacing: calc(3px * 0.6);
+  }
+
+  .PlayIconContainer {
+    height: calc(70px * 0.6);
+    right: calc(50% - (35px * 0.6));
+    top: calc(50% - (35px * 0.6));
+    width: calc(70px * 0.6);
+    box-shadow: 0 0 calc(10px * 0.6) calc(5px * 0.6) rgba(var(--color-logo-rgb), 0.75);
+  }
+
+  .PlayIcon {
+    height: calc(30px * 0.6);
+  }
+  .ResultNone {
+    height: calc(340px * 0.6);
+  }
+  .ResultNoneMessage {
+    font-size: calc(30px * 0.6);
+  }
+
+  .GridWrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, calc(550px * 0.6));
+    gap: calc(50px * 0.6);
+  }
+}
+@media (max-width: 960px) {
+  .ActionsTitle {
+    font-size: calc(30px * 0.5);
+  }
+  .CarouselTitle {
+    font-size: calc(60px * 0.5);
+    letter-spacing: calc(2px * 0.5);
+  }
+  .ActionsIcons {
+    height: calc(30px * 0.5);
+  }
+  .ActionsElements {
+    gap: calc(50px * 0.5);
+  }
+  .ActionsElements > * {
+    border-right: calc(3px * 0.5) solid rgba(var(--color-text-secondary-rgb), 0.5);
+    padding-right: calc(50px * 0.5);
+  }
+  .SortContainer {
+    gap: calc(25px * 0.5);
+  }
+
+  .FlagsContainer {
+    gap: calc(25px * 0.5);
+    height: calc(100px * 0.5);
+    font-size: calc(30px * 0.5);
+  }
+  .Flag {
+    height: calc(40px * 0.5);
+    border: calc(2px * 0.5) solid var(--color-text-secondary);
+    border-radius: calc(7px * 0.5);
+  } 
+  .SearchInput {
+    font-size: calc(30px * 0.5);
+    width: calc(240px * 0.5);
+  }
+  .Flag.Selected {
+    border: calc(2px * 0.5) solid var(--color-logo)
+  }
+  .Container {
+    gap: calc(33px * 0.5);
+  }
+
+  .NavigationContainer {
+    width: calc(100px * 0.5);  
+  }
+  .NavigationIcon {
+    height: calc(70px * 0.5);
+  }
+
+  .ContentsContainer {
+    gap: calc(83px * 0.5);
+  }
+
+  .Item {
+    height: calc(340px * 0.5);
+    width: calc(550px * 0.5);
+  }
+  .ElementsContainer {
+    margin: calc(25px * 0.5);
+    height: calc(100% - (50px * 0.5));
+    width: calc(100% - (50px * 0.5));
+  }
+
+  .ProgressBar {
+    height: calc(5px * 0.5);
+  }
+
+  .ProgressFill {
+    border-radius: 0 calc(2.5px * 0.5) calc(2.5px * 0.5) 0;
+  }
+  .RemainingMinutes {
+    padding: calc(5px * 0.5) calc(15px * 0.5);
+    border-radius: calc(7px * 0.5);
+    font-size: calc(20px * 0.5);
+    letter-spacing: calc(1px * 0.5);
+  }
+  .Language {
+    height: calc(40px * 0.5);
+    border-radius: calc(7px * 0.5);
+    border: calc(2px * 0.5) solid var(--color-logo);
+  }
+
+  .CoverTitle h2 {
+    font-size: calc(35px * 0.5);
+    letter-spacing: calc(3px * 0.5);
+    text-shadow: 0 calc(4px * 0.5) calc(4px * 0.5) rgba(var(--color-shadow-rgb), 0.25);
+  }
+  .CoverEpisodeTitle h2 {
+    font-size: calc(35px * 0.5);
+    letter-spacing: calc(3px * 0.5);
+  }
+
+  .PlayIconContainer {
+    height: calc(70px * 0.5);
+    right: calc(50% - (35px * 0.5));
+    top: calc(50% - (35px * 0.5));
+    width: calc(70px * 0.5);
+    box-shadow: 0 0 calc(10px * 0.5) calc(5px * 0.5) rgba(var(--color-logo-rgb), 0.75);
+  }
+
+  .PlayIcon {
+    height: calc(30px * 0.5);
+  }
+  .ResultNone {
+    height: calc(340px * 0.5);
+  }
+  .ResultNoneMessage {
+    font-size: calc(30px * 0.5);
+  }
+
+  .GridWrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, calc(550px * 0.5));
+    gap: calc(50px * 0.5);
   }
 }

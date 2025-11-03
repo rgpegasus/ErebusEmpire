@@ -5,6 +5,7 @@ export { SeasonsAnime } from '@ipcHandlers/scraper/SeasonsAnime';
 export { EpisodesSeason } from '@ipcHandlers/scraper/EpisodesSeason';
 export { UrlEpisode } from '@ipcHandlers/scraper/UrlEpisode';
 export { LatestEpisodes } from '@ipcHandlers/scraper/LatestEpisodes';
+export { LatestScans } from "@ipcHandlers/scraper/LatestScans"
 export { CatalogAnime } from '@ipcHandlers/scraper/CatalogAnime';
 export { AvailableLanguages } from '@ipcHandlers/scraper/AvailableLanguages'
 export { ScansChapter } from '@ipcHandlers/scraper/ScansChapter';

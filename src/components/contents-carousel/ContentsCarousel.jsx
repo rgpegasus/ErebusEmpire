@@ -1,180 +1,268 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import useEmblaCarousel from 'embla-carousel-react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import ScrollTitle from '@components/scroll-title/ScrollTitle';
-import ImgLoader from '../img-loader/ImgLoader';
-import { toSlug } from '@utils/functions/toSlug';
-import styles from './ContentsCarousel.module.css';
+import React, { useState, useEffect, useCallback } from "react"
+import useEmblaCarousel from "embla-carousel-react"
+import { toSlug } from "@utils/functions/toSlug"
+import styles from "./ContentsCarousel.module.css"
+import CarouselHeader from "./components/carousel-header/CarouselHeader"
+import CarouselItem from "./components/episode-item/EpisodeItem"
+import CarouselNavigation from "./components/navigation/Navigation"
 
 const ContentsCarousel = ({
   data = [],
   onClickEpisode,
   onDeleteEpisode = () => {},
-  getEpisodeCover,
-  getEpisodeTitle,
-  getEpisodeSubTitle,
-  availableLanguageKey = 'language',
-  title = '',
+  getEpisodeCover = () => "",
+  getAnimeTitle = () => "",
+  getEpisodeSubTitle = () => "",
+  getEpisodeTitle = () => "",
+  getUrlErebus = () => "",
+  getAnimeUrl = "",
+  currentLanguage = "language",
+  title = "",
   enableShiftDelete = false,
   display = true,
+  isSeason = false,
+  availableLanguages = [],
+  onLanguageChange,
+  searchBy = "title",
+  onContentTypeChange,
+  availableContentTypes = { hasAnime: false, hasManga: false },
+  contentType = "anime",
+  isGridMode = true,
 }) => {
+  const [watchedEpisodes, setWatchedEpisodes] = useState([])
+  const [isInside, setIsInside] = useState(false)
+  const [isGrabing, setIsGrabing] = useState(false)
+  const [shiftPressed, setShiftPressed] = useState(false)
+  const [activeIndex, setActiveIndex] = useState(null)
+  const [isAscending, setIsAscending] = useState(true)
+  const [canScrollPrev, setCanScrollPrev] = useState(false)
+  const [canScrollNext, setCanScrollNext] = useState(false)
+  const [gridMode, setGridMode] = useState(isGridMode)
+  const [searchValue, setSearchValue] = useState("")
+  const [filteredData, setFilteredData] = useState(data)
+
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
-    align: 'center',
+    align: "center",
     skipSnaps: false,
-    containScroll: 'trimSnaps',
+    containScroll: "trimSnaps",
     dragFree: true,
+  })
 
-  });
+  const handleSearch = () => {
+    if (!searchValue) {
+      setFilteredData(data)
+      return
+    }
 
-  const [isInside, setIsInside] = useState(false);
-  const [shiftPressed, setShiftPressed] = useState(false);
-const [activeIndex, setActiveIndex] = useState(0);
+    if (searchBy === "title") {
+      setFilteredData(
+        data.filter((ep) => getAnimeTitle(ep).toLowerCase().includes(searchValue.toLowerCase())),
+      )
+    } else if (searchBy === "episode") {
+      setFilteredData(
+        data.filter((ep) => {
+          const val = searchValue.toLowerCase()
+          const textMatch = getEpisodeSubTitle(ep)?.toLowerCase().includes(val)
+          const numbersInTitle = getEpisodeSubTitle(ep)?.match(/\d+/g) || []
+          const numberMatch = numbersInTitle.some((num) => num.includes(val))
+          return textMatch || numberMatch
+        }),
+      )
+    }
+  }
 
-useEffect(() => {
-  if (!emblaApi) return;
-
-  const onSelect = () => {
-    setActiveIndex(emblaApi.selectedScrollSnap());
-  };
-
-  emblaApi.on('select', onSelect);
-  onSelect(); // initialisation
-
-  return () => emblaApi.off('select', onSelect);
-}, [emblaApi]);
-
-  // Gestion Shift pour suppression
   useEffect(() => {
-    if (!enableShiftDelete) return;
+    handleSearch()
+  }, [searchValue])
+
+  useEffect(() => {
+    setFilteredData(data)
+  }, [data])
+
+  useEffect(() => {
+    const loadWatchedEpisodes = async () => {
+      const all = await animeData.loadAll("animeWatchHistory")
+      if (!all) return
+
+      const episodes = Object.entries(all).map(([key, data]) => ({ key, ...data }))
+      episodes.sort((a, b) => b.timestamp - a.timestamp)
+      setWatchedEpisodes(episodes)
+    }
+
+    loadWatchedEpisodes()
+  }, [])
+
+  useEffect(() => {
+    if (!emblaApi) return
+
+    const onSelect = () => {
+      const index = emblaApi.selectedScrollSnap()
+      setActiveIndex(index)
+    }
+
+    emblaApi.on("select", onSelect)
+
+    return () => emblaApi.off("select", onSelect)
+  }, [emblaApi])
+
+  useEffect(() => {
+    if (!enableShiftDelete) return
+
     const handleDown = (e) => {
-      if (e.key === 'Shift' && isInside) setShiftPressed(true);
-    };
+      if (e.key === "Shift" && isInside) setShiftPressed(true)
+    }
+
     const handleUp = (e) => {
-      if (e.key === 'Shift') setShiftPressed(false);
-    };
-    window.addEventListener('keydown', handleDown);
-    window.addEventListener('keyup', handleUp);
+      if (e.key === "Shift") setShiftPressed(false)
+    }
+
+    window.addEventListener("keydown", handleDown)
+    window.addEventListener("keyup", handleUp)
+
     return () => {
-      window.removeEventListener('keydown', handleDown);
-      window.removeEventListener('keyup', handleUp);
-    };
-  }, [enableShiftDelete, isInside]);
+      window.removeEventListener("keydown", handleDown)
+      window.removeEventListener("keyup", handleUp)
+    }
+  }, [enableShiftDelete, isInside])
+
+  const getProgressForEpisode = (episode) => {
+    const match = watchedEpisodes.find((ep) => ep.key === getUrlErebus(episode))
+    if (!match || !match.videoDuration) return []
+
+    const minutes = (match.videoDuration - match.videoTime) / 60
+    const duration = Math.min(100, (match.videoTime / match.videoDuration) * 100)
+    if (minutes < 1) {
+      return [minutes, duration]
+    } else {
+      return [Math.round(minutes), duration]
+    }
+  }
 
   const handleClick = (episode, e) => {
     if (enableShiftDelete && e.shiftKey) {
-      onDeleteEpisode(episode);
-      return;
+      onDeleteEpisode(episode)
+      return
     }
-    onClickEpisode(episode, e);
-  };
+    onClickEpisode(episode, e)
+  }
 
-  // Navigation Embla
-  const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
-  const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
-const [canScrollPrev, setCanScrollPrev] = useState(false);
-const [canScrollNext, setCanScrollNext] = useState(false);
-
-useEffect(() => {
-  if (!emblaApi) return;
-
-  const onSelect = () => {
-    setActiveIndex(emblaApi.selectedScrollSnap());
-    setCanScrollPrev(emblaApi.canScrollPrev());
-    setCanScrollNext(emblaApi.canScrollNext());
-  };
-
-  emblaApi.on('select', onSelect);
-  onSelect(); // initialisation
-
-  return () => emblaApi.off('select', onSelect);
-}, [emblaApi]);
+  const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi])
+  const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi])
 
   if (data.length === 0 && !display) {
-    return null;
+    return null
   }
-  
+
+  const sortedData = isAscending ? filteredData : [...filteredData].reverse()
 
   return (
-    <div>
+    <div className={styles.Container}>
       {title && <div className={styles.CarouselTitle}>{title}</div>}
-      {data.length > 0 ? (
-        <div
-          className={styles.CarouselContainer}
-          onMouseEnter={() => setIsInside(true)}
-          onMouseLeave={() => setIsInside(false)}
-        >
-          {/* Bouton gauche */}
-<div
-  className={styles.NavigationContainer}
-  style={{
-    left: 0,
-    opacity: canScrollPrev ? 1 : 0,
-    pointerEvents: canScrollPrev ? 'auto' : 'none',
-    transition: 'opacity 0.3s ease',
-  }}
->
-  <button
-    className={`${styles.NavigationContainer} prev-${toSlug(title)}`}
-    onClick={scrollPrev}
-  >
-    <ChevronLeft className={styles.NavigationIcon} aria-label="Previous slide" />
-  </button>
-</div>
+      <CarouselHeader
+        data={sortedData}
+        isAscending={isAscending}
+        setIsAscending={setIsAscending}
+        isSeason={isSeason}
+        currentLanguage={currentLanguage}
+        availableLanguages={availableLanguages}
+        onLanguageChange={onLanguageChange}
+        gridMode={gridMode}
+        setGridMode={setGridMode}
+        searchValue={searchValue}
+        setSearchValue={setSearchValue}
+        onContentTypeChange={onContentTypeChange}
+        availableContentTypes={availableContentTypes}
+        contentType={contentType}
+      />
 
-          {/* Carousel */}
-          <div className={styles.ContentsWrapper} ref={emblaRef}>
-            <div className={styles.ContentsContainer}>
-              {data.map((episode, index) => (
-                <div className={`${styles.emblaSlide} ${index === activeIndex ? styles.activeSlide : ''}`} key={index}>
-                  <div
-                    className={`${styles.Item} ${enableShiftDelete && shiftPressed && styles.ShiftDelete}`}
-                    onClick={(e) => handleClick(episode, e)}
-                  >
-                    <div className={styles.Cover}>
-                      <h3 className={styles.CoverTitle}>{getEpisodeTitle(episode)}</h3>
-                      <div className={styles.CoverContainer}>
-                        <ImgLoader
-                          src={getEpisodeCover(episode)}
-                          key={`${getEpisodeTitle(episode)} - ${getEpisodeSubTitle(episode)}`}
-                        />
-                      </div>
-                    </div>
-                    <div className={styles.Information}>
-                      <ScrollTitle title={getEpisodeSubTitle(episode)} />
-                      <div className={styles.Separation}></div>
-                      <p className={styles.Language}>{episode[availableLanguageKey]}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
+      {sortedData.length > 0 ? (
+        gridMode ? (
           <div
-  className={styles.NavigationContainer}
-  style={{
-    right: 0,
-    opacity: canScrollNext ? 1 : 0,
-    pointerEvents: canScrollNext ? 'auto' : 'none',
-    transition: 'opacity 0.3s ease',
-  }}
->
-  <button
-    className={`${styles.NavigationContainer} next-${toSlug(title)}`}
-    onClick={scrollNext}
-  >
-    <ChevronRight className={styles.NavigationIcon} aria-label="Next slide" />
-  </button>
-</div>
-        </div>
+            className={styles.GridWrapper}
+            onMouseEnter={() => setIsInside(true)}
+            onMouseLeave={() => setIsInside(false)}
+          >
+            {sortedData.map((episode, index) => (
+              <CarouselItem
+                key={index}
+                episode={episode}
+                index={index}
+                activeIndex={activeIndex}
+                shiftPressed={shiftPressed}
+                enableShiftDelete={enableShiftDelete}
+                getProgressForEpisode={getProgressForEpisode}
+                getEpisodeCover={getEpisodeCover}
+                getAnimeTitle={getAnimeTitle}
+                getEpisodeSubTitle={getEpisodeSubTitle}
+                getEpisodeTitle={getEpisodeTitle}
+                currentLanguage={currentLanguage}
+                isSeason={isSeason}
+                onClick={handleClick}
+                onMouseEnter={() => setActiveIndex(index)}
+                onMouseLeave={() => setActiveIndex(null)}
+                contentType={contentType}
+              />
+            ))}
+          </div>
+        ) : (
+          <div
+            className={styles.CarouselContainer}
+            onMouseEnter={() => setIsInside(true)}
+            onMouseLeave={() => setIsInside(false)}
+            onMouseDown={() => setIsGrabing(true)}
+            onMouseUp={() => setIsGrabing(false)}
+          >
+            <CarouselNavigation
+              direction="prev"
+              onClick={scrollPrev}
+              isVisible={canScrollPrev}
+              className={`prev-${toSlug(title)}`}
+            />
+
+            <div className={styles.ContentsWrapper} ref={emblaRef}>
+              <div className={`${styles.ContentsContainer} ${isGrabing && styles.IsGrabing}`}>
+                {sortedData.map((episode, index) => (
+                  <CarouselItem
+                    key={index}
+                    episode={episode}
+                    index={index}
+                    activeIndex={activeIndex}
+                    shiftPressed={shiftPressed}
+                    enableShiftDelete={enableShiftDelete}
+                    getProgressForEpisode={getProgressForEpisode}
+                    getEpisodeCover={getEpisodeCover}
+                    getAnimeTitle={getAnimeTitle}
+                    getAnimeUrl={getAnimeUrl}
+                    getEpisodeSubTitle={getEpisodeSubTitle}
+                    getEpisodeTitle={getEpisodeTitle}
+                    currentLanguage={currentLanguage}
+                    isSeason={isSeason}
+                    onClick={handleClick}
+                    onMouseEnter={() => setActiveIndex(index)}
+                    onMouseLeave={() => setActiveIndex(null)}
+                    isGrabing={isGrabing}
+                    contentType={contentType}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <CarouselNavigation
+              direction="next"
+              onClick={scrollNext}
+              isVisible={canScrollNext}
+              className={`next-${toSlug(title)}`}
+            />
+          </div>
+        )
       ) : (
         <div className={styles.ResultNone}>
           <p className={styles.ResultNoneMessage}>Aucun épisode disponible</p>
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default ContentsCarousel;
+export default ContentsCarousel
