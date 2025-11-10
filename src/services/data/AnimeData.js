@@ -61,22 +61,43 @@ function DeleteAnimeData(fileKey, key = null) {
 }
 
 function AnimeData() {
-  ipcMain.handle('save-anime-data', (event, fileKey, storageKey, data) => {
-    SaveAnimeData(fileKey, storageKey, data);
-    return true;
-  });
+  ipcMain.handle("save-anime-data", async (event, fileKey, storageKey, data) => {
+    try {
+      SaveAnimeData(fileKey, storageKey, data)
+      return true
+    } catch (err) {
+      console.error("Erreur save-anime-data:", err)
+      throw err
+    }
+  })
 
-  ipcMain.handle('load-anime-data', (event, fileKey, storageKey) => {
-    return LoadAnimeData(fileKey, storageKey);
-  });
+  ipcMain.handle("load-anime-data", async (event, fileKey, storageKey) => {
+    try {
+      return LoadAnimeData(fileKey, storageKey)
+    } catch (err) {
+      console.error("Erreur load-anime-data:", err)
+      throw err
+    }
+  })
 
-  ipcMain.handle('load-all-anime-data', (event, fileKey) => {
-    return LoadAllAnimeData(fileKey);
-  });
+  ipcMain.handle("load-all-anime-data", async (event, fileKey) => {
+    try {
+      return LoadAllAnimeData(fileKey)
+    } catch (err) {
+      console.error("Erreur load-all-anime-data:", err)
+      throw err
+    }
+  })
 
-  ipcMain.handle('delete-anime-data', (event, fileKey, storageKey) => {
-    return DeleteAnimeData(fileKey, storageKey);
-  });
+  ipcMain.handle("delete-anime-data", async (event, fileKey, storageKey) => {
+    try {
+      return DeleteAnimeData(fileKey, storageKey)
+    } catch (err) {
+      console.error("Erreur delete-anime-data:", err)
+      throw err
+    }
+  })
 }
+
 
 export { AnimeData };

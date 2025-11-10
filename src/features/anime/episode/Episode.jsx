@@ -45,6 +45,7 @@ export const Episode = () => {
   const videoTimeRef = useRef(videoTime)
   const [resolvedSources, setResolvedSources] = useState([])
   const lastPresenceUpdateRef = useRef(0)
+  const [openingTime, setOpeningTime] = useState([0, 0])
 
   const containerRef = useRef(null)
   const zoomRef = useRef(null)
@@ -280,11 +281,17 @@ export const Episode = () => {
         const hosts = episodeSources.host || []
         const urls = episodeSources.url || []
         const resolvedUrls = []
-
+        
         for (let i = 0; i < urls.length; i++) {
           const realUrl = await window.electron.ipcRenderer.invoke("get-url", urls[i], hosts[i])
-          if (cancelled) return 
-          resolvedUrls.push(realUrl)
+          if (cancelled) return
+        
+          if (hosts[i] === "vidmoly") {
+            resolvedUrls.push(realUrl.videoUrl)
+            setOpeningTime(realUrl.openingTime)
+          } else {
+            resolvedUrls.push(realUrl)
+          }
         }
 
         const filteredSources = []
@@ -517,6 +524,7 @@ export const Episode = () => {
       fullPlayer={true}
       autoPlay={true}
       startPosition={videoTime}
+      openingTime={openingTime}
       onEnded={() => nextEpisode && EndEpisodeNext(nextEpisode)}
       dataNext={
         nextEpisode

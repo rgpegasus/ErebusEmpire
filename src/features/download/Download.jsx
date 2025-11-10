@@ -91,7 +91,7 @@ export const Download = () => {
   )
   const handleEpisodeClick = async (episode) => {  
     setLoading(true)
-    const { animeTitle, seasonTitle, episodeTitle, animeCover } = episode.metadata
+    const { animeTitle, seasonTitle, episodeTitle, animeCover } = episode
     const normalizedPath = episode.path.replace(/\\/g, '/')
     const filePath = `file:///${encodeURI(normalizedPath)}`
     setSelectedEpisode({ animeTitle, seasonTitle, episodeTitle, animeCover, filePath })

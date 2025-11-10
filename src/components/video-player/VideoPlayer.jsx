@@ -29,6 +29,7 @@ export const ErebusPlayer = ({
   onDownloadClick = undefined,
   onCrossClick = undefined,
   startPosition = 0,
+  openingTime= [0,0],
   dataNext = {},
   reprodutionList = [],
   onTimeUpdate = undefined, 
@@ -509,14 +510,17 @@ const handleClick = () => {
 
   return (
     <div
-      className={`container ${error ? 'hide-video' : ''}`}
+      className={`container ${error ? "hide-video" : ""}`}
       onMouseMove={hoverScreen}
       ref={playerElement}
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
       style={{ fontFamily }}
     >
-      {(videoReady === false || (waitingBuffer === true && playing === true)) && !error && !end && renderLoading()}
+      {(videoReady === false || (waitingBuffer === true && playing === true)) &&
+        !error &&
+        !end &&
+        renderLoading()}
 
       {overlayEnabled && renderInfoVideo()}
 
@@ -532,92 +536,117 @@ const handleClick = () => {
         onEnded={onEndedFunction}
       />
       {showSettingsMenu && (
-      <>
-        <div
-          className="settings-overlay"
-          onClick={() => setShowSettingsMenu(false)}
-        />
-        <div
-          className="settings-menu-slide"
-          onClick={(e) => e.stopPropagation()}
-          onDoubleClick={(e) => e.stopPropagation()}
-        >
-          <div className="settings-menu-header">
-            <span>Paramètres</span>
-            <button className="close-button"  onClick={() => {setShowSettingsMenu(false);videoRef.current.play()}}>
-              <FiX />
-            </button>
-          </div>
-          <div className="settings-menu-content">
-            <div className="SettingsMenuTop">
-              <div className='SettingsMenuTop-cover'>
-                <img
-                  src={cover}
-                  alt="Cover"
-                  draggable="false"
-                  className="SettingsMenuTop-image"
-                />
-              </div>
-              <div className='SettingsMenuTop-title'>
-                <div className='SettingsMenuTop-animeTitle'>{title}</div>
-                <h1 className='SettingsMenuTop-subTitle'>{subTitle}</h1>
-              </div>
+        <>
+          <div className="settings-overlay" onClick={() => setShowSettingsMenu(false)} />
+          <div
+            className="settings-menu-slide"
+            onClick={(e) => e.stopPropagation()}
+            onDoubleClick={(e) => e.stopPropagation()}
+          >
+            <div className="settings-menu-header">
+              <span>Paramètres</span>
+              <button
+                className="close-button"
+                onClick={() => {
+                  setShowSettingsMenu(false)
+                  videoRef.current.play()
+                }}
+              >
+                <FiX />
+              </button>
             </div>
-            <div className='TopBar-profile-separation'></div>
-            <div className='SettingsMenuSources-list'>
-              {sources?.map((source, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleSelectSource(source)}
-                  className={`SettingsMenuSources-item ${
-                    currentSource === source.url ? 'selected' : ''
-                  }`}
-                >
-                  Lecteur {index + 1}
-                </button>
-              ))}
-            </div>
-            <div className='TopBar-profile-separation'></div>
-            <div className="SettingsMenuAvailableLanguages">
-              {availableLanguages.map((lang, index) => {
-                const flag = FlagDispatcher(lang.toLowerCase());
-                return (
-                  <span
-                    onClick={() => ChangeLanguage(lang)}
+            <div className="settings-menu-content">
+              <div className="SettingsMenuTop">
+                <div className="SettingsMenuTop-cover">
+                  <img
+                    src={cover}
+                    alt="Cover"
+                    draggable="false"
+                    className="SettingsMenuTop-image"
+                  />
+                </div>
+                <div className="SettingsMenuTop-title">
+                  <div className="SettingsMenuTop-animeTitle">{title}</div>
+                  <h1 className="SettingsMenuTop-subTitle">{subTitle}</h1>
+                </div>
+              </div>
+              <div className="TopBar-profile-separation"></div>
+              <div className="SettingsMenuSources-list">
+                {sources?.map((source, index) => (
+                  <button
                     key={index}
-                    className={`SettingsMenuLanguageItem${currentLanguage === lang.toLowerCase() ? ' selected' : ''}`}
+                    onClick={() => handleSelectSource(source)}
+                    className={`SettingsMenuSources-item ${
+                      currentSource === source.url ? "selected" : ""
+                    }`}
                   >
-                    {flag && (
-                      <img
-                        src={flag}
-                        alt={lang}
-                        draggable='false'
-                        className={`SettingsMenuLanguageItem-img${currentLanguage === lang.toLowerCase() ? ' selected' : ''}`}
-                      />
-                    )}
-                    <div className={`SettingsMenuLanguageItem-txt${currentLanguage === lang.toLowerCase() ? ' selected' : ''}`}>
-                      {lang.toUpperCase()}
-                    </div>
-                  </span>
-                );
-              }
-              )}
+                    Lecteur {index + 1}
+                  </button>
+                ))}
+              </div>
+              <div className="TopBar-profile-separation"></div>
+              <div className="SettingsMenuAvailableLanguages">
+                {availableLanguages.map((lang, index) => {
+                  const flag = FlagDispatcher(lang.toLowerCase())
+                  return (
+                    <span
+                      onClick={() => ChangeLanguage(lang)}
+                      key={index}
+                      className={`SettingsMenuLanguageItem${currentLanguage === lang.toLowerCase() ? " selected" : ""}`}
+                    >
+                      {flag && (
+                        <img
+                          src={flag}
+                          alt={lang}
+                          draggable="false"
+                          className={`SettingsMenuLanguageItem-img${currentLanguage === lang.toLowerCase() ? " selected" : ""}`}
+                        />
+                      )}
+                      <div
+                        className={`SettingsMenuLanguageItem-txt${currentLanguage === lang.toLowerCase() ? " selected" : ""}`}
+                      >
+                        {lang.toUpperCase()}
+                      </div>
+                    </span>
+                  )
+                })}
+              </div>
             </div>
           </div>
-        </div>
-      </>
+        </>
       )}
 
-      <div className={`controls ${showControls && !showSettingsMenu && !error ? 'show' : ''}`}>
+      <div className={`controls ${showControls && !showSettingsMenu && !error ? "show" : ""}`}>
         {backButton && videoReady && (
-          <div className="back" onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()} >
-            <div onClick={backButton}  style={{ cursor: 'pointer' }}>
+          <div
+            className="back"
+            onClick={(e) => {
+              handleControlClick(e)
+            }}
+            onDoubleClick={(e) => e.stopPropagation()}
+          >
+            <div onClick={backButton} style={{ cursor: "pointer" }}>
               <FaArrowLeft />
               <span>Saisons</span>
             </div>
           </div>
         )}
-
+        {videoReady &&
+          openingTime != [0, 0] &&
+          videoRef.current.currentTime < openingTime[1] &&
+          videoRef.current.currentTime >= openingTime[0] &&(
+            <div className="skipOpening">
+              <div
+                onClick={(e) => {
+                  handleControlClick(e)
+                  goToPosition(openingTime[1])
+                }}
+                onDoubleClick={(e) => e.stopPropagation()}
+              >
+                Skip Opening
+              </div>
+            </div>
+          )}
         {!showControlVolume && videoReady && !showDataNext && !showReproductionList && (
           <div className="line-reproduction">
             <input
@@ -625,154 +654,251 @@ const handleClick = () => {
               value={progress}
               className="progress-bar"
               max={duration}
-              onClick={(e) => {handleControlClick(e)}}
-              onDoubleClick={(e) => e.stopPropagation()} 
+              onClick={(e) => {
+                handleControlClick(e)
+              }}
+              onDoubleClick={(e) => e.stopPropagation()}
               onChange={(e) => goToPosition(+e.target.value)}
               title=""
               style={{
-                '--progress': `${(progress * 100) / duration}%`,
-                '--primaryColor': primaryColor
+                "--progress": `${(progress * 100) / duration}%`,
+                "--primaryColor": primaryColor,
               }}
             />
             <span>{secondsToHms(duration - progress)}</span>
           </div>
         )}
 
-
-          <div className="controls-content">
-            <div className="start">
-              <div className="item-control" onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()}>
-                {!playing && videoReady && (
-                  <div className='IconSvg'><FaPlay onClick={() => play()} /></div>
-                )}
-                {playing && videoReady && (
-                  <div className='IconSvg'><FaPause onClick={() => play()} /></div>
-                )}
-              </div>
-
-              {videoReady && (<div className="item-control" onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()}>
-                <div className='IconSvg'><FaUndoAlt onClick={() => previousSeconds(5)} /></div>
-              </div>)}
-              {videoReady && (<div className="item-control" onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()}>
-                <div className='IconSvg'><FaRedoAlt onClick={() => nextSeconds(10)} /></div>
-              </div>)}
-
-              {!muted && (
-                <div 
-                  className="item-control" 
-                  onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()}
-                  onMouseLeave={() => setShowControlVolume(false)}
-                  style={{ '--primaryColor': primaryColor, '--percentVolume':  `${volume}%` }}
-                >
-                  {showControlVolume && (
-                    <div className="volume-controller">
-                      <div className="box-connector" />
-                      <div className="box">
-                        <input
-                          type="range"
-                          min={0}
-                          max={100}
-                          value={videoRef.current?.volume ? videoRef.current.volume * 100 : volume}
-                          onChange={(e) => setVolumeAction(Number(e.target.value))}
-                          title=""
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  <div 
-                    onMouseEnter={() => setShowControlVolume(true)} 
-                    onClick={() => setMuttedAction(true)} 
-                  >
-                    <div className='IconSvg'>{getVolumeIcon()}</div>
-                  </div>
+        <div className="controls-content">
+          <div className="start">
+            <div
+              className="item-control"
+              onClick={(e) => {
+                handleControlClick(e)
+              }}
+              onDoubleClick={(e) => e.stopPropagation()}
+            >
+              {!playing && videoReady && (
+                <div className="IconSvg">
+                  <FaPlay onClick={() => play()} />
                 </div>
               )}
-
-              {muted && (
-                <div className="item-control" onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()}>
-                    <div className='IconSvg'><FaVolumeMute onClick={() => setMuttedAction(false)} /></div>
+              {playing && videoReady && (
+                <div className="IconSvg">
+                  <FaPause onClick={() => play()} />
                 </div>
               )}
-              <div className="item-control info-video">
-                <span className="info-first">{titleMedia}</span>
-                <span className="info-secund">{extraInfoMedia}</span>
-              </div>
             </div>
 
-                <div className="end">
-                {onNextClick && dataNext?.title && (
-                    <div className="item-control" onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()}>
-                    <div 
-                        className="next-tooltip" 
-                        data-tooltip={dataNext?.title || "Épisode suivant"}
-                        onMouseEnter={() => setShowDataNext(true)}
-                        onMouseLeave={() => setShowDataNext(false)}
-                    >
-                        <div className='IconSvg'><FaStepForward onClick={onNextClick} /></div>
-                    </div>
-                    </div>
-                )}
-                <div className="item-control" onMouseLeave={() => setShowReproductionList(false)} onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()}>
-                {showReproductionList && (
-                  <div className='item-list-reproduction-box'>
+            {videoReady && (
+              <div
+                className="item-control"
+                onClick={(e) => {
+                  handleControlClick(e)
+                }}
+                onDoubleClick={(e) => e.stopPropagation()}
+              >
+                <div className="IconSvg">
+                  <FaUndoAlt onClick={() => previousSeconds(5)} />
+                </div>
+              </div>
+            )}
+            {videoReady && (
+              <div
+                className="item-control"
+                onClick={(e) => {
+                  handleControlClick(e)
+                }}
+                onDoubleClick={(e) => e.stopPropagation()}
+              >
+                <div className="IconSvg">
+                  <FaRedoAlt onClick={() => nextSeconds(10)} />
+                </div>
+              </div>
+            )}
+
+            {!muted && (
+              <div
+                className="item-control"
+                onClick={(e) => {
+                  handleControlClick(e)
+                }}
+                onDoubleClick={(e) => e.stopPropagation()}
+                onMouseLeave={() => setShowControlVolume(false)}
+                style={{ "--primaryColor": primaryColor, "--percentVolume": `${volume}%` }}
+              >
+                {showControlVolume && (
+                  <div className="volume-controller">
                     <div className="box-connector" />
-                    <div className="item-list-reproduction-container"  >
-                    <div>
-                        <div className="title">Playlist</div>
-                        <div ref={listReproduction} className="list-list-reproduction scroll-clean-player">
-                        {reprodutionList.map((item) => (
-                            <div
-                            key={item.id}
-                            className={`item-list-reproduction${item.playing ? ' selected' : ''}`}
-                            onClick={() =>
-                                onClickItemListReproduction && onClickItemListReproduction(item.id, item.playing)
-                            }
-                            >
-                            <div className="bold">
-                                {item.name}
-                            </div>
-                            {item.percent && <div className="percent" />}
-                            </div>
-                        ))}
-                        </div>
-                    </div>
+                    <div className="box">
+                      <input
+                        type="range"
+                        min={0}
+                        max={100}
+                        value={videoRef.current?.volume ? videoRef.current.volume * 100 : volume}
+                        onChange={(e) => setVolumeAction(Number(e.target.value))}
+                        title=""
+                      />
                     </div>
                   </div>
                 )}
-                {reprodutionList?.length > 1 && (
-                    <div className='IconSvg'><FaClone onMouseEnter={() => setShowReproductionList(true)} /></div>
-                )}
-                </div>
-              
-              {videoReady && (<div className="item-control" onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()}>
-                <div className='IconSvg'><MdPictureInPictureAlt onClick={togglePiP}/></div>
-              </div>)}
-              
-              {onDownloadClick && videoReady && (
-                <div className="item-control" onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()}>
-                  <div className='IconSvg'><FaDownload onClick={onDownloadClick}/></div>
-                </div>
-              )}
-              {settingsEnabled && (
-                <div className="item-control" onClick={(e) => {
-                  e?.stopPropagation(); 
-                  setShowSettingsMenu(!showSettingsMenu);
-                  videoRef.current.pause()
-                }}>
-                  <div className='IconSvg'><LuSlidersHorizontal /></div>
-                </div>
-              )}
 
-              <div className="item-control" onClick={(e) => {handleControlClick(e)}} onDoubleClick={(e) => e.stopPropagation()}>
-                {!fullScreen && <div className='IconSvg'><FaExpand onClick={enterFullScreen} /></div>}
-                {fullScreen && <div className='IconSvg'><FaCompress onClick={exitFullScreen} /></div>}
+                <div
+                  onMouseEnter={() => setShowControlVolume(true)}
+                  onClick={() => setMuttedAction(true)}
+                >
+                  <div className="IconSvg">{getVolumeIcon()}</div>
+                </div>
               </div>
+            )}
+
+            {muted && (
+              <div
+                className="item-control"
+                onClick={(e) => {
+                  handleControlClick(e)
+                }}
+                onDoubleClick={(e) => e.stopPropagation()}
+              >
+                <div className="IconSvg">
+                  <FaVolumeMute onClick={() => setMuttedAction(false)} />
+                </div>
+              </div>
+            )}
+            <div className="item-control info-video">
+              <span className="info-first">{titleMedia}</span>
+              <span className="info-secund">{extraInfoMedia}</span>
             </div>
           </div>
 
+          <div className="end">
+            {onNextClick && dataNext?.title && (
+              <div
+                className="item-control"
+                onClick={(e) => {
+                  handleControlClick(e)
+                }}
+                onDoubleClick={(e) => e.stopPropagation()}
+              >
+                <div
+                  className="next-tooltip"
+                  data-tooltip={dataNext?.title || "Épisode suivant"}
+                  onMouseEnter={() => setShowDataNext(true)}
+                  onMouseLeave={() => setShowDataNext(false)}
+                >
+                  <div className="IconSvg">
+                    <FaStepForward onClick={onNextClick} />
+                  </div>
+                </div>
+              </div>
+            )}
+            <div
+              className="item-control"
+              onMouseLeave={() => setShowReproductionList(false)}
+              onClick={(e) => {
+                handleControlClick(e)
+              }}
+              onDoubleClick={(e) => e.stopPropagation()}
+            >
+              {showReproductionList && (
+                <div className="item-list-reproduction-box">
+                  <div className="box-connector" />
+                  <div className="item-list-reproduction-container">
+                    <div>
+                      <div className="title">Playlist</div>
+                      <div
+                        ref={listReproduction}
+                        className="list-list-reproduction scroll-clean-player"
+                      >
+                        {reprodutionList.map((item) => (
+                          <div
+                            key={item.id}
+                            className={`item-list-reproduction${item.playing ? " selected" : ""}`}
+                            onClick={() =>
+                              onClickItemListReproduction &&
+                              onClickItemListReproduction(item.id, item.playing)
+                            }
+                          >
+                            <div className="bold">{item.name}</div>
+                            {item.percent && <div className="percent" />}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {reprodutionList?.length > 1 && (
+                <div className="IconSvg">
+                  <FaClone onMouseEnter={() => setShowReproductionList(true)} />
+                </div>
+              )}
+            </div>
+
+            {videoReady && (
+              <div
+                className="item-control"
+                onClick={(e) => {
+                  handleControlClick(e)
+                }}
+                onDoubleClick={(e) => e.stopPropagation()}
+              >
+                <div className="IconSvg">
+                  <MdPictureInPictureAlt onClick={togglePiP} />
+                </div>
+              </div>
+            )}
+
+            {onDownloadClick && videoReady && (
+              <div
+                className="item-control"
+                onClick={(e) => {
+                  handleControlClick(e)
+                }}
+                onDoubleClick={(e) => e.stopPropagation()}
+              >
+                <div className="IconSvg">
+                  <FaDownload onClick={onDownloadClick} />
+                </div>
+              </div>
+            )}
+            {settingsEnabled && (
+              <div
+                className="item-control"
+                onClick={(e) => {
+                  e?.stopPropagation()
+                  setShowSettingsMenu(!showSettingsMenu)
+                  videoRef.current.pause()
+                }}
+              >
+                <div className="IconSvg">
+                  <LuSlidersHorizontal />
+                </div>
+              </div>
+            )}
+
+            <div
+              className="item-control"
+              onClick={(e) => {
+                handleControlClick(e)
+              }}
+              onDoubleClick={(e) => e.stopPropagation()}
+            >
+              {!fullScreen && (
+                <div className="IconSvg">
+                  <FaExpand onClick={enterFullScreen} />
+                </div>
+              )}
+              {fullScreen && (
+                <div className="IconSvg">
+                  <FaCompress onClick={exitFullScreen} />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  );
+  )
 };
 

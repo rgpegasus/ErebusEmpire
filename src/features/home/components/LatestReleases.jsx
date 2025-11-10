@@ -17,7 +17,8 @@ const LatestReleases = ({
     try {
       setLoading(true)
       if (contentType == "anime") {
-        const { path, matchedEmbed, embedData, animeId, seasonId, seasonTitle } = await getRealEpisodeName(releases)
+        const { path, matchedEmbed, embedData, animeId, seasonId, seasonTitle } =
+          await getRealEpisodeName(releases)
         const episodes = { [releases.language]: embedData }
         if (path) {
           navigate(path, {
@@ -36,7 +37,8 @@ const LatestReleases = ({
           })
         }
       } else {
-        const { path, ChapterName, matchedEmbed, animeId, seasonId, seasonTitle } = await getRealChapterName(releases)
+        const { path, ChapterName, matchedEmbed, animeId, seasonId, seasonTitle } =
+          await getRealChapterName(releases)
         const scansImg = await window.electron.ipcRenderer.invoke(
           "get-scans-img",
           releases.url,
@@ -60,11 +62,10 @@ const LatestReleases = ({
           })
         }
       }
-
-      setLoading(false)
     } catch (err) {
-      setLoading(false)
       console.error("Erreur lors de la navigation :", err)
+    } finally {
+      setLoading(false)
     }
   }
 

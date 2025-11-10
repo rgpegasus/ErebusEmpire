@@ -1,14 +1,14 @@
-import { ipcMain } from 'electron';
+import { ipcMain } from "electron"
 
 function CatalogAnime(scraper) {
-  ipcMain.handle("get-all-anime", async (event, page = null)=> {
+  ipcMain.handle("get-all-anime", async (event, page = null) => {
     try {
-      return await scraper.getAllAnime(["vostfr", "vf"], ["Anime", "Film", "Autre", "Scans"], page);
-    } catch (error){
-      console.error('Erreur dans le main process:', error);
-      return null;
+      return await scraper.getAllAnime(["vostfr", "vf"], ["Anime", "Film", "Autre", "Scans"], page)
+    } catch (error) {
+      console.error("Erreur dans le main process:", error)
+      return null
     }
-  });
+  })
 }
 
-export { CatalogAnime };
+export { CatalogAnime }

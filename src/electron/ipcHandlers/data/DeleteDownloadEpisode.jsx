@@ -23,23 +23,19 @@ function DeleteDownloadEpisode() {
             delete data.season[seasonName];
           }
           await fs.promises.writeFile(dataJsonPath, JSON.stringify(data, null, 2), 'utf-8');
-          console.log(`Mise à jour de animeData.json : ${episodeName} supprimé`);
         }
       }
 
       const seasonFiles = await fs.promises.readdir(seasonDir);
       if (seasonFiles.length === 0) {
         await fs.promises.rmdir(seasonDir);
-        console.log(`Dossier saison supprimé: ${seasonDir}`);
 
         const animeFiles = await fs.promises.readdir(animeDir);
         if (animeFiles.length === 2 && animeFiles.includes('cover.jpg') && animeFiles.includes('animeData.json')) {
           for (const file of animeFiles) {
             await fs.promises.unlink(path.join(animeDir, file));
-            console.log(`Fichier supprimé: ${file}`);
           }
           await fs.promises.rmdir(animeDir);
-          console.log(`Dossier anime supprimé: ${animeDir}`);
         }
       }
 

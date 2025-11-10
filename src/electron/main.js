@@ -147,7 +147,6 @@ function createWindow(route = '/') {
     try {
       if (fs.existsSync(sessionStorage)) {
         fsExtra.removeSync(sessionStorage);
-        console.log('Session supprimée après fermeture de la fenêtre');
       }
     } catch (error) {
       console.error('Erreur suppression sessionStorage :', error);

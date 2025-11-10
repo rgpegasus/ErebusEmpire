@@ -8,28 +8,22 @@ import WatchHistory from "./components/WatchHistory"
 export const Home = () => {
   const [coverInfo, setCoverInfo] = useState(null)
   const [latestReleases, setLatestReleases] = useState([])
-  const [dataLoaded, setDataLoaded] = useState(false)
   const { setLoading } = useLoader()
   const [contentType, setContentType] = useState("anime")
   const [availableContentTypes, setAvailableContentTypes] = useState({
     hasAnime: false,
-    hasManga: false, 
+    hasManga: false,
   })
   const [latestEpisodes, setLatestEpisodes] = useState([])
   const [latestScans, setLatestScans] = useState([])
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
-      try {
-        let animeData = await animeCover.load()
 
+      try {
+        let animeData = null
         if (!animeData) {
-          const tempData = await window.electron.ipcRenderer.invoke("random-anime")
-          const tempInfo = await window.electron.ipcRenderer.invoke("info-anime", tempData.url)
-          const animeInfo = {
-            ...tempInfo,
-            url: tempData.url,
-          }
+          const animeInfo = await window.electron.ipcRenderer.invoke("random-anime")
           animeCover.save(animeInfo)
           setCoverInfo(animeInfo)
         } else {
@@ -38,6 +32,7 @@ export const Home = () => {
 
         const episodes = await window.electron.ipcRenderer.invoke("get-latest-episode")
         const scans = await window.electron.ipcRenderer.invoke("get-latest-scans")
+
         setLatestReleases(episodes)
         setLatestEpisodes(episodes)
         setLatestScans(scans)
@@ -49,21 +44,19 @@ export const Home = () => {
         console.error("Erreur lors du chargement:", err)
       } finally {
         setLoading(false)
-        setDataLoaded(true)
       }
     }
-    if (!dataLoaded) {
-      fetchData()
-    }
-  }, [dataLoaded])
+
+    fetchData()
+  }, []) 
 
   const handleContentTypeChange = (newType) => {
-    setContentType(newType)    
-      if (newType === "anime") {   
-        setLatestReleases(latestEpisodes)
-      } else {
-        setLatestReleases(latestScans)
-      }
+    setContentType(newType)
+    if (newType === "anime") {
+      setLatestReleases(latestEpisodes)
+    } else {
+      setLatestReleases(latestScans)
+    }
   }
   return (
     <div className="MainPage">

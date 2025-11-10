@@ -10,7 +10,6 @@ async function getRealEpisodeName (episodeInfo) {
       animeUrl = "https://anime-sama.org"+animeUrl
     }  
     const animeId = animeUrl.split("/").slice(4, 5).join("/");
-    console.log(animeUrl)
     try {
       const { animeInfo, episodes } = await window.electron.ipcRenderer.invoke(
         "get-episodes",
