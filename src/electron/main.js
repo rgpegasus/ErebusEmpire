@@ -3,13 +3,17 @@ import { join } from 'path';
 import path from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import { ErebusIcon } from '@utils/dispatchers/Pictures';
-import {AnimeScraper} from 'better-ani-scraped';
+import { AnimeScraper } from 'better-ani-scraped';
+// import { AnimeScraper } from "../../../../BOT/better-ani-scraped/index.js"
 import fsExtra from 'fs-extra'; 
 import fs from 'fs';
 import { Client } from '@xhayper/discord-rpc';
 const clientId = '1366193765701783604';
 const rpc = new Client({ transport: { type: 'ipc' }, clientId });
 const scraper = new AnimeScraper("animesama");
+
+
+
 import {
   SearchAnime,
   RandomAnime,
@@ -28,6 +32,7 @@ import {
   AvailableLanguages,
   ScansChapter,
   ScansImg,
+  WorkingUrl,
 } from "@utils/dispatchers/IpcHandler" 
 import { AnimeCoverTemp, AnimeData } from '@utils/dispatchers/ServicesData'
 import { spawn } from 'child_process';
@@ -45,7 +50,6 @@ function launchBackgroundScript() {
 }
 
 launchBackgroundScript();
-
 const sessionStorage = join(app.getPath('appData'), 'Erebus Empire', 'userData', 'sessionStorage');
 
 let startTimestamp = null;
@@ -103,7 +107,7 @@ function createWindow(route = '/') {
       webSecurity: false,
       preload: join(__dirname, "../preload/preload.js"),
       sandbox: false,
-      nodeIntegration: true, // ← Active l’accès à require, __dirname, etc.
+      nodeIntegration: true,
       contextIsolation: false,
     },
   })
@@ -190,85 +194,88 @@ if (!gotTheLock) {
       mainWindow.focus();
     }
   });
-  app.whenReady().then(() => {
+  app.whenReady().then(async  () => {
     session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
       details.requestHeaders["Referer"] = "https://vidmoly.net/"
       details.requestHeaders["Origin"] = "https://vidmoly.net"
       callback({ requestHeaders: details.requestHeaders })
     })
-    electronApp.setAppUserModelId('com.erebus-empire.app');
-    app.on('browser-window-created', (_, window) => {
-      optimizer.watchWindowShortcuts(window);
-    });
-    const route = deeplinkingUrl
-      ? deeplinkingUrl.replace('erebusempire://', '')
-      : '/';
-    createWindow(route);
+    electronApp.setAppUserModelId("com.erebus-empire.app")
+    app.on("browser-window-created", (_, window) => {
+      optimizer.watchWindowShortcuts(window)
+    })
+    const route = deeplinkingUrl ? deeplinkingUrl.replace("erebusempire://", "") : "/"
+    createWindow(route)
 
-    ipcMain.on('update-rich-presence', (event, { anime, episode, cover, startTimestamp, endTimestamp}) => {
-      if (!rpc || !rpc.user || typeof rpc.user.setActivity !== 'function') {
-        console.warn('Rich Presence non prêt : rpc ou rpc.user non défini');
-        return;
-      }
-      rpc.user.setActivity({
-        details: `Regarde ${anime}`,
-        state: `${episode}`,
-        startTimestamp: startTimestamp ? new Date(startTimestamp) : new Date(),
-        endTimestamp: endTimestamp ? new Date(endTimestamp) : undefined,
-        largeImageKey: `${cover}`,
-        largeImageText: `${anime}`,
-        instance: false,
-        type:3,
-        buttons: [
-          { label: "Discord", url: "https://discord.gg/Mj9cYRQTcU" },
-          { label: "Installer", url: "https://github.com/rgpegasus/ErebusEmpire/releases/latest" }
-        ],
-      });
-    });
+    ipcMain.on(
+      "update-rich-presence",
+      (event, { anime, episode, cover, startTimestamp, endTimestamp }) => {
+        if (!rpc || !rpc.user || typeof rpc.user.setActivity !== "function") {
+          console.warn("Rich Presence non prêt : rpc ou rpc.user non défini")
+          return
+        }
+        rpc.user.setActivity({
+          details: `Regarde ${anime}`,
+          state: `${episode}`,
+          startTimestamp: startTimestamp ? new Date(startTimestamp) : new Date(),
+          endTimestamp: endTimestamp ? new Date(endTimestamp) : undefined,
+          largeImageKey: `${cover}`,
+          largeImageText: `${anime}`,
+          instance: false,
+          type: 3,
+          buttons: [
+            { label: "Discord", url: "https://discord.gg/Mj9cYRQTcU" },
+            {
+              label: "Installer",
+              url: "https://github.com/rgpegasus/ErebusEmpire/releases/latest",
+            },
+          ],
+        })
+      },
+    )
 
-    ipcMain.on('defaul-rich-presence', () => {
-      if (!rpc) return;
-      if (!startTimestamp) startTimestamp = new Date();
-      setActivity();
-    });
-
-    SearchAnime(scraper);
-    RandomAnime(scraper);
-    InfoAnime(scraper);
-    SeasonsAnime(scraper);
-    EpisodesSeason(scraper);
-    UrlEpisode();
-    LatestEpisodes(scraper);
+    ipcMain.on("defaul-rich-presence", () => {
+      if (!rpc) return
+      if (!startTimestamp) startTimestamp = new Date()
+      setActivity()
+    })
+    SearchAnime(scraper)
+    RandomAnime(scraper)
+    InfoAnime(scraper)
+    SeasonsAnime(scraper)
+    EpisodesSeason(scraper)
+    UrlEpisode()
+    LatestEpisodes(scraper)
     LatestScans(scraper)
-    CatalogAnime(scraper);
-    AvailableLanguages(scraper);
-    ScansChapter(scraper);
-    ScansImg(scraper);
-    AnimeData();
-    DownloadEpisode();
-    DownloadList();
-    DeleteDownloadEpisode();
-    ExportData();
-    ImportData();
-    AnimeCoverTemp();
-    
+    CatalogAnime(scraper)
+    AvailableLanguages(scraper)
+    ScansChapter(scraper)
+    ScansImg(scraper)
+    WorkingUrl(scraper)
+    AnimeData()
+    DownloadEpisode()
+    DownloadList()
+    DeleteDownloadEpisode()
+    ExportData()
+    ImportData()
+    AnimeCoverTemp()
 
-    ipcMain.on('open-devtools', () => {
+    ipcMain.on("open-devtools", () => {
       if (mainWindow && !mainWindow.webContents.isDevToolsOpened()) {
-        mainWindow.webContents.openDevTools({ mode: 'detach' });
+        mainWindow.webContents.openDevTools({ mode: "detach" })
       }
-    });
+    })
 
-    ipcMain.on('close-devtools', () => {
+    ipcMain.on("close-devtools", () => {
       if (mainWindow && mainWindow.webContents.isDevToolsOpened()) {
-        mainWindow.webContents.closeDevTools();
+        mainWindow.webContents.closeDevTools()
       }
-    });
+    })
 
-    app.on('activate', () => {
-      if (BrowserWindow.getAllWindows().length === 0) createWindow();
-    });
-  });
+    app.on("activate", () => {
+      if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    })
+  })
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
       app.quit();

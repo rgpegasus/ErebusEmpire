@@ -43,38 +43,45 @@ const importData = async () => {
    
     const navigate = useNavigate();
   return (
-    <div className='MainPage'>
-        <div  onClick={() =>navigate("/erebus-empire/settings")}><ChevronLeftCircle size={30} className='BackButton'/></div>
-        <h1 className='CategorieTitle'>Profil :</h1>
-        <div className='SettingsPage'>
-            <div className='SettingsGroupe'>
-                <div className="setting-item">
-                    <h2 className="setting-label">Données</h2>
-                    <div className="buttons-wrapper">
-                        <button className="data-button" onClick={exportData}>
-                            <Upload size={16} />
-                            Exporter
-                        </button>
-                        <button className="data-button" onClick={importData}>
-                            <Download size={16} />
-                            Importer
-                        </button>
-                    </div>
-                </div>
+    <div className="MainPage">
+      <div className="Space"></div>
+      <div className="Space"></div>
+      <div className="Space"></div>
+      <div className="Space"></div>
+      <div className="Space"></div>
+      <h1 className="CategorieTitle">Profil :</h1>
+      <div className="SettingsPage">
+        <div className="SettingsGroupe">
+          <div className="setting-item">
+            <h2 className="setting-label">Données</h2>
+            <div className="buttons-wrapper">
+              <button className="data-button" onClick={exportData}>
+                <Upload size={16} />
+                Exporter
+              </button>
+              <button className="data-button" onClick={importData}>
+                <Download size={16} />
+                Importer
+              </button>
+            </div>
+          </div>
 
-                {isDevVisible && (<div className="setting-item">
-                    <h2 className="setting-label">Mode Dev</h2>
-                    <label className="switch">
-                      <input type="checkbox" checked={isDev} onChange={toggleDev} />
-                      <span className="slider">
-                        <span className="icon">{isDev ? <Bug size={14} /> : <ShieldOff size={14} />}</span>
-                      </span>
-                    </label>
-                </div>)}
-            </div> 
+          {isDevVisible && (
+            <div className="setting-item">
+              <h2 className="setting-label">Mode Dev</h2>
+              <label className="switch">
+                <input type="checkbox" checked={isDev} onChange={toggleDev} />
+                <span className="slider">
+                  <span className="icon">
+                    {isDev ? <Bug size={14} /> : <ShieldOff size={14} />}
+                  </span>
+                </span>
+              </label>
+            </div>
+          )}
         </div>
-        
+      </div>
     </div>
-  );
+  )
 };
 

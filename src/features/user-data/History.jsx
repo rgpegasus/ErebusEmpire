@@ -5,5 +5,6 @@ export const History = () => (
     storageKey="animeWatchHistory"
     title="Animés en Cours :"
     sort={true}
+    customType="~en Cours"
   />
-);
+)

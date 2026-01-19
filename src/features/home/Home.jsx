@@ -4,6 +4,7 @@ import { useLoader } from "@utils/dispatchers/Page"
 import BackgroundCover from "@components/background-cover/BackgroundCover"
 import LatestReleases from "./components/LatestReleases"
 import WatchHistory from "./components/WatchHistory"
+import { toSlug } from "@utils/functions/toSlug"
 
 export const Home = () => {
   const [coverInfo, setCoverInfo] = useState(null)
@@ -16,6 +17,13 @@ export const Home = () => {
   })
   const [latestEpisodes, setLatestEpisodes] = useState([])
   const [latestScans, setLatestScans] = useState([])
+  function isValidUrl(url) {
+    try {
+      return fetch(url, { method: "HEAD" }).then((res) => res.ok)
+    } catch {
+      return false
+    }
+  }
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
@@ -31,14 +39,27 @@ export const Home = () => {
         }
 
         const episodes = await window.electron.ipcRenderer.invoke("get-latest-episode")
+        const filteredEpisodes = []
+        for (let episode of episodes) {
+          const validUrl = await isValidUrl(episode.url)
+          if (validUrl) {
+            filteredEpisodes.push(episode)
+          }
+        }
         const scans = await window.electron.ipcRenderer.invoke("get-latest-scans")
-
-        setLatestReleases(episodes)
-        setLatestEpisodes(episodes)
-        setLatestScans(scans)
+        const filteredScans = []
+        for (let scan of scans) {
+          const validUrl = await isValidUrl(scan.url)
+          if (validUrl) {
+            filteredScans.push(scan)
+          }
+        }
+        setLatestReleases(filteredEpisodes)
+        setLatestEpisodes(filteredEpisodes)
+        setLatestScans(filteredScans)
         setAvailableContentTypes({
-          hasAnime: episodes.length > 0,
-          hasManga: scans.length > 0,
+          hasAnime: filteredEpisodes.length > 0,
+          hasManga: filteredScans.length > 0,
         })
       } catch (err) {
         console.error("Erreur lors du chargement:", err)

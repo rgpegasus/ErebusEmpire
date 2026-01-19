@@ -149,7 +149,7 @@ const handleChange = (e) => {
           <div style={{ WebkitAppRegion: 'no-drag' }} className={styles.ContainerButton} onClick={() => navigate('/erebus-empire/downloads')}>
             <DownloadIcon className={styles.Button} />
           </div>
-          <div style={{ WebkitAppRegion: 'no-drag' }} className={styles.ContainerButton} onClick={() => navigate('/erebus-empire/catalogue')}>
+          <div style={{ WebkitAppRegion: 'no-drag' }} className={styles.ContainerButton} onClick={() => navigate('/erebus-empire/catalog')}>
             <CatalogIcon className={styles.Button} />
           </div>
         </div>

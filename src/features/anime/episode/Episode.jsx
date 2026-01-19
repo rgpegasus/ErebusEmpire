@@ -19,9 +19,8 @@ export const Episode = () => {
     seasonUrl = "",
     availableLanguages = null,
     selectedLanguage = "",
-    scans = "",
+    scans = [],
   } = location.state || {}
-
   const [currentEpisodeTitle, setCurrentEpisodeTitle] = useState(location.state?.episodeTitle || "")
   const [currentEpisodes, setCurrentEpisodes] = useState(location.state?.episodes || null)
   const [currentSeasonUrl, setCurrentSeasonUrl] = useState(location.state?.seasonUrl || "")
@@ -30,6 +29,9 @@ export const Episode = () => {
   )
   const [currentSelectedLanguage, setCurrentSelectedLanguage] = useState(
     location.state?.selectedLanguage || "",
+  )
+  const [imgScans, setImgScans] = useState(
+    location.state?.scans || [],
   )
   const [currentSeasonTitle, setCurrentSeasonTitle] = useState(location.state?.seasonTitle || "")
   const [animeInfo, setAnimeInfo] = useState({})
@@ -88,28 +90,53 @@ export const Episode = () => {
     const fetchMissingData = async () => {
       try {
         setLoading(true)
-
+        const BASE_URL = await window.electron.ipcRenderer.invoke("get-working-url")
         if (!animeTitle || !animeCover) {
           const info = await window.electron.ipcRenderer.invoke(
             "info-anime",
-            `https://anime-sama.org/catalogue/${animeId}/`,
+            `${BASE_URL}/catalogue/${animeId}/`,
           )
           if (info) setAnimeInfo(info)
         }
         if (!seasonTitle) {
           const result = await window.electron.ipcRenderer.invoke(
             "get-seasons",
-            `https://anime-sama.org/catalogue/${animeId}/`,
+            `${BASE_URL}/catalogue/${animeId}/`,
           )
+          
           const currentSeason = result.seasons.find((s) => s.url.split("/")[5] === seasonId)
           setCurrentSeasonTitle(currentSeason.title)
+          if (currentSeason.title.toLowerCase().includes("scan")) {
+            const language = currentSeason.title.split("/").slice(6, 7).join("/")
+            setCurrentAvailableLanguages([language])
+            setCurrentSelectedLanguage(language)
+            setCurrentSeasonUrl(currentSeason.url)
+            const scansLinks = await window.electron.ipcRenderer.invoke(
+              "get-scans-chapter",
+              currentSeason.url,
+            )
+            const currentEpisode = Object.entries(scansLinks).find(
+              ([_, e]) =>
+                e.title?.toLowerCase().replace(/\s+/g, "-") ===
+                location.pathname.split("/").slice(4, 5).join("/"),
+            )[0]
+            console.log(currentSeason.url, currentEpisode)
+            setCurrentEpisodeTitle(currentEpisode)
+            const scansImg = await window.electron.ipcRenderer.invoke(
+              "get-scans-img",
+              currentSeason.url,
+              currentEpisode,
+            )
+            setImgScans(scansImg)
+            return  
+          }
         }
         let chosenLang = currentSelectedLanguage
 
         if (!currentAvailableLanguages) {
           const langs = await window.electron.ipcRenderer.invoke(
             "get-available-languages",
-            `https://anime-sama.org/catalogue/${animeId}/${seasonId}/`,
+            `${BASE_URL}/catalogue/${animeId}/${seasonId}/`,
           )
           const normalizedLangs = (langs || []).map((lang) => String(lang).toLowerCase())
           setCurrentAvailableLanguages(normalizedLangs)
@@ -124,12 +151,10 @@ export const Episode = () => {
           if (langToUse) {
             const eps = await window.electron.ipcRenderer.invoke(
               "get-episodes",
-              `https://anime-sama.org/catalogue/${animeId}/${seasonId}/${langToUse}`,
+              `${BASE_URL}/catalogue/${animeId}/${seasonId}/${langToUse}`,
               true,
             )
-            setCurrentSeasonUrl(
-              `https://anime-sama.org/catalogue/${animeId}/${seasonId}/${langToUse}`,
-            )
+            setCurrentSeasonUrl(`${BASE_URL}/catalogue/${animeId}/${seasonId}/${langToUse}`)
             const newEpisodes = { [langToUse]: eps || [] }
 
             if (!currentEpisodeTitle && urlEpisodeId && newEpisodes[langToUse]) {
@@ -138,7 +163,6 @@ export const Episode = () => {
               )
               if (ep) setCurrentEpisodeTitle(ep.title)
             }
-
             setCurrentEpisodes(newEpisodes)
           }
         }
@@ -149,7 +173,11 @@ export const Episode = () => {
       }
     }
 
-    if (!currentEpisodes || !currentAvailableLanguages || !currentEpisodeTitle) {
+    if (
+      (!currentEpisodes && !imgScans.length) ||
+      !currentAvailableLanguages ||
+      !currentEpisodeTitle
+    ) {
       fetchMissingData()
     }
   }, [
@@ -160,13 +188,16 @@ export const Episode = () => {
     currentAvailableLanguages,
     currentSelectedLanguage,
   ])
+  
+  const episodeIndex = currentEpisodes?.[currentSelectedLanguage]?.title?.findIndex((ep) => {
+    const normalizedEp = ep?.toLowerCase().replace(/\s+/g, "-")
+    const normalizedCurrent = currentEpisodeTitle?.toLowerCase().replace(/\s+/g, "-")
 
-  const episodeIndex = currentEpisodes?.[currentSelectedLanguage]?.findIndex(
-    (ep) =>
-      ep.title?.toLowerCase().replace(/\s+/g, "-") ===
-      currentEpisodeTitle?.toLowerCase()?.replace(/\s+/g, "-"),
-  )
-
+    return normalizedEp === normalizedCurrent
+  })
+  
+  
+      
   useEffect(() => {
     if (!currentEpisodes || !currentAvailableLanguages) return
 
@@ -196,10 +227,11 @@ export const Episode = () => {
     if (urlEpisodeId) {
       const langToCheck =
         currentSelectedLanguage || (currentAvailableLanguages && currentAvailableLanguages[0])
-      if (langToCheck && currentEpisodes?.[langToCheck]) {
-        const found = currentEpisodes[langToCheck].find(
-          (e) => e.title?.toLowerCase().replace(/\s+/g, "-") === urlEpisodeId,
-        )
+      if (langToCheck && currentEpisodes) {
+        let found;
+        if ( currentEpisodes.title?.toLowerCase().replace(/\s+/g, "-") === urlEpisodeId ) {
+          found = currentEpisodes
+        }
         if (found && found.title !== currentEpisodeTitle) {
           setCurrentEpisodeTitle(found.title)
           return
@@ -260,14 +292,7 @@ export const Episode = () => {
       window.electron.ipcRenderer.send("defaul-rich-presence")
     }
   }, [])
-  async function testSource(url) {
-    try {
-      const res = await fetch(url, { method: "HEAD" })
-      return res.ok
-    } catch {
-      return false
-    }
-  }
+
 
 
   useEffect(() => {
@@ -286,13 +311,15 @@ export const Episode = () => {
           const realUrl = await window.electron.ipcRenderer.invoke("get-url", urls[i], hosts[i])
           if (cancelled) return
         
-          if (hosts[i] === "vidmoly") {
+          if (hosts[i] === "vidmoly" && realUrl!=null) {
+            
             resolvedUrls.push(realUrl.videoUrl)
             setOpeningTime(realUrl.openingTime)
           } else {
             resolvedUrls.push(realUrl)
           }
         }
+        
 
         const filteredSources = []
         for (let i = 0; i < resolvedUrls.length; i++) {
@@ -371,9 +398,6 @@ export const Episode = () => {
       setRestored(true)
     })
   }, [storageKey])
-
-  // Remplacer votre useEffect problématique par ceci :
-
   useEffect(() => {
     if (!restored || !storageKey) return
 
@@ -405,53 +429,55 @@ export const Episode = () => {
       const seasonKeys = allKeys.filter((key) =>
         key.startsWith(`/erebus-empire/${animeId}/${seasonId}/`),
       )
-      const deletePromises = seasonKeys.map((key) => animeData.delete("animeWatchHistory", key))
-      await Promise.all(deletePromises)
+      const keysToDelete = seasonKeys.filter((key) => key !== storageKey)
+      await Promise.all(keysToDelete.map((key) => animeData.delete("animeWatchHistory", key)))
     } catch (err) {
-      console.error("Erreur lors de la suppression des entrées de saison :", err)
+      console.error("Erreur lors du nettoyage de l'historique :", err)
     }
   }
+  
+  
 
   useEffect(() => {
     skipFinalSaveRef.current = false
   }, [storageKey])
 
-  const EndEpisodeNext = (episode) => {
+  const EndEpisodeNext = async (episode) => {
     if (!episode) return
+    await clearSeasonHistory()
+    await animeData.save("animeWatchHistory", storageKey, buildWatchData())
+
     skipFinalSaveRef.current = true
     clearInterval(intervalRef.current)
 
     const nextId = `${episode.title.toLowerCase().replace(/\s+/g, "-")}`
-
     setCurrentEpisodeTitle(episode.title)
     setResolvedSources([])
     setEpisodeUrl(undefined)
     setEpisodeSources(episode)
 
     navigate(`/erebus-empire/${animeId}/${seasonId}/${nextId}`, {
-      state: {
-        ...location.state,
-        episodeTitle: episode.title,
-      },
+      state: { ...location.state, episodeTitle: episode.title },
     })
   }
+  
 
-  const handleNavigation = (episode) => {
+  const handleNavigation = async (episode) => {
     if (!episode) return
-    const navId = `${episode.title.toLowerCase().replace(/\s+/g, "-")}`
 
+    await clearSeasonHistory()
+    await animeData.save("animeWatchHistory", storageKey, buildWatchData())
+
+    const navId = `${episode.title.toLowerCase().replace(/\s+/g, "-")}`
     setCurrentEpisodeTitle(episode.title)
     setResolvedSources([])
     setEpisodeUrl(undefined)
     setEpisodeSources(episode)
 
     navigate(`/erebus-empire/${animeId}/${seasonId}/${navId}`, {
-      state: {
-        ...location.state,
-        episodeTitle: episode.title,
-      },
+      state: { ...location.state, episodeTitle: episode.title },
     })
-  }
+  }  
 
   const BackMenu = () => navigate("/erebus-empire/home")
   const BackSeason = () => navigate(`/erebus-empire/${animeId}/${seasonId}`)
@@ -500,7 +526,7 @@ export const Episode = () => {
         <div onClick={() => nextChapter && handleChapterNavigation(nextChapter)}>Suivant</div>
         <div className="ScansPage" ref={zoomRef}>
           <div className="ScansContainer" ref={containerRef}>
-            {scans.map((img, idx) => (
+            {imgScans.map((img, idx) => (
               <img key={idx} className="ImgScans" src={img} alt={`scan-${idx}`} />
             ))}
           </div>

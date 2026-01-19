@@ -2,7 +2,7 @@ import { ipcMain } from "electron"
 import { getVideoUrlFromEmbed } from "better-ani-scraped"
 
 const chromePath =
-  "C:\\Users\\gabin\\Desktop\\CODE\\ANIME_SAMA\\ELECTRON\\ErebusEmpire\\puppeteer\\chrome\\win64-135.0.7049.95\\chrome-win64\\chrome.exe"
+  "C:\\Users\\gabin\\Desktop\\CODE\\EREBUS_EMPIRE\\APP\\ErebusEmpire\\puppeteer\\chrome\\win64-135.0.7049.95\\chrome-win64\\chrome.exe"
 
 
 function UrlEpisode() {

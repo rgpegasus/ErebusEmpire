@@ -62,31 +62,31 @@ const App = () => {
           {/* <LoginPage/> */}
           <Logger />
           <Theme visible={showTheme} onClose={closeTheme} />
-          <DeepLinkHandler /> 
-          <div> 
-            <TopBar /> 
+          <DeepLinkHandler />
+          <div>
+            <TopBar />
             <Routes>
               <Route path="/" element={<Navigate to="/erebus-empire/home" replace />} />
-              <Route path="/erebus-empire/home" element={<Home/>} />
-              <Route path="/erebus-empire/catalogue" element={<Catalog/>} />
-              <Route path="/erebus-empire/downloads" element={<Download/>} />
+              <Route path="/erebus-empire/home" element={<Home />} />
+              <Route path="/erebus-empire/catalog" element={<Catalog />} />
+              <Route path="/erebus-empire/downloads" element={<Download />} />
+              <Route path="/erebus-empire/:animeId/:seasonId?" element={<Season />} />
+              <Route path="/erebus-empire/:animeId/:seasonId/:episodeId" element={<Episode />} />
               <Route path="/erebus-empire/settings" element={<Settings openTheme={openTheme} />} />
-              <Route path="/erebus-empire/settings/profile" element={<Profile/>} />
-              <Route path="/erebus-empire/switchAccount" element={<SwitchAccount/>} />
-              <Route path="/erebus-empire/favorites" element={<Favorites/>} />
-              <Route path="/erebus-empire/watchlist" element={<Watchlist/>} />
-              <Route path="/erebus-empire/history" element={<History/>} />
-              <Route path="/erebus-empire/onHold" element={<OnHold/>} /> 
-              <Route path="/erebus-empire/alreadySeen" element={<AlreadySeen/>} />
-              <Route path="/erebus-empire/:animeId/:seasonId?" element={<Season/>} />
-              <Route path="/erebus-empire/:animeId/:seasonId/:episodeId" element={<Episode/>} />
+              <Route path="/erebus-empire/settings/profile" element={<Profile />} />
+              <Route path="/erebus-empire/switchAccount" element={<SwitchAccount />} />
+              <Route path="/erebus-empire/favorites" element={<Favorites />} />
+              <Route path="/erebus-empire/watchlist" element={<Watchlist />} />
+              <Route path="/erebus-empire/history" element={<History />} />
+              <Route path="/erebus-empire/onHold" element={<OnHold />} />
+              <Route path="/erebus-empire/alreadySeen" element={<AlreadySeen />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
         </Router>
-      </UserProvider> 
-    </LoaderProvider> 
-  );
+      </UserProvider>
+    </LoaderProvider>
+  )
 }
 
 export default App;

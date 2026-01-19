@@ -4,5 +4,6 @@ export const Favorites = () => (
   <AnimeLibrary
     storageKey="animeFavorites"
     title="Animés Favoris :"
+    customType="Favori"
   />
 );

@@ -4,5 +4,6 @@ export const Watchlist = () => (
   <AnimeLibrary
     storageKey="animeWatchlist"
     title="Animés à Regarder :"
+    customType="~à Regarder"
   />
 );

@@ -10,7 +10,21 @@ import ContentsCarousel from '@components/contents-carousel/ContentsCarousel';
 export const Season = () => {
   const { animeId, seasonId } = useParams();
   const navigate = useNavigate(); 
-  const animeUrl = `https://anime-sama.org/catalogue/${animeId}`;
+  const [animeUrl, setBaseUrl] = useState(null)
+
+  useEffect(() => {
+    const fetchBaseUrl = async () => {
+      try {
+        const url = await window.electron.ipcRenderer.invoke("get-working-url");
+        setBaseUrl(`${url}/catalogue/${animeId}`)
+      } catch (err) {
+        console.error("Erreur récupération embed:", err)
+      }
+    }
+    fetchBaseUrl()
+  }, [])
+  
+
   const [animeInfo, setAnimeInfo] = useState(null);
   const [coverInfo, setCoverInfo] = useState(null);
   const [seasons, setSeasons] = useState([]);
@@ -39,6 +53,7 @@ export const Season = () => {
   }, [emblaApi, selectedSeason, seasons]);
 
   useEffect(() => {
+    if (!animeUrl) return;
     const fetchAnimeInfo = async () => {
       try {
         setLoading(true); 
@@ -57,6 +72,7 @@ export const Season = () => {
   }, [animeUrl]);
 
   useEffect(() => {
+    if (!animeUrl) return
     const fetchSeasons = async () => {
       try {
         setLoading(true);
@@ -183,7 +199,8 @@ export const Season = () => {
         setAvailableLanguages([language])
         setSelectedLanguage(language)
         const episodeLinks = await window.electron.ipcRenderer.invoke('get-scans-chapter', selectedSeason);
-        setEpisodes(episodeLinks.map(link => ({ title: link })));
+        setEpisodes(Object.entries(episodeLinks).map(([key, ep]) => ({id: key, title: ep.title})))              
+        
       } catch (error) {
         console.error("Erreur lors de la récupération des scans :", error);
       } finally {
@@ -284,7 +301,7 @@ export const Season = () => {
       }
     } else if (contentType === "manga") {
       try {
-        const scansImg = await window.electron.ipcRenderer.invoke('get-scans-img', selectedSeason, episode.title);
+        const scansImg = await window.electron.ipcRenderer.invoke('get-scans-img', selectedSeason, episode.id);
         navigate(path, {
           state: {
             episodeTitle: episode.title,

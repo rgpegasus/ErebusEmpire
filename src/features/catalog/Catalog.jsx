@@ -68,12 +68,8 @@ export const Catalog = () => {
   };
 
   return (
-    <div className='MainPage'>
-      <BackgroundCover 
-        coverInfo = {LoginPageBackground}
-        whileWatching = {false}
-        isAnime = {false}
-      />
+    <div className="MainPage">
+      <BackgroundCover coverInfo={LoginPageBackground} whileWatching={false} isAnime={false} />
       <div className={styles.Container}>
         <ContentsCarousel
           data={animeList}
@@ -83,14 +79,27 @@ export const Catalog = () => {
           getAnimeTitle={(anime) => anime.title}
           enableShiftDelete={true}
           isSeason={true}
-          searchBy={"title"}
+          searchBy={setSearchParams}
           onDeleteEpisode={(anime) => deleteAnime(anime)}
+          customType={`~~Page ${page}`}
         />
         <div className={styles.NavigationContainer}>
-          <button className={styles.NavigationButton} onClick={() => handlePageChange(-1)} disabled={page <= 1}>Précédent</button>
-          <button className={styles.NavigationButton} onClick={() => handlePageChange(1)} disabled={!hasNext}>Suivant</button>
+          <button
+            className={styles.NavigationButton}
+            onClick={() => handlePageChange(-1)}
+            disabled={page <= 1}
+          >
+            Précédent
+          </button>
+          <button
+            className={styles.NavigationButton}
+            onClick={() => handlePageChange(1)}
+            disabled={!hasNext}
+          >
+            Suivant
+          </button>
         </div>
       </div>
     </div>
-  );
+  )
 };

@@ -12,26 +12,25 @@ async function getRealChapterName(chapterInfo) {
   if (!ChapterName || ChapterName.length === 0) return null
   const seasonId = chapterInfo.url.split("/").slice(5, 6).join("/")
   const chapterFakeName = sanitizeName(chapterInfo.chapter)
-  const chapterNumber = chapterFakeName.match(/chapitre(\d+)/i)[1] || null
-
+  const chapterNumber = chapterFakeName.match(/(?:chapitre|tome|volume)\s*(\d+)/i)[1] || null
   let matchedEmbed = null
-  matchedEmbed = ChapterName.find((e) => toSlug(e) === toSlug(chapterInfo.chapter))
-
-
+  
+  matchedEmbed = Object.values(ChapterName).find((e) => toSlug(e) === toSlug(chapterInfo.chapter))
   if (!matchedEmbed && chapterNumber) {
-    matchedEmbed = ChapterName.find((e) => {
-      return e.toLowerCase() === chapterNumber
-    })
+    matchedEmbed = Object.values(ChapterName).find((e) => {
+      const tempChapterNumber = e.title.toLowerCase().match(/(?:chapitre|tome|volume)\s*(\d+)/i)[1] || null
+      if (tempChapterNumber){
+        return tempChapterNumber === chapterNumber
+      }
+    }).title
   }
-
   if (!matchedEmbed && chapterNumber) {
-    matchedEmbed = ChapterName.find((e) => {
+    matchedEmbed = Object.values(ChapterName).find((e) => {
       const title = e.title.toLowerCase()
       const match = title.match(/chapitre?\s*(\d+)/i)
       return title.includes(typeToSearch) && match && match[2] === chapterNumber
     })
   }
-
   if (!matchedEmbed) {
     matchedEmbed = ChapterName.find(
       (e) =>
@@ -39,13 +38,14 @@ async function getRealChapterName(chapterInfo) {
         toSlug(chapterInfo.title).includes(toSlug(e.title)),
     )
   }
-
   if (!matchedEmbed) {
     matchedEmbed = ChapterName[0]
   }
+  console.log(matchedEmbed, "pipi")
   const finalPath = matchedEmbed
     ? `/erebus-empire/${animeId}/${seasonId}/${toSlug(matchedEmbed)}`
     : `/erebus-empire/${animeId}/${seasonId}`
+  console.log(finalPath, "caca")
   return {
     path: finalPath,
     ChapterName,

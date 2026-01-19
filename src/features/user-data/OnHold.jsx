@@ -4,5 +4,6 @@ export const OnHold = () => (
   <AnimeLibrary
     storageKey="animeOnHold"
     title="Animés en Attente :"
+    customType="~en Attente"
   />
 );

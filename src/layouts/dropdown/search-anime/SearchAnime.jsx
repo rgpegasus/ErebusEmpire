@@ -44,13 +44,32 @@ const SearchAnime = () => {
       handleCardClick(results[0])
     }
   }
-  const handleInputChange = async (event) => {
+  let debounceTimeout
+
+  const handleInputChange = (event) => {
     const newValue = event.target.value
     setInputValue(newValue)
 
-    const data = await window.electron.ipcRenderer.invoke("search-anime", newValue, 5, null)
-    setResults(data)
+    // Supprime l'ancien timeout si l'utilisateur tape encore
+    clearTimeout(debounceTimeout)
+
+    // Lance la recherche après 300ms de pause
+    debounceTimeout = setTimeout(async () => {
+      if (!newValue.trim()) {
+        setResults([])
+        return
+      }
+
+      try {
+        const data = await window.electron.ipcRenderer.invoke("search-anime", newValue, 5, null)
+        setResults(data)
+      } catch (err) {
+        console.error("Erreur recherche anime :", err)
+        setResults([])
+      }
+    }, 500)
   }
+
   const getAnimeId = (url) => {
     try {
       const cleanUrl = new URL(url)

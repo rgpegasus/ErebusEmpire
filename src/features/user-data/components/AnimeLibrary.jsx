@@ -6,8 +6,9 @@ import BackgroundCover from "@components/background-cover/BackgroundCover"
 import ContentsCarousel from '@components/contents-carousel/ContentsCarousel';
 export const AnimeLibrary = ({
   storageKey,           
-  title,   
-  sort = false             
+  title,
+  customType,
+  sort = false           
 }) => {
   const [animeList, setAnimeList] = useState([]);
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ export const AnimeLibrary = ({
   useEffect(() => {
     loadAnimeList(); 
   }, []);
+  
 const deleteAnime = async (anime) => {
   const all = await animeData.loadAll(storageKey);
   if (!all) return;
@@ -42,14 +44,9 @@ const deleteAnime = async (anime) => {
   }
 };
 
-
   return (
-    <div className='MainPage'>
-      <BackgroundCover 
-        coverInfo = {LoginPageBackground}
-        whileWatching = {false}
-        isAnime = {false}
-      />
+    <div className="MainPage">
+      <BackgroundCover coverInfo={LoginPageBackground} whileWatching={false} isAnime={false} />
       <div className={styles.Container}>
         <ContentsCarousel
           data={animeList}
@@ -61,8 +58,9 @@ const deleteAnime = async (anime) => {
           isSeason={true}
           searchBy={"title"}
           onDeleteEpisode={(anime) => deleteAnime(anime)}
+          customType={customType}
         />
       </div>
     </div>
-  );
+  )
 };

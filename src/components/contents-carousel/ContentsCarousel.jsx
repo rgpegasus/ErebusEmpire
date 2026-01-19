@@ -28,6 +28,8 @@ const ContentsCarousel = ({
   availableContentTypes = { hasAnime: false, hasManga: false },
   contentType = "anime",
   isGridMode = true,
+  customType = "",
+  customSearch,
 }) => {
   const [watchedEpisodes, setWatchedEpisodes] = useState([])
   const [isInside, setIsInside] = useState(false)
@@ -54,8 +56,9 @@ const ContentsCarousel = ({
       setFilteredData(data)
       return
     }
-
-    if (searchBy === "title") {
+    if (customSearch) {
+      
+    } else if (searchBy === "title") {
       setFilteredData(
         data.filter((ep) => getAnimeTitle(ep).toLowerCase().includes(searchValue.toLowerCase())),
       )
@@ -69,6 +72,8 @@ const ContentsCarousel = ({
           return textMatch || numberMatch
         }),
       )
+    } else if (searchBy) {
+      setFilteredData(searchBy)
     }
   }
 
@@ -174,10 +179,12 @@ const ContentsCarousel = ({
         onContentTypeChange={onContentTypeChange}
         availableContentTypes={availableContentTypes}
         contentType={contentType}
+        customType={customType}
+        customSearch={customSearch}
       />
 
       {sortedData.length > 0 ? (
-        gridMode ? (
+        gridMode & (sortedData.length > 4) ? (
           <div
             className={styles.GridWrapper}
             onMouseEnter={() => setIsInside(true)}

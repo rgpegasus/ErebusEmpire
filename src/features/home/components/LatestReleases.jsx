@@ -33,7 +33,7 @@ const LatestReleases = ({
               seasonUrl: releases.url,
               availableLanguages: [releases.language],
               selectedLanguage: releases.language,
-            },
+            }, 
           })
         }
       } else {

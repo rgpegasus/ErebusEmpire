@@ -7,7 +7,7 @@ async function getRealEpisodeName (episodeInfo) {
     let embedData = [];
     let seasonTitle = "null"; 
     if (animeUrl.startsWith("/catalogue")) {
-      animeUrl = "https://anime-sama.org"+animeUrl
+      animeUrl = BASE_URL + animeUrl
     }  
     const animeId = animeUrl.split("/").slice(4, 5).join("/");
     try {

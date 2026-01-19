@@ -82,7 +82,7 @@ const WatchHistory = () => {
           hasAnime: tempEpisodes.length > 0,
           hasManga: tempScans.length > 0,
         })
-        if (tempEpisodes.length === 0) {
+        if (tempEpisodes.length === 0 || episode.seasonUrl.includes("scan")) {
           setWatchedEpisodes(tempScans)
         } else {
           setWatchedEpisodes(tempEpisodes)
@@ -193,7 +193,7 @@ const WatchHistory = () => {
       onDeleteEpisode={(ep) => deleteEpisode(ep)}
       getEpisodeCover={(ep) => ep.animeCover}
       getAnimeTitle={(ep) => ep.animeTitle}
-      getAnimeUrl={(ep) => ep.seasonUrl}
+      getAnimeUrl={(ep) => `${ep.seasonUrl}/`}
       getEpisodeSubTitle={(ep) => `${ep.seasonTitle} - ${ep.episodeTitle}`}
       getUrlErebus={(ep) => `/erebus-empire/${ep.animeId}/${ep.seasonId}/${ep.episodeId}`}
       currentLanguage={(ep) => ep.selectedLanguage}

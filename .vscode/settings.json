@@ -1,11 +1,264 @@
 {
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  "explorerSort.rules": [
+    {
+      "name": "Global Structure",
+      "pathPattern": "**/src/**",
+      "priorities": [
+        {
+          "condition": "name === 'App.jsx'",
+          "priority": 0
+        },
+        {
+          "condition": "name === 'features'",
+          "priority": 999
+        },
+        {
+          "condition": "name === 'components'",
+          "priority": 998
+        },
+        {
+          "condition": "name === 'layouts'",
+          "priority": 997
+        },
+        {
+          "condition": "name === 'electron'",
+          "priority": 996
+        },
+        {
+          "condition": "name === 'context'",
+          "priority": 995
+        },
+        {
+          "condition": "name === 'services'",
+          "priority": 994
+        },
+        {
+          "condition": "name === 'utils'",
+          "priority": 993
+        },
+        {
+          "condition": "name === 'styles'",
+          "priority": 992
+        }
+      ]
+    },
+    {
+      "name": "Features Structure",
+      "pathPattern": "**/src/features/**",
+      "priorities": [
+        {
+          "condition": "name === 'home'",
+          "priority": 1000
+        },
+        {
+          "condition": "name === 'catalog'",
+          "priority": 999
+        },
+        {
+          "condition": "name === 'download'",
+          "priority": 998
+        },
+        {
+          "condition": "name === 'anime'",
+          "priority": 997
+        },
+        {
+          "condition": "name === 'settings'",
+          "priority": 996
+        },
+        {
+          "condition": "name === 'user-data'",
+          "priority": 995
+        },
+        {
+          "condition": "name === 'account'",
+          "priority": 994
+        },
+        {
+          "condition": "name === 'loader'",
+          "priority": 993
+        },
+        {
+          "condition": "name === 'not-found'",
+          "priority": 992
+        }
+      ]
+    },
+    {
+      "name": "Components Structure",
+      "pathPattern": "**/src/components/**",
+      "priorities": [
+        {
+          "condition": "name === 'video-player'",
+          "priority": 1000
+        },
+        {
+          "condition": "name === 'contents-carousel'",
+          "priority": 999
+        },
+        {
+          "condition": "name === 'background-cover'",
+          "priority": 998
+        },
+        {
+          "condition": "name === 'img-loader'",
+          "priority": 997
+        },
+        {
+          "condition": "name === 'scroll-title'",
+          "priority": 996
+        },
+        {
+          "condition": "name === 'overlay-portal'",
+          "priority": 995
+        }
+      ]
+    },
+    {
+      "name": "Layouts Structure",
+      "pathPattern": "**/src/layouts/**",
+      "priorities": [
+        {
+          "condition": "name === 'top-bar'",
+          "priority": 1000
+        },
+        {
+          "condition": "name === 'tool-bar'",
+          "priority": 999
+        },
+        {
+          "condition": "name === 'theme'",
+          "priority": 998
+        },
+        {
+          "condition": "name === 'dropdown'",
+          "priority": 997
+        }
+      ]
+    },
+    {
+      "name": "Electron Structure",
+      "pathPattern": "**/src/electron/**",
+      "priorities": [
+        {
+          "condition": "name === 'main.js'",
+          "priority": 1000
+        },
+        {
+          "condition": "name === 'preload.js'",
+          "priority": 999
+        },
+        {
+          "condition": "name === 'main.jsx'",
+          "priority": 998
+        },
+        {
+          "condition": "name === 'hindex.html'",
+          "priority": 997
+        }
+      ]
+    },
+    {
+      "name": "Anime Structure",
+      "pathPattern": "**/src/features/anime/**",
+      "priorities": [
+        {
+          "condition": "name === 'season'",
+          "priority": 1000
+        }
+      ]
+    },
+    {
+      "name": "Resources Structure",
+      "pathPattern": "**/resources/**",
+      "priorities": [
+        {
+          "condition": "name === 'pictures'",
+          "priority": 1000
+        },
+        {
+          "condition": "name === 'fonts'",
+          "priority": 999
+        },
+        {
+          "condition": "name === 'bin'",
+          "priority": 998
+        },
+        {
+          "condition": "name === 'icon.png'",
+          "priority": 997
+        }
+      ]
+    },
+    {
+      "name": "Default File Order",
+      "pathPattern": "**/*",
+      "priorities": [
+        {
+          "condition": "name.endsWith('.jsx')",
+          "priority": 1000
+        },
+        {
+          "condition": "name.endsWith('.css')",
+          "priority": 999
+        },
+        {
+          "condition": "name.endsWith('.js')",
+          "priority": 998
+        },
+        {
+          "condition": "name.endsWith('.html')",
+          "priority": 997
+        },
+        {
+          "condition": "name === '.git'",
+          "priority": -1
+        },
+        {
+          "condition": "name === '.vscode'",
+          "priority": -2
+        },
+        {
+          "condition": "name === 'node_modules'",
+          "priority": -3
+        },
+        {
+          "condition": "name === 'out'",
+          "priority": -4
+        },
+        {
+          "condition": "name === 'build'",
+          "priority": -5
+        },
+        {
+          "condition": "name === 'puppeteer'",
+          "priority": -6
+        },
+        {
+          "condition": "name === 'resources'",
+          "priority": -7
+        },
+        {
+          "condition": "name === 'src'",
+          "priority": -8
+        },
+        {
+          "condition": "name === 'electron.vite.config.mjs'",
+          "priority": -9
+        },
+        {
+          "condition": "name === 'package.json'",
+          "priority": -10
+        },
+        {
+          "condition": "name === 'README.md'",
+          "priority": -11
+        },
+        {
+          "condition": "name === 'HELPER'",
+          "priority": -0.1
+        }
+      ]
+    }
+  ]
 }

@@ -4,7 +4,8 @@ import { dirname, resolve } from "path";
 import { defineConfig, externalizeDepsPlugin } from "electron-vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
-var __electron_vite_injected_import_meta_url = "file:///C:/Users/gabin/Desktop/CODE/ANIME_SAMA/ELECTRON/ErebusEmpire/electron.vite.config.mjs";
+var __electron_vite_injected_import_meta_url =
+  "file:///C:/Users/gabin/Desktop/CODE/EREBUS_EMPIRE/APP/ErebusEmpire/electron.vite.config.mjs"
 var __filename = fileURLToPath(__electron_vite_injected_import_meta_url);
 var __dirname = dirname(__filename);
 var electron_vite_config_default = defineConfig({

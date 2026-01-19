@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 const CarouselItem = ({
   episode,
   index,
-  activeIndex,
+  activeIndex, 
   shiftPressed,
   enableShiftDelete,
   getProgressForEpisode,
@@ -39,8 +39,8 @@ const CarouselItem = ({
 
   const [remainingMinutes, duration] = getProgressForEpisode(episode)
   const navigateAnime = (animeUrl) => {
-    const animeId = animeUrl.split("/").slice(4, 5).join("/")
-    navigate(`/erebus-empire/${animeId}`)
+    const Id = animeUrl.split("/").slice(4, 6).join("/")
+    navigate(`/erebus-empire/${Id}`)
   }
   return (
     <div>
