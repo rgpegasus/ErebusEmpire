@@ -3,7 +3,7 @@ import { AnimeLibrary } from './components/AnimeLibrary';
 export const History = () => (
   <AnimeLibrary
     storageKey="animeWatchHistory"
-    title="Animés en Cours :"
+    title="Animés & Scans en Cours :"
     sort={true}
     customType="~en Cours"
   />

@@ -17,13 +17,21 @@ export const Home = () => {
   })
   const [latestEpisodes, setLatestEpisodes] = useState([])
   const [latestScans, setLatestScans] = useState([])
-  function isValidUrl(url) {
-    try {
-      return fetch(url, { method: "HEAD" }).then((res) => res.ok)
-    } catch {
-      return false
-    }
+
+  const filterValidUrls = async (items) => {
+    const results = await Promise.all(
+      items.map(async (item) => {
+        try {
+          const res = await fetch(item.url, { method: "HEAD" })
+          return res.ok ? item : null
+        } catch {
+          return null
+        }
+      }),
+    )
+    return results.filter(Boolean)
   }
+  
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
@@ -38,23 +46,13 @@ export const Home = () => {
           setCoverInfo(animeData)
         }
 
-        const episodes = await window.electron.ipcRenderer.invoke("get-latest-episode")
-        const filteredEpisodes = []
-        for (let episode of episodes) {
-          const validUrl = await isValidUrl(episode.url)
-          if (validUrl) {
-            filteredEpisodes.push(episode)
-          }
-        }
-        const scans = await window.electron.ipcRenderer.invoke("get-latest-scans")
-        const filteredScans = []
-        for (let scan of scans) {
-          const validUrl = await isValidUrl(scan.url)
-          if (validUrl) {
-            filteredScans.push(scan)
-          }
-        }
-        setLatestReleases(filteredEpisodes)
+        const episodes = await window.electron.ipcRenderer.invoke("get-latest-episode")     
+        const filteredEpisodes = await filterValidUrls(episodes)
+
+        const scans = await window.electron.ipcRenderer.invoke("get-latest-scans")     
+        const filteredScans = await filterValidUrls(scans)
+
+        setLatestReleases(filteredEpisodes.length > 0 ? filteredEpisodes : filteredScans)
         setLatestEpisodes(filteredEpisodes)
         setLatestScans(filteredScans)
         setAvailableContentTypes({
@@ -65,6 +63,7 @@ export const Home = () => {
         console.error("Erreur lors du chargement:", err)
       } finally {
         setLoading(false)
+
       }
     }
 

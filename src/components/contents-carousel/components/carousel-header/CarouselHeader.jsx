@@ -60,7 +60,7 @@ const CarouselHeader = ({
           </div>
         )}
 
-        <h2 className={`${styles.ActionsTitle} ${styles.NoHover}`}>
+        {data && <h2 className={`${styles.ActionsTitle} ${styles.NoHover}`}>
           {data.length === 0
             ? `Aucun ${getContentTypeDisplay() === "Anime" ? "épisode" : "chapitre"}`
             : `${!customType.startsWith("~~") ? data.length : ""} ${
@@ -74,7 +74,7 @@ const CarouselHeader = ({
                         ? "Episode"
                         : "Chapitre"
               }${data.length > 1 && !customType.startsWith("~") ? "s" : ""}`}
-        </h2>
+        </h2>}
 
         <div
           className={styles.SortContainer}

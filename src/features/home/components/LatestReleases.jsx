@@ -37,8 +37,7 @@ const LatestReleases = ({
           })
         }
       } else {
-        const { path, ChapterName, matchedEmbed, animeId, seasonId, seasonTitle } =
-          await getRealChapterName(releases)
+        const { path, ChapterName, matchedEmbed, animeId, seasonId, seasonTitle } = await getRealChapterName(releases)
         const scansImg = await window.electron.ipcRenderer.invoke(
           "get-scans-img",
           releases.url,

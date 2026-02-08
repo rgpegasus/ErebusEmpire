@@ -18,7 +18,7 @@ async function getRealChapterName(chapterInfo) {
   matchedEmbed = Object.values(ChapterName).find((e) => toSlug(e) === toSlug(chapterInfo.chapter))
   if (!matchedEmbed && chapterNumber) {
     matchedEmbed = Object.values(ChapterName).find((e) => {
-      const tempChapterNumber = e.title.toLowerCase().match(/(?:chapitre|tome|volume)\s*(\d+)/i)[1] || null
+      const tempChapterNumber = e.title.toLowerCase().match(/(?:chapitre|tome|volume)\s*(\d+)/i)?.[1] || null
       if (tempChapterNumber){
         return tempChapterNumber === chapterNumber
       }
@@ -41,11 +41,9 @@ async function getRealChapterName(chapterInfo) {
   if (!matchedEmbed) {
     matchedEmbed = ChapterName[0]
   }
-  console.log(matchedEmbed, "pipi")
   const finalPath = matchedEmbed
     ? `/erebus-empire/${animeId}/${seasonId}/${toSlug(matchedEmbed)}`
     : `/erebus-empire/${animeId}/${seasonId}`
-  console.log(finalPath, "caca")
   return {
     path: finalPath,
     ChapterName,

@@ -155,7 +155,7 @@ const ContentsCarousel = ({
   const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi])
   const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi])
 
-  if (data.length === 0 && !display) {
+  if (!data || data.length === 0 && !display) {
     return null
   }
 
@@ -183,7 +183,7 @@ const ContentsCarousel = ({
         customSearch={customSearch}
       />
 
-      {sortedData.length > 0 ? (
+      {sortedData && sortedData.length > 0 ? (
         gridMode & (sortedData.length > 4) ? (
           <div
             className={styles.GridWrapper}

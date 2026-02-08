@@ -82,7 +82,7 @@ const WatchHistory = () => {
           hasAnime: tempEpisodes.length > 0,
           hasManga: tempScans.length > 0,
         })
-        if (tempEpisodes.length === 0 || episode.seasonUrl.includes("scan")) {
+        if (tempEpisodes.length === 0 || episode.seasonUrl.includes("scan") && tempScans.length > 0) {
           setWatchedEpisodes(tempScans)
         } else {
           setWatchedEpisodes(tempEpisodes)
@@ -114,10 +114,11 @@ const WatchHistory = () => {
           "get-scans-chapter",
           episode.seasonUrl,
         )
-        result[episode.selectedLanguage] = episodeLinks
+        languageResults = [{ lang: "vf", data: episodeLinks }]
       }
-
       if (languageResults) {
+        
+            
         languageResults.forEach((item) => {
           if (item) {
             const { lang, data } = item
@@ -125,7 +126,8 @@ const WatchHistory = () => {
           }
         })
       }
-
+      
+      
       return result
     } catch (error) {
       console.error("Erreur lors de la récupération des épisodes :", error)
@@ -162,15 +164,9 @@ const WatchHistory = () => {
         },
       })
     } else {
-      const scansImg = await window.electron.ipcRenderer.invoke(
-        "get-scans-img",
-        episode.seasonUrl,
-        episode.episodeTitle,
-      )
       navigate(`/erebus-empire/${episode.animeId}/${episode.seasonId}/${episodeId}`, {
         state: {
           episodeTitle: episode.episodeTitle,
-          scans: scansImg,
           episodes,
           animeId: episode.animeId,
           seasonId: episode.seasonId,

@@ -1,4 +1,4 @@
-$stats = Get-ChildItem -Recurse -Include *.js,*.jsx,*.css | 
+$stats = Get-ChildItem -Recurse -Include *.js,*.jsx,*.css, *.html | 
     ForEach-Object {
         $content = Get-Content $_.FullName -Raw
         [PSCustomObject]@{

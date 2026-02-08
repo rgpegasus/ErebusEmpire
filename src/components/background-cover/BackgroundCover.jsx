@@ -11,6 +11,8 @@ const BackgroundCover = ({ coverInfo, whileWatching = false, isAnime = true}) =>
     const navigate = useNavigate();
     const StatusDropdownRef = useRef(null)
     const AddButtonRef = useRef(null)
+    const [height, setHeight] = useState(0)
+    const contentRef = useRef(null)
     const [showStatusMenu, setShowStatusMenu] = useState(false);
     const [animeStatus, setAnimeStatus] = useState({
       favoris: false,
@@ -123,8 +125,7 @@ const BackgroundCover = ({ coverInfo, whileWatching = false, isAnime = true}) =>
             setLoading(false);
         }
     }
-    const [height, setHeight] = useState(0);
-    const contentRef = useRef(null);
+    
 
     useEffect(() => {
         if (contentRef.current) {

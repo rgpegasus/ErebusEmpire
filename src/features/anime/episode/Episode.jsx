@@ -9,20 +9,14 @@ export const Episode = () => {
   const { animeId: urlAnimeId, seasonId: urlSeasonId, episodeId: urlEpisodeId } = useParams()
 
   let {
-    episodeTitle = "",
-    episodes = null,
     animeId = urlAnimeId,
     seasonId = urlSeasonId,
     animeTitle = "",
-    seasonTitle = "",
     animeCover = "",
-    seasonUrl = "",
-    availableLanguages = null,
-    selectedLanguage = "",
-    scans = [],
   } = location.state || {}
   const [currentEpisodeTitle, setCurrentEpisodeTitle] = useState(location.state?.episodeTitle || "")
   const [currentEpisodes, setCurrentEpisodes] = useState(location.state?.episodes || null)
+  const [chapterId, setChapterId] = useState(location.state?.chapterId || null)
   const [currentSeasonUrl, setCurrentSeasonUrl] = useState(location.state?.seasonUrl || "")
   const [currentAvailableLanguages, setCurrentAvailableLanguages] = useState(
     location.state?.availableLanguages || null,
@@ -96,69 +90,92 @@ export const Episode = () => {
             "info-anime",
             `${BASE_URL}/catalogue/${animeId}/`,
           )
-          if (info) setAnimeInfo(info)
+          if (info) {
+            setAnimeInfo(info)
+          }
         }
-        if (!seasonTitle) {
+
+        
+      let chosenLang = currentSelectedLanguage ?? null
+      let seasonUrl = currentSeasonUrl ?? null
+      let seasonTitle = currentSeasonTitle ?? null
+        if (!seasonTitle || !seasonUrl) {
           const result = await window.electron.ipcRenderer.invoke(
             "get-seasons",
             `${BASE_URL}/catalogue/${animeId}/`,
           )
           
-          const currentSeason = result.seasons.find((s) => s.url.split("/")[5] === seasonId)
-          setCurrentSeasonTitle(currentSeason.title)
-          if (currentSeason.title.toLowerCase().includes("scan")) {
-            const language = currentSeason.title.split("/").slice(6, 7).join("/")
-            setCurrentAvailableLanguages([language])
-            setCurrentSelectedLanguage(language)
-            setCurrentSeasonUrl(currentSeason.url)
-            const scansLinks = await window.electron.ipcRenderer.invoke(
-              "get-scans-chapter",
-              currentSeason.url,
-            )
-            const currentEpisode = Object.entries(scansLinks).find(
-              ([_, e]) =>
-                e.title?.toLowerCase().replace(/\s+/g, "-") ===
-                location.pathname.split("/").slice(4, 5).join("/"),
-            )[0]
-            console.log(currentSeason.url, currentEpisode)
-            setCurrentEpisodeTitle(currentEpisode)
-            const scansImg = await window.electron.ipcRenderer.invoke(
-              "get-scans-img",
-              currentSeason.url,
-              currentEpisode,
-            )
-            setImgScans(scansImg)
-            return  
+          const currentSeason = result.seasons.find((season) => season.url.split("/")[5] === seasonId)
+          seasonTitle = currentSeason.title
+          seasonUrl = currentSeason.url
+          
+          
+          if (!chosenLang) {
+            chosenLang = seasonUrl.split("/").slice(6, 7).join("/")
           }
+          setCurrentSeasonUrl(seasonUrl)
+          setCurrentSeasonTitle(seasonTitle)
         }
-        let chosenLang = currentSelectedLanguage
-
-        if (!currentAvailableLanguages) {
+        const isScan = seasonTitle.toLowerCase().includes("scan")
+        if ((!currentAvailableLanguages || !chosenLang) && !isScan) {
           const langs = await window.electron.ipcRenderer.invoke(
             "get-available-languages",
-            `${BASE_URL}/catalogue/${animeId}/${seasonId}/`,
+            `${BASE_URL}/catalogue/${animeId}/${seasonId}/${currentSelectedLanguage}`,
           )
           const normalizedLangs = (langs || []).map((lang) => String(lang).toLowerCase())
           setCurrentAvailableLanguages(normalizedLangs)
 
           if (!chosenLang && normalizedLangs.length > 0) {
             chosenLang = normalizedLangs[0]
+            seasonUrl = `${seasonUrl}/${chosenLang}`
+            setCurrentSeasonUrl(seasonUrl)
             setCurrentSelectedLanguage(chosenLang)
           }
         }
-        if (!currentEpisodes) {
-          const langToUse = chosenLang || currentSelectedLanguage
-          if (langToUse) {
+        if (isScan) {
+          if(!currentAvailableLanguages || !chosenLang) {
+            const lang = seasonUrl.split("/").slice(6, 7).join("/")
+            if(!chosenLang) {
+              seasonUrl = `${seasonUrl}/${lang}`
+              setCurrentSeasonUrl(seasonUrl)
+            }
+            chosenLang = lang
+            setCurrentAvailableLanguages([chosenLang])
+            setCurrentSelectedLanguage(chosenLang)
+          }
+          const scansLinks = await window.electron.ipcRenderer.invoke(
+            "get-scans-chapter",
+            seasonUrl,
+          )
+          const slugFromUrl = location.pathname.split("/")[4]
+          const currentEpisode = Object.entries(scansLinks)
+            .map(([id, ep]) => ({ id, ...ep }))
+            .find((ep) => {
+              return ep?.title?.toLowerCase().replace(/\s+/g, "-") === slugFromUrl
+            })
+
+          setCurrentEpisodes(currentEpisode)
+          setCurrentEpisodeTitle(currentEpisode?.title)
+          setChapterId(currentEpisode?.id)
+          const scansImg = await window.electron.ipcRenderer.invoke(
+            "get-scans-img",
+            seasonUrl,
+            currentEpisode?.id,
+          )
+          setImgScans(scansImg)
+          return
+        } else if (!currentEpisodes) {
+          if (chosenLang) {
             const eps = await window.electron.ipcRenderer.invoke(
               "get-episodes",
-              `${BASE_URL}/catalogue/${animeId}/${seasonId}/${langToUse}`,
+              `${BASE_URL}/catalogue/${animeId}/${seasonId}/${chosenLang}`,
               true,
             )
-            setCurrentSeasonUrl(`${BASE_URL}/catalogue/${animeId}/${seasonId}/${langToUse}`)
-            const newEpisodes = { [langToUse]: eps || [] }
+            setCurrentSeasonUrl(`${BASE_URL}/catalogue/${animeId}/${seasonId}/${chosenLang}`)
+            const newEpisodes = { [chosenLang]: eps || [] }
 
-            if (!currentEpisodeTitle && urlEpisodeId && newEpisodes[langToUse]) {
-              const ep = newEpisodes[langToUse].find(
+            if (!currentEpisodeTitle && urlEpisodeId && newEpisodes[chosenLang]) {
+              const ep = newEpisodes[chosenLang].find(
                 (e) => e.title?.toLowerCase().replace(/\s+/g, "-") === urlEpisodeId,
               )
               if (ep) setCurrentEpisodeTitle(ep.title)
@@ -174,7 +191,8 @@ export const Episode = () => {
     }
 
     if (
-      (!currentEpisodes && !imgScans.length) ||
+      !currentEpisodes ||
+      (imgScans.length <= 0 && currentSeasonUrl.toLowerCase().includes("scan")) ||
       !currentAvailableLanguages ||
       !currentEpisodeTitle
     ) {
@@ -188,13 +206,13 @@ export const Episode = () => {
     currentAvailableLanguages,
     currentSelectedLanguage,
   ])
-  
-  const episodeIndex = currentEpisodes?.[currentSelectedLanguage]?.title?.findIndex((ep) => {
-    const normalizedEp = ep?.toLowerCase().replace(/\s+/g, "-")
+  const episodesObj = currentEpisodes?.[currentSelectedLanguage] || {}
+  const episodeIndex = Object.values(episodesObj).findIndex((ep) => {
+    const normalizedEp = ep.title?.toLowerCase().replace(/\s+/g, "-")
     const normalizedCurrent = currentEpisodeTitle?.toLowerCase().replace(/\s+/g, "-")
-
     return normalizedEp === normalizedCurrent
   })
+
   
   
       
@@ -300,7 +318,6 @@ export const Episode = () => {
 
     const resolveAllSources = async () => {
       if (!episodeSources?.url || !episodeSources?.host) return
-
       try {
         setLoading(true)
         const hosts = episodeSources.host || []
@@ -340,7 +357,7 @@ export const Episode = () => {
       } catch (err) {
         if (!cancelled) console.error("Erreur lors de la résolution des sources :", err)
       } finally {
-        if (!cancelled) setLoading(false)
+        setLoading(false)
       }
     }
 
@@ -359,6 +376,7 @@ export const Episode = () => {
     animeId,
     seasonId,
     episodeId,
+    chapterId: chapterId,
     episodeTitle: currentEpisodeTitle,
     animeTitle: displayAnimeTitle,
     seasonTitle: currentSeasonTitle,
@@ -526,7 +544,7 @@ export const Episode = () => {
         <div onClick={() => nextChapter && handleChapterNavigation(nextChapter)}>Suivant</div>
         <div className="ScansPage" ref={zoomRef}>
           <div className="ScansContainer" ref={containerRef}>
-            {imgScans.map((img, idx) => (
+            {imgScans?.map((img, idx) => (
               <img key={idx} className="ImgScans" src={img} alt={`scan-${idx}`} />
             ))}
           </div>

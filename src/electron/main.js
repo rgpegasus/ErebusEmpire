@@ -3,8 +3,8 @@ import { join } from 'path';
 import path from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import { ErebusIcon } from '@utils/dispatchers/Pictures';
-import { AnimeScraper } from 'better-ani-scraped';
-// import { AnimeScraper } from "../../../../BOT/better-ani-scraped/index.js"
+// import { AnimeScraper } from 'better-ani-scraped';
+import { AnimeScraper } from "../../../../BOT/better-ani-scraped/index.js"
 import fsExtra from 'fs-extra'; 
 import fs from 'fs';
 import { Client } from '@xhayper/discord-rpc';
@@ -195,6 +195,9 @@ if (!gotTheLock) {
     }
   });
   app.whenReady().then(async  () => {
+    session.defaultSession.setUserAgent(
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
+    )
     session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
       details.requestHeaders["Referer"] = "https://vidmoly.net/"
       details.requestHeaders["Origin"] = "https://vidmoly.net"
