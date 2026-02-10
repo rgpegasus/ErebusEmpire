@@ -4,7 +4,6 @@ import { useLoader } from "@utils/dispatchers/Page"
 import BackgroundCover from "@components/background-cover/BackgroundCover"
 import LatestReleases from "./components/LatestReleases"
 import WatchHistory from "./components/WatchHistory"
-import { toSlug } from "@utils/functions/toSlug"
 
 export const Home = () => {
   const [coverInfo, setCoverInfo] = useState(null)

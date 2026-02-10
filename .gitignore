@@ -7,4 +7,5 @@ out
 .eslintcache
 bin
 *.log*
-HELPER
+**/HELPER/
+**/.vscode

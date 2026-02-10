@@ -3,7 +3,7 @@ import { HashRouter as Router, Routes, Route, useLocation, Navigate, useNavigate
 import ToolBar from '@layouts/tool-bar/ToolBar';
 import TopBar from '@layouts/top-bar/TopBar';
 import Theme from '@layouts/theme/Theme'
-import { LoaderProvider, Catalog, Home, Download, Season, Episode, Settings, SwitchAccount, Favorites, Watchlist, History, OnHold, AlreadySeen, Profile, NotFound } from '@utils/dispatchers/Page';
+import { LoaderProvider, Catalog, Home, Download, Season, Dispatcher, Settings, SwitchAccount, Favorites, Watchlist, History, OnHold, AlreadySeen, Profile, NotFound } from '@utils/dispatchers/Page';
 import { UserProvider } from '@context/user-context/UserContext';
 
 const Logger = () => {
@@ -13,7 +13,7 @@ const Logger = () => {
 };
 
 const App = () => {
-  const [showTheme, setShowTheme] = React.useState(false);
+  const [showTheme, setShowTheme] = React.useState(false); 
   const openTheme = () => setShowTheme(true);
   const closeTheme = () => setShowTheme(false);
 
@@ -71,7 +71,7 @@ const App = () => {
               <Route path="/erebus-empire/catalog" element={<Catalog />} />
               <Route path="/erebus-empire/downloads" element={<Download />} />
               <Route path="/erebus-empire/:animeId/:seasonId?" element={<Season />} />
-              <Route path="/erebus-empire/:animeId/:seasonId/:episodeId" element={<Episode />} />
+              <Route path="/erebus-empire/:animeId/:seasonId/:episodeId" element={<Dispatcher />} />
               <Route path="/erebus-empire/settings" element={<Settings openTheme={openTheme} />} />
               <Route path="/erebus-empire/settings/profile" element={<Profile />} />
               <Route path="/erebus-empire/switchAccount" element={<SwitchAccount />} />

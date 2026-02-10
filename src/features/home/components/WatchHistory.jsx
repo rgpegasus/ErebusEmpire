@@ -98,9 +98,9 @@ const WatchHistory = () => {
     try {
       const baseUrl = episode.seasonUrl.split("/").slice(0, 6).join("/")
 
-      if (!episode.seasonUrl.includes("scan")) {
+      if (!episode.seasonUrl.includes("scan") && episode.availableLanguages) {
         languageResults = await Promise.all(
-          episode.availableLanguages.map(async (lang) => {
+          episode?.availableLanguages.map(async (lang) => {
             const langUrl = `${baseUrl}/${lang.toLowerCase()}`
             const data = await window.electron.ipcRenderer.invoke("get-episodes", langUrl, true)
             if (data === null) {
