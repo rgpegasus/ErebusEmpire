@@ -3,8 +3,8 @@ import { join } from 'path';
 import path from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import { ErebusIcon } from '@utils/dispatchers/Pictures';
-// import { AnimeScraper } from 'better-ani-scraped';
-import { AnimeScraper } from "../../../../BOT/better-ani-scraped/index.js"
+import { AnimeScraper } from 'better-ani-scraped';
+// import { AnimeScraper } from "../../../../BOT/better-ani-scraped/index.js"
 import fsExtra from 'fs-extra'; 
 import fs from 'fs';
 import { Client } from '@xhayper/discord-rpc';
@@ -222,6 +222,30 @@ if (!gotTheLock) {
           state: `${episode}`,
           startTimestamp: startTimestamp ? new Date(startTimestamp) : new Date(),
           endTimestamp: endTimestamp ? new Date(endTimestamp) : undefined,
+          largeImageKey: `${cover}`,
+          largeImageText: `${anime}`,
+          instance: false,
+          type: 3,
+          buttons: [
+            { label: "Discord", url: "https://discord.gg/Mj9cYRQTcU" },
+            {
+              label: "Installer",
+              url: "https://github.com/rgpegasus/ErebusEmpire/releases/latest",
+            },
+          ],
+        })
+      },
+    )
+    ipcMain.on(
+      "scan-discord-presence",
+      (event, { anime, episode, cover }) => {
+        if (!rpc || !rpc.user || typeof rpc.user.setActivity !== "function") {
+          console.warn("Rich Presence non prêt : rpc ou rpc.user non défini")
+          return
+        }
+        rpc.user.setActivity({
+          details: `Lit ${anime}`,
+          state: `${episode}`,
           largeImageKey: `${cover}`,
           largeImageText: `${anime}`,
           instance: false,

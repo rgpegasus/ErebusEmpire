@@ -3,6 +3,7 @@ import { SearchIcon } from "@utils/dispatchers/Icons"
 import { useNavigate } from "react-router-dom"
 import ImgLoader from "@components/img-loader/ImgLoader"
 import styles from "./SearchAnime.module.css"
+import { toSlug } from "@utils/functions/toSlug"
 
 const SearchAnime = () => {
   const logoRef = useRef(null)
@@ -40,7 +41,7 @@ const SearchAnime = () => {
   }, [searchOpen])
 
   const handleKeyDown = (event) => {
-    if (event.key === "Enter" && results.length > 0 && !enterCooldown.current) {
+    if (event.key === "Enter" && results?.length > 0 && !enterCooldown.current) {
       handleCardClick(results[0])
     }
   }
@@ -49,11 +50,8 @@ const SearchAnime = () => {
   const handleInputChange = (event) => {
     const newValue = event.target.value
     setInputValue(newValue)
-
-    // Supprime l'ancien timeout si l'utilisateur tape encore
     clearTimeout(debounceTimeout)
 
-    // Lance la recherche après 300ms de pause
     debounceTimeout = setTimeout(async () => {
       if (!newValue.trim()) {
         setResults([])
@@ -61,7 +59,7 @@ const SearchAnime = () => {
       }
 
       try {
-        const data = await window.electron.ipcRenderer.invoke("search-anime", newValue, 5, null)
+        const data = await window.electron.ipcRenderer.invoke("search-anime", newValue, 5)
         setResults(data)
       } catch (err) {
         console.error("Erreur recherche anime :", err)
@@ -132,10 +130,10 @@ const SearchAnime = () => {
             />
           </div>
         </div>
-        {inputValue && results.length > 0 && (
+        {inputValue && results?.length > 0 && (
           <div className={styles.ResultContainer}>
             {results?.map((anime) => (
-              <div className={styles.Item} onClick={() => handleCardClick(anime)}>
+              <div key={toSlug(anime.title)} className={styles.Item} onClick={() => handleCardClick(anime)}>
                 <div className={styles.Cover}>
                   <ImgLoader key={anime.title + anime.cover} anime={anime} />
                 </div>

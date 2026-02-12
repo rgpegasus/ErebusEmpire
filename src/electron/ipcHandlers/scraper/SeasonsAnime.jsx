@@ -1,12 +1,12 @@
 import { ipcMain } from 'electron';
 
 function SeasonsAnime(scraper) {
-  ipcMain.handle("get-seasons", async (event, query, languagePriority=["vostfr", "vf"] )=> {
+  ipcMain.handle("get-seasons", async (event, animeUrl)=> {
     try {
-      return await scraper.getSeasons(query, languagePriority, ["Anime", "Scans"] );
+      return await scraper.getSeasons(animeUrl, [], ["Anime", "Scans"])
     } catch (error){
       console.error('Erreur dans le main process:', error);
-      return null;
+      return [];
     }
   });
 }

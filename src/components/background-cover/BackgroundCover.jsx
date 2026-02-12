@@ -82,17 +82,17 @@ const BackgroundCover = ({ coverInfo, whileWatching = false, isAnime = true}) =>
         try {
             setLoading(true);
             const result = await window.electron.ipcRenderer.invoke('get-seasons', coverInfo.url);
-            if (!result || result.error || !Array.isArray(result.seasons) || result?.seasons?.length === 0) {
+            if (!result || result.error || result?.length === 0) {
                 console.warn("Aucune saison trouvée ou erreur:", result?.error);
                 setLoading(false);
                 return;
             }
-            const languages = await window.electron.ipcRenderer.invoke('get-available-languages', result.seasons[0].url);
-            const selectedLanguage = result.seasons[0].url.split("/").slice(6,7)[0]
+            const languages = await window.electron.ipcRenderer.invoke('get-available-languages', result[0].url);
+            const selectedLanguage = result[0].url.split("/").slice(6,7)[0]
             
             for (const lang of languages ) {
-                const saisonUrlNoLanguage = result.seasons[0].url.split("/").slice(0,6).join("/")+"/"+lang.toLowerCase()
-                const episodeLinks = await window.electron.ipcRenderer.invoke('get-episodes', saisonUrlNoLanguage, true);
+                const saisonUrl = `${result[0].url.split("/").slice(0,6).join("/")}/${lang.toLowerCase()}`
+                const episodeLinks = await window.electron.ipcRenderer.invoke('get-episodes', saisonUrl, true);
                 episodesData[lang.toLowerCase()] = episodeLinks;
             }
             
@@ -102,9 +102,17 @@ const BackgroundCover = ({ coverInfo, whileWatching = false, isAnime = true}) =>
                 return;
             }
             const animeId = getAnimeId(coverInfo.url)
-            const seasonId = toSlug(result.seasons[0].title)
+            const seasonId = result[0].url.split("/")[5]
             const episodeId = toSlug(episodesData[selectedLanguage][0].title);
             const path = `/erebus-empire/${animeId}/${seasonId}/${episodeId}`;
+            console.log(
+              episodesData[selectedLanguage][0].title,
+              episodesData,
+              coverInfo.title,
+              result[0].url,
+              languages,
+              selectedLanguage,
+            )
             navigate(path, {
             state: {
                 episodeTitle: episodesData[selectedLanguage][0].title,
@@ -112,9 +120,9 @@ const BackgroundCover = ({ coverInfo, whileWatching = false, isAnime = true}) =>
                 episodes:episodesData,
                 seasonId,
                 animeTitle: coverInfo.title,
-                seasonTitle: result.seasons[0].title,
+                seasonTitle: result[0].title,
                 animeCover: coverInfo.cover,
-                seasonUrl: result.seasons[0].url,
+                seasonUrl: result[0].url,
                 availableLanguages:languages,
                 selectedLanguage
             }

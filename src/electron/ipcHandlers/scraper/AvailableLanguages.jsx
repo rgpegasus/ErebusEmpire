@@ -6,7 +6,7 @@ function AvailableLanguages(scraper) {
       return await scraper.getAvailableLanguages(seasonUrl, ["vostfr", "vf"], false);
     } catch (error){
       console.error('Erreur dans le main process:', error);
-      return null;
+      return [];
     }
   });
 }

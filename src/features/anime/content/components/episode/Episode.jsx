@@ -3,51 +3,47 @@ import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { useLoader, Loader } from "@utils/dispatchers/Page"
 import { ErebusPlayer } from "@components/video-player/VideoPlayer"
 
-export const Episode = ({ animeId, seasonId, episodeId }) => {
+export const Episode = ({
+  animeId,
+  seasonId,
+  episodeId,
+  animeCover,
+  seasonUrl,
+  animeTitle,
+  seasonTitle,
+  episodeTitle,
+  episodeIndex,
+  availableLanguages,
+  getEpisodeTitle,
+  getWatchDataRef,
+  getCurrentEpisodes,
+  getAvailableLanguages,
+  currentEpisodes,
+  getRestored,
+  restored,
+  storageKey,
+}) => {
   const navigate = useNavigate()
   const location = useLocation()
-  let { animeTitle = "", animeCover = "" } = location.state || {}
   const [videoDuration, setVideoDuration] = useState(0)
-  const [restored, setRestored] = useState(false)
-  const [animeInfo, setAnimeInfo] = useState({})
   const [episodeUrl, setEpisodeUrl] = useState(undefined)
-  const [currentEpisodeTitle, setCurrentEpisodeTitle] = useState(location.state?.episodeTitle || "")
   const [resolvedSources, setResolvedSources] = useState([])
   const { loading, setLoading } = useLoader()
   const [openingTime, setOpeningTime] = useState([0, 0])
   const [episodeSources, setEpisodeSources] = useState(null)
   const [videoTime, setVideoTime] = useState(0)
-  const videoTimeRef = useRef(videoTime)
-  const displayAnimeTitle = animeInfo?.title || animeTitle || ""
-  const displayAnimeCover = animeInfo?.cover || animeCover || ""
-  const videoDurationRef = useRef(0)
-  const [currentAvailableLanguages, setCurrentAvailableLanguages] = useState(
-    location.state?.availableLanguages || null,
-  )
-  const [currentSeasonUrl, setCurrentSeasonUrl] = useState(location.state?.seasonUrl || "")
   const lastPresenceUpdateRef = useRef(0)
-  useEffect(() => {
-    videoDurationRef.current = videoDuration
-  }, [videoDuration])
-  const [currentEpisodes, setCurrentEpisodes] = useState(location.state?.episodes || null)
-  const [currentSeasonTitle, setCurrentSeasonTitle] = useState(location.state?.seasonTitle || "")
-  const [currentSelectedLanguage, setCurrentSelectedLanguage] = useState(
-    location.state?.selectedLanguage || "",
-  )
-  const episodesObj = currentEpisodes?.[currentSelectedLanguage] || {}
-  const episodeIndex = Object.values(episodesObj).findIndex((ep) => {
-    const normalizedEp = ep.title?.toLowerCase().replace(/\s+/g, "-")
-    const normalizedCurrent = currentEpisodeTitle?.toLowerCase().replace(/\s+/g, "-")
-    return normalizedEp === normalizedCurrent
-  })
-  const newEpisodeId = currentEpisodeTitle?.toLowerCase().replace(/\s+/g, "-")
+  const [availableLanguagesEpisode, setAvailableLanguagesEpisode] = useState(undefined)
+ 
+
+  const newEpisodeId = episodeTitle?.toLowerCase().replace(/\s+/g, "-")
 
   const intervalRef = useRef(null)
 
+  const [selectedLanguage, setSelectedLanguage] = useState(location.state?.selectedLanguage || "")
   const skipFinalSaveRef = useRef(false)
-  const storageKey = newEpisodeId ? `/erebus-empire/${animeId}/${seasonId}/${newEpisodeId}` : null
 
-  const nextEpisode = currentEpisodes?.[currentSelectedLanguage]?.[episodeIndex + 1]
+  const nextEpisode = currentEpisodes?.[selectedLanguage]?.[episodeIndex + 1]
   const updatePresence = (title, episodeNumber, cover, currentTime, duration) => {
     const now = Date.now()
     const start = now - (currentTime || 0) * 1000
@@ -60,36 +56,54 @@ export const Episode = ({ animeId, seasonId, episodeId }) => {
       endTimestamp: end,
     })
   }
-  const [availableLanguagesEpisode, setAvailableLanguagesEpisode] = useState(undefined)
+  useEffect(() => {
+    return () => {
+      window.electron.ipcRenderer.send("defaul-rich-presence")
+    }
+  }, [])
   const buildWatchData = () => ({
     animeId,
     seasonId,
     episodeId: newEpisodeId,
-    episodeTitle: currentEpisodeTitle,
-    animeTitle: displayAnimeTitle,
-    seasonTitle: currentSeasonTitle,
-    animeCover: displayAnimeCover,
+    episodeTitle,
+    animeTitle,
+    seasonTitle,
+    animeCover,
     timestamp: Date.now(),
-    videoTime: videoTimeRef.current,
-    videoDuration: videoDurationRef.current,
-    seasonUrl: currentSeasonUrl,
-    availableLanguages: currentAvailableLanguages,
-    selectedLanguage: currentSelectedLanguage,
+    videoTime,
+    videoDuration,
+    seasonUrl,
+    availableLanguages,
+    selectedLanguage,
   })
-
-  const clearSeasonHistory = async () => {
-    try {
-      const allData = await animeData.loadAll("animeWatchHistory")
-      const allKeys = Object.keys(allData || {})
-      const seasonKeys = allKeys.filter((key) =>
-        key.startsWith(`/erebus-empire/${animeId}/${seasonId}/`),
-      )
-      const keysToDelete = seasonKeys.filter((key) => key !== storageKey)
-      await Promise.all(keysToDelete.map((key) => animeData.delete("animeWatchHistory", key)))
-    } catch (err) {
-      console.error("Erreur lors du nettoyage de l'historique :", err)
+  useEffect(() => {
+    if (
+      animeId &&
+      seasonId &&
+      episodeId &&
+      episodeTitle &&
+      seasonTitle &&
+      animeTitle &&
+      animeCover &&
+      seasonUrl &&
+      availableLanguages &&
+      selectedLanguage
+    ) {
+      getWatchDataRef(buildWatchData())
     }
-  }
+  }, [
+    animeId,
+    seasonId,
+    episodeId,
+    episodeTitle,
+    seasonTitle,
+    animeTitle,
+    animeCover,
+    seasonUrl,
+    videoTime,
+    availableLanguages,
+    selectedLanguage,
+  ])
   const EndEpisodeNext = async (episode) => {
     if (!episode) return
     await clearSeasonHistory()
@@ -99,7 +113,7 @@ export const Episode = ({ animeId, seasonId, episodeId }) => {
     clearInterval(intervalRef.current)
 
     const nextId = `${episode.title.toLowerCase().replace(/\s+/g, "-")}`
-    setCurrentEpisodeTitle(episode.title)
+    getEpisodeTitle(episode.title)
     setResolvedSources([])
     setEpisodeUrl(undefined)
     setEpisodeSources(episode)
@@ -116,7 +130,7 @@ export const Episode = ({ animeId, seasonId, episodeId }) => {
     await animeData.save("animeWatchHistory", storageKey, buildWatchData())
 
     const navId = `${episode.title.toLowerCase().replace(/\s+/g, "-")}`
-    setCurrentEpisodeTitle(episode.title)
+    getEpisodeTitle(episode.title)
     setResolvedSources([])
     setEpisodeUrl(undefined)
     setEpisodeSources(episode)
@@ -129,7 +143,7 @@ export const Episode = ({ animeId, seasonId, episodeId }) => {
   const changeLanguage = (lang) => {
     const lower = lang?.toLowerCase()
     if (!lower || !currentEpisodes?.[lower]) return
-    setCurrentSelectedLanguage(lower)
+    setSelectedLanguage(lower)
 
     const newEpisode = currentEpisodes[lower]?.[episodeIndex]
     if (!newEpisode) return
@@ -148,10 +162,10 @@ export const Episode = ({ animeId, seasonId, episodeId }) => {
       alert("Téléchargement commence")
 
       await window.electron.ipcRenderer.invoke("download-video", episodeUrl, {
-        episodeTitle: currentEpisodeTitle,
-        seasonTitle: currentSeasonTitle,
-        animeTitle: displayAnimeTitle,
-        animeCover: displayAnimeCover,
+        episodeTitle,
+        seasonTitle,
+        animeTitle,
+        animeCover,
       })
 
       alert("Téléchargement terminé !")
@@ -174,9 +188,9 @@ export const Episode = ({ animeId, seasonId, episodeId }) => {
     if (now - lastPresenceUpdateRef.current >= 5000 && duration) {
       lastPresenceUpdateRef.current = now
       updatePresence(
-        displayAnimeTitle,
-        `${currentSeasonTitle} - ${currentEpisodeTitle}`,
-        displayAnimeCover,
+        animeTitle,
+        `${seasonTitle} - ${episodeTitle}`,
+        animeCover,
         currentTime,
         duration,
       )
@@ -187,70 +201,39 @@ export const Episode = ({ animeId, seasonId, episodeId }) => {
       try {
         setLoading(true)
         const BASE_URL = await window.electron.ipcRenderer.invoke("get-working-url")
-        if (!animeTitle || !animeCover) {
-          const info = await window.electron.ipcRenderer.invoke(
-            "info-anime",
-            `${BASE_URL}/catalogue/${animeId}/`,
-          )
-          if (info) {
-            setAnimeInfo(info)
-          }
+        let chosenLang = selectedLanguage || ""
+        if (!chosenLang) {
+          chosenLang = seasonUrl.split("/").slice(6, 7).join("/")
         }
-
-        let chosenLang = currentSelectedLanguage ?? null
-        let seasonUrl = currentSeasonUrl ?? null
-        let seasonTitle = currentSeasonTitle ?? null
-        if (!seasonTitle || !seasonUrl) {
-          const result = await window.electron.ipcRenderer.invoke(
-            "get-seasons",
-            `${BASE_URL}/catalogue/${animeId}/`,
-          )
-
-          const currentSeason = result.seasons.find(
-            (season) => season.url.split("/")[5] === seasonId,
-          )
-          seasonTitle = currentSeason.title
-          seasonUrl = currentSeason.url
-
-          if (!chosenLang) {
-            chosenLang = seasonUrl.split("/").slice(6, 7).join("/")
-          }
-          setCurrentSeasonUrl(seasonUrl)
-          setCurrentSeasonTitle(seasonTitle)
-        }
-        if (!currentAvailableLanguages || !chosenLang) {
+        if (!availableLanguages || !chosenLang) {
           const langs = await window.electron.ipcRenderer.invoke(
             "get-available-languages",
-            `${BASE_URL}/catalogue/${animeId}/${seasonId}/${currentSelectedLanguage}`,
+            `${BASE_URL}/catalogue/${animeId}/${seasonId}/${selectedLanguage}`,
           )
           const normalizedLangs = (langs || []).map((lang) => String(lang).toLowerCase())
-          setCurrentAvailableLanguages(normalizedLangs)
+          getAvailableLanguages(normalizedLangs)
 
           if (!chosenLang && normalizedLangs.length > 0) {
             chosenLang = normalizedLangs[0]
             seasonUrl = `${seasonUrl}/${chosenLang}`
-            setCurrentSeasonUrl(seasonUrl)
-            setCurrentSelectedLanguage(chosenLang)
+            setSelectedLanguage(chosenLang)
           }
         }
-        if (!currentEpisodes) {
-          if (chosenLang) {
-            const eps = await window.electron.ipcRenderer.invoke(
-              "get-episodes",
-              `${BASE_URL}/catalogue/${animeId}/${seasonId}/${chosenLang}`,
-              true,
-            )
-            setCurrentSeasonUrl(`${BASE_URL}/catalogue/${animeId}/${seasonId}/${chosenLang}`)
-            const newEpisodes = { [chosenLang]: eps || [] }
+        if (!currentEpisodes && chosenLang) {
+          const eps = await window.electron.ipcRenderer.invoke(
+            "get-episodes",
+            `${BASE_URL}/catalogue/${animeId}/${seasonId}/${chosenLang}`,
+            true,
+          )
+          const newEpisodes = { [chosenLang]: eps || [] }
 
-            if (!currentEpisodeTitle && episodeId && newEpisodes[chosenLang]) {
-              const ep = newEpisodes[chosenLang].find(
-                (e) => e.title?.toLowerCase().replace(/\s+/g, "-") === episodeId,
-              )
-              if (ep) setCurrentEpisodeTitle(ep.title)
-            }
-            setCurrentEpisodes(newEpisodes)
+          if (!episodeTitle && episodeId && newEpisodes[chosenLang]) {
+            const ep = newEpisodes[chosenLang].find(
+              (e) => e.title?.toLowerCase().replace(/\s+/g, "-") === episodeId,
+            )
+            if (ep) getEpisodeTitle(ep.title)
           }
+          getCurrentEpisodes(newEpisodes)
         }
       } catch (error) {
         console.error("Erreur dans le recalcul Episode:", error)
@@ -258,21 +241,10 @@ export const Episode = ({ animeId, seasonId, episodeId }) => {
         setLoading(false)
       }
     }
-
-    if (!currentEpisodes || !currentAvailableLanguages || !currentEpisodeTitle) {
+    if (!currentEpisodes || !selectedLanguage) {
       fetchMissingData()
     }
-  }, [
-    animeId,
-    seasonId,
-    episodeId,
-    currentEpisodes,
-    currentAvailableLanguages,
-    currentSelectedLanguage,
-  ])
-  useEffect(() => {
-    videoTimeRef.current = videoTime
-  }, [videoTime])
+  }, [animeId, seasonId, episodeId, selectedLanguage])
 
   useEffect(() => {
     let cancelled = false
@@ -325,16 +297,16 @@ export const Episode = ({ animeId, seasonId, episodeId }) => {
     return () => {
       cancelled = true
     }
-  }, [episodeSources, currentSelectedLanguage])
+  }, [episodeSources, selectedLanguage])
 
   useEffect(() => {
     skipFinalSaveRef.current = false
   }, [storageKey])
 
   useEffect(() => {
-    if (!currentEpisodes || !currentAvailableLanguages) return
+    if (!currentEpisodes || !availableLanguages) return
 
-    const EpisodeLanguages = currentAvailableLanguages.filter((lang) => {
+    const EpisodeLanguages = availableLanguages.filter((lang) => {
       const epList = currentEpisodes[lang.toLowerCase()]
       return epList && episodeIndex != null && episodeIndex !== -1 && epList[episodeIndex]?.title
     })
@@ -342,78 +314,53 @@ export const Episode = ({ animeId, seasonId, episodeId }) => {
     setAvailableLanguagesEpisode(EpisodeLanguages)
 
     if (
-      currentSelectedLanguage &&
+      selectedLanguage &&
       episodeIndex !== -1 &&
-      currentEpisodes[currentSelectedLanguage] &&
-      currentEpisodes[currentSelectedLanguage][episodeIndex]
+      currentEpisodes[selectedLanguage] &&
+      currentEpisodes[selectedLanguage][episodeIndex]
     ) {
-      setEpisodeSources(currentEpisodes[currentSelectedLanguage][episodeIndex])
+      setEpisodeSources(currentEpisodes[selectedLanguage][episodeIndex])
     }
-  }, [currentSelectedLanguage, episodeIndex, currentEpisodes, currentAvailableLanguages])
+  }, [selectedLanguage, episodeIndex, currentEpisodes, availableLanguages])
 
   useEffect(() => {
-    if (location.state?.episodeTitle && location.state.episodeTitle !== currentEpisodeTitle) {
-      setCurrentEpisodeTitle(location.state.episodeTitle)
+    if (location.state?.episodeTitle && location.state.episodeTitle !== episodeTitle) {
+      getEpisodeTitle(location.state.episodeTitle)
       return
     }
-
     if (episodeId) {
-      const langToCheck =
-        currentSelectedLanguage || (currentAvailableLanguages && currentAvailableLanguages[0])
+      const langToCheck = selectedLanguage || (availableLanguages && availableLanguages[0])
       if (langToCheck && currentEpisodes) {
         let found
         if (currentEpisodes.title?.toLowerCase().replace(/\s+/g, "-") === episodeId) {
           found = currentEpisodes
         }
-        if (found && found.title !== currentEpisodeTitle) {
-          setCurrentEpisodeTitle(found.title)
+        if (found && found.title !== episodeTitle) {
+          getEpisodeTitle(found.title)
           return
         }
       }
 
       if (!currentEpisodes) {
-        setCurrentEpisodeTitle("")
+        getEpisodeTitle("")
       }
     }
   }, [
     episodeId,
     location.state?.episodeTitle,
     currentEpisodes,
-    currentSelectedLanguage,
-    currentAvailableLanguages,
+    selectedLanguage,
+    availableLanguages,
   ])
   useEffect(() => {
     if (!storageKey) return
     animeData.load("animeWatchHistory", storageKey).then((data) => {
       const time = parseFloat(data?.videoTime || 0)
       setVideoTime(time)
-      videoTimeRef.current = time
-      setRestored(true)
+      getRestored(true)
     })
   }, [storageKey])
-  useEffect(() => {
-    if (!restored || !storageKey) return
 
-    const cleanupOldHistory = async () => {
-      try {
-        await clearSeasonHistory()
-      } catch (err) {
-        console.error("Erreur lors du nettoyage de l'historique :", err)
-      }
-    }
-    cleanupOldHistory()
-
-    intervalRef.current = setInterval(() => {
-      animeData.save("animeWatchHistory", storageKey, buildWatchData())
-    }, 5000)
-
-    return () => {
-      clearInterval(intervalRef.current)
-      if (!skipFinalSaveRef.current) {
-        animeData.save("animeWatchHistory", storageKey, buildWatchData())
-      }
-    }
-  }, [restored, storageKey])
   if (loading || !restored) {
     return <Loader />
   }
@@ -421,10 +368,10 @@ export const Episode = ({ animeId, seasonId, episodeId }) => {
     <ErebusPlayer
       src={episodeUrl}
       overlayEnabled={true}
-      cover={displayAnimeCover}
-      title={displayAnimeTitle}
-      subTitle={`${currentSeasonTitle} - ${currentEpisodeTitle}`}
-      titleMedia={`${displayAnimeTitle} : ${currentSeasonTitle} - ${currentEpisodeTitle}`}
+      cover={animeCover}
+      title={animeTitle}
+      subTitle={`${seasonTitle} - ${episodeTitle}`}
+      titleMedia={`${animeTitle} : ${seasonTitle} - ${episodeTitle}`}
       autoControllCloseEnabled={true}
       fullPlayer={true}
       autoPlay={true}
@@ -441,19 +388,18 @@ export const Episode = ({ animeId, seasonId, episodeId }) => {
       }
       onNextClick={() => nextEpisode && EndEpisodeNext(nextEpisode)}
       onClickItemListReproduction={(slug) => {
-        const lang =
-          currentSelectedLanguage || (currentAvailableLanguages && currentAvailableLanguages[0])
+        const lang = selectedLanguage || (availableLanguages && availableLanguages[0])
         const episode = currentEpisodes?.[lang]?.find(
           (ep) => ep.title.toLowerCase().replace(/\s+/g, "-") === slug,
         )
         if (episode) handleNavigation(episode)
       }}
-      reprodutionList={currentEpisodes?.[currentSelectedLanguage]?.map((ep) => ({
+      reprodutionList={currentEpisodes?.[selectedLanguage]?.map((ep) => ({
         id: ep.title.toLowerCase().replace(/\s+/g, "-"),
         name: ep.title,
         playing:
           ep.title.toLowerCase().replace(/\s+/g, "-") ===
-          currentEpisodeTitle.toLowerCase().replace(/\s+/g, "-"),
+          episodeTitle.toLowerCase().replace(/\s+/g, "-"),
       }))}
       onTimeUpdate={handleVideoTimeUpdate}
       onCrossClick={BackMenu}
@@ -461,7 +407,7 @@ export const Episode = ({ animeId, seasonId, episodeId }) => {
       onDownloadClick={handleDownload}
       episodeSources={resolvedSources}
       availableLanguages={availableLanguagesEpisode}
-      currentLanguage={currentSelectedLanguage}
+      currentLanguage={selectedLanguage}
       onChangeLanguage={changeLanguage}
     />
   )

@@ -38,6 +38,7 @@ const CarouselItem = ({
         : getEpisodeSubTitle(episode)
 
   const [remainingMinutes, duration] = getProgressForEpisode(episode)
+
   const navigateAnime = (animeUrl) => {
     const Id = animeUrl.split("/").slice(4, 6).join("/")
     navigate(`/erebus-empire/${Id}`)

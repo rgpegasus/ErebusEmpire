@@ -1,12 +1,12 @@
 import { ipcMain } from "electron"
 
 function RandomAnime(scraper) {
-  ipcMain.handle("random-anime", async (event, max) => {
+  ipcMain.handle("random-anime", async (event, maxAttempts=null) => {
     try {
-      return await scraper.getRandomAnime(["vostfr", "vf"], ["Anime", "Film"], max)
+      return await scraper.getRandomAnime([], ["Anime", "Film", "Autres"], maxAttempts)
     } catch (error) {
       console.error("Erreur dans le main process:", error)
-      return null
+      return {}
     }
   })
 }

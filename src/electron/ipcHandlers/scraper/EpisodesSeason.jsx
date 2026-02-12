@@ -7,14 +7,25 @@ const chromePath = isDev
 
 
 function EpisodesSeason(scraper) {
-  ipcMain.handle("get-episodes", async (event, query, allHost = false, SeasonInfo = false)=> {
+  ipcMain.handle("get-episodes", async (event, seasonUrl, allHost = false, includeInfo = false) => {
     try {
-      return await scraper.getEmbed(query, ["sibnet","movearnpre", "sendvid", "smoothpre"], allHost, SeasonInfo, chromePath );
-    } catch (error){
-      console.error('Erreur dans le main process:', error);
-      return null;
+      return await scraper.getEmbed(
+        seasonUrl,
+        ["sibnet", "movearnpre", "sendvid", "smoothpre"],
+        allHost,
+        includeInfo,
+        chromePath,
+      )
+    } catch (error) {
+      console.error("Erreur dans le main process:", error)
+      if (includeInfo) {
+        return {}
+      } else {
+        return []
+      }
+      
     }
-  });
+  })
 }
 
 export { EpisodesSeason };

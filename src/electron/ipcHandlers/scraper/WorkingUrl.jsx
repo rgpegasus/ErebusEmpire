@@ -6,7 +6,7 @@ function WorkingUrl(scraper) {
       return await scraper.getWorkingUrl()
     } catch (error) {
       console.error("Erreur dans le main process:", error)
-      return null
+      return ""
     }
   })
 }
