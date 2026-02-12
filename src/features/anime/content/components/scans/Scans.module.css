@@ -1,0 +1,62 @@
+.NavigationContainer {
+    bottom:75px;
+    width: 100vw;
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.NavigationBox {
+    background-color: rgba(var(--color-background-rgb), 0.5);
+    display: flex;
+    width: 300px;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 25px;
+    overflow: hidden;
+    padding: 3px;
+}
+
+.Navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;border-radius: 20px;
+    background-color: rgba(var(--color-background-rgb), 0.4); 
+    cursor: pointer;
+}
+.ArrowIconLeft, 
+.ArrowIconRight {
+    border-radius: 30px;
+    margin: 10px;
+    transform: rotate(90deg);
+    width: 20px;
+    height: 20px;
+    color: var(--color-text-secondary);
+    opacity: 0.75;
+}
+
+.ChapterTitle {
+    color: white;
+    opacity: 0.75;
+    font-weight: var(--semi-bold);
+    cursor: pointer;
+    font-size: 17px;
+    font-family: var(--font-family-main);
+}
+.ChapterTitle:hover {
+    color: var(--color-logo);
+    opacity: 1;
+}
+.Navigation:hover,
+.Navigation:hover {
+    background-color: var(--color-logo);
+}
+.NavigationBox:hover {
+    background-color: rgba(var(--color-background-rgb), 0.65); 
+}
+
+.ArrowIconRight {
+    transform: rotate(-90deg);
+}

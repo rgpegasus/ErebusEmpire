@@ -22,7 +22,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: #000;
+  background: var(--color-shadow);
   z-index: -1;
 
   -webkit-mask-image: linear-gradient(

@@ -92,6 +92,10 @@
   /* Toolbar */
   --color-toolbar: #dc9696;
   --color-toolbar-rgb: 220, 150, 150;
+  
+    /* Button */
+  --color-button: #000;
+  --color-button-rgb: 255, 255, 255;
 }
 
 @font-face {

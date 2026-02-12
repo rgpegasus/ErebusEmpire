@@ -60,19 +60,19 @@ export const Dispatcher = () => {
             (season) => season.url.split("/")[5] === seasonId,
           )
           setSeasonData(currentSeason)
-          setSeasonUrl(currentSeason.url)
-          setSeasonTitle(currentSeason.title)
+          setSeasonUrl(currentSeason?.url)
+          setSeasonTitle(currentSeason?.title)
         }
         if (!selectedLanguage) {
-          setSelectedLanguage(currentSeason.language)
+          setSelectedLanguage(currentSeason?.language)
         }
         console.log(currentSeason, seasonData, "oui")
         setContentType(
           currentSeason
-            ? currentSeason?.type.toLowerCase() === "scans"
+            ? currentSeason?.type?.toLowerCase() === "scans"
               ? "manga"
               : "anime"
-            : seasonData?.type === "scans"
+            : seasonData?.type?.toLowerCase() === "scans"
               ? "manga"
               : "anime",
         )
@@ -173,7 +173,7 @@ export const Dispatcher = () => {
       />
     )
   } else {
-    console.log(contentType, "caca")
+    // console.log(contentType, "caca")
     return (
       <Episode
         animeId={animeId}

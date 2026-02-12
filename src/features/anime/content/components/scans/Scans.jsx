@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { useLoader, Loader } from "@utils/dispatchers/Page"
+import styles from './Scans.module.css';
+import { ArrowIcon } from '@utils/dispatchers/Icons';
 
 export const Scans = ({
   animeId,
@@ -22,6 +24,7 @@ export const Scans = ({
   getRestored,
 }) => {
   const location = useLocation()
+  const navigate = useNavigate()
   const { loading, setLoading } = useLoader()
 
   const zoomRef = useRef(null)
@@ -30,8 +33,10 @@ export const Scans = ({
   const [chapterId, setChapterId] = useState(location.state?.chapterId || null)
 
   const [widthPercent, setWidthPercent] = useState(100)
-  const prevChapter = currentEpisodes?.[selectedLanguage]?.[episodeIndex - 1]
-  const nextChapter = currentEpisodes?.[selectedLanguage]?.[episodeIndex + 1]
+  const [chapters, setChapters] = useState([])
+  const [prevChapter, setPrevChapter] = useState(currentEpisodes?.[selectedLanguage]?.[episodeIndex - 1])
+  const [nextChapter, setNextChapter] = useState(currentEpisodes?.[selectedLanguage]?.[episodeIndex + 1])
+  
   const buildWatchData = () => ({
     animeId,
     seasonId,
@@ -58,18 +63,36 @@ export const Scans = ({
           "get-scans-chapter",
           seasonUrl,
         )
-        const currentChapter = chapterTempLink?.scans.map((chap, index) =>
+        const chapterLink = chapterTempLink?.scans.map((chap, index) =>
           ({
             id: index,
             numberImg: chap.numberImg,
             title: chap.title,
           })
-        ).find((ep) => {
+        )
+        const currentChapter = chapterLink.find((ep) => {
           return ep?.title?.toLowerCase().replace(/\s+/g, "-") === location.pathname.split("/")[4]
         })
-          
+        
         getCurrentEpisodes(currentChapter)
-        // console.log(currentEpisode.title, seasonUrl)
+        setChapters(chapterLink)
+        const prev = chapterLink.find((ep) => {
+          return ep?.id === episodeIndex - 1 
+        }) 
+        if (prev) {
+        setPrevChapter(prev)
+        } else {
+          setPrevChapter([])
+        }
+        const next = chapterLink.find((ep) => {
+          return ep?.id === episodeIndex + 1 
+        }) 
+        if (next) {
+        setNextChapter(next)
+        } else {
+          setNextChapter([])
+        }
+        
         getEpisodeTitle(currentChapter?.title)
         setChapterId(currentChapter?.id)
         const scansImg = await window.electron.ipcRenderer.invoke(
@@ -90,7 +113,6 @@ export const Scans = ({
     }
 
     if (!currentEpisodes || imgScans?.length <= 0 || !availableLanguages) {
-      // console.log(currentEpisodes,imgScans.length, availableLanguages,episodeTitle)
       fetchMissingData()
     }
   }, [animeId, seasonId, episodeId, currentEpisodes, availableLanguages, selectedLanguage])
@@ -136,16 +158,13 @@ export const Scans = ({
 
     return () => container.removeEventListener("wheel", handleWheel)
   }, [widthPercent])
+
   const handleChapterNavigation = (chapter) => {
     if (!chapter) return
-    const navId = `${chapter.title.toLowerCase().replace(/\s+/g, "-")}`
 
     getEpisodeTitle(chapter.title)
-    setResolvedSources([])
-    setEpisodeUrl(undefined)
-    setEpisodeSources(chapter)
 
-    navigate(`/erebus-empire/${animeId}/${seasonId}/${navId}`, {
+    navigate(`/erebus-empire/${animeId}/${seasonId}/${chapter.id}`, {
       state: {
         ...location.state,
         episodeTitle: chapter.title,
@@ -178,8 +197,13 @@ export const Scans = ({
           ))}
         </div>
       </div>
-      <div onClick={() => prevChapter && handleChapterNavigation(prevChapter)}>Précédent</div>
-      <div onClick={() => nextChapter && handleChapterNavigation(nextChapter)}>Suivant</div>
+      <div className={styles.NavigationContainer}>
+        <div className={styles.NavigationBox}>
+          <div className={styles.Navigation} onClick={() => prevChapter && handleChapterNavigation(prevChapter)}><ArrowIcon className={styles.ArrowIconLeft}/></div>
+          <div className={styles.ChapterTitle}>{episodeTitle}</div>
+          <div className={styles.Navigation} onClick={() => nextChapter && handleChapterNavigation(nextChapter)}><ArrowIcon className={styles.ArrowIconRight}/></div>
+        </div>
+      </div>
     </div>
   )
 }

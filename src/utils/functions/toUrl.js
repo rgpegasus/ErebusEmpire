@@ -4,7 +4,7 @@ function toUrl(text, separator = "-") {
     .normalize("NFD")               
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/\s+/g, separator)
-    .replace(/[^a-zA-Z0-9\-\/]+/g, "")
+    .replace(/[^a-zA-Z0-9\-\_\/]+/g, "")
     .replace(new RegExp(`${separator}+`, "g"), separator)
     .replace(new RegExp(`^${separator}|${separator}$`, "g"), "") 
     .toLowerCase();

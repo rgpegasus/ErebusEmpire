@@ -4,7 +4,7 @@
     top:calc(var(--size-topbar) + 15px);
     right: 50px;
     background-color: var(--color-secondary);
-    width: 15%;
+    width: 385px;
     box-shadow: 0 0 20px var(--color-shadow);
     padding: 40px 50px;
     border-radius: 20px;
@@ -164,4 +164,275 @@
 }
 .SaveButton:hover {
     opacity: 0.9;
+}
+
+
+@media (max-width: 1920px) {
+  .ThemeContainer {
+    top:calc((var(--size-topbar) + 15px) * 0.75);
+    right:  calc(50px * 0.75);
+    width: calc(385px * 0.75);
+    box-shadow:  0 0  calc(20px * 0.75) var(--color-shadow);
+    padding:  calc(40px * 0.75)  calc(50px * 0.75);
+    border-radius:  calc(20px * 0.75);
+}
+.BackButton {
+  width:  calc(25px * 0.75);
+  height:  calc(25px * 0.75);
+}
+.Title {
+    font-size:  calc(16px * 0.75);
+}
+.ItemContainer {
+    margin-top:  calc(40px * 0.75);
+    gap:  calc(15px * 0.75);
+}
+.TitleItem {
+    font-size:  calc(15px * 0.75);
+}
+.AspectContainer {
+    border-radius:  calc(7px * 0.75);
+    border:  calc(1px * 0.75) solid var(--color-separation);
+    gap:  calc(4px * 0.75);
+    padding:  calc(4px * 0.75);
+}
+
+.AspectItem {
+    border-radius:  calc(7px * 0.75);
+    border:  calc(1px * 0.75) solid transparent;
+}
+
+.AspectItem.Selected {
+    border-radius:  calc(7px * 0.75);
+    border:  calc(1px * 0.75) solid var(--color-separation);
+}
+.NameAspectContainer {
+    top: calc(83px * 0.75);
+    padding:  calc(10px * 0.75);
+    font-size:  calc(14px * 0.75);
+    border-radius:  calc(7px * 0.75);
+    border:  calc(1px * 0.75) solid var(--color-separation);
+    box-shadow:  calc(-2px * 0.75)  calc(5px * 0.75)  calc(10px * 0.75) var(--color-shadow);
+}
+.AspectIcon {
+    width:  calc(20px * 0.75);
+    height:  calc(20px * 0.75);
+    margin:  calc(10px * 0.75) auto;
+}
+.ItemTitleContainer {
+    margin-top:  calc(40px * 0.75);
+    gap:  calc(15px * 0.75);
+}
+
+.ColorPicker :global(.react-colorful) {
+    height:  calc(200px * 0.75);
+}
+.ColorToolsContainer {
+    background-color: var(--color-secondary);
+    border-radius:  calc(7px * 0.75);
+    border:  calc(1px * 0.75) solid var(--color-separation);
+    gap:  calc(4px * 0.75);
+    padding:  calc(10px * 0.75);
+    gap:  calc(10px * 0.75);
+}
+.ActiveColor {
+    width:  calc(30px * 0.75);
+    height:  calc(30px * 0.75);
+    border:  calc(1px * 0.75) solid var(--color-separation);
+}
+.HexInput {
+    font-size:  calc(16px * 0.75);
+    letter-spacing:  calc(0.5px * 0.75);
+}
+.PipetteButton {
+    width:  calc(17px * 0.75);
+    height:  calc(17px * 0.75);
+}
+.SaveButton {
+    padding:  calc(10px * 0.75);
+    font-size:  calc(15px * 0.75);
+    letter-spacing:  calc(1px * 0.75);
+    border-radius:  calc(7px * 0.75);
+}
+
+}
+
+@media (max-width: 1300px) {
+  .ThemeContainer {
+    top:calc((var(--size-topbar) + 15px) * 0.6);
+    right:  calc(50px * 0.6);
+    width: calc(385px * 0.6);
+    box-shadow:  0 0  calc(20px * 0.6) var(--color-shadow);
+    padding:  calc(40px * 0.6)  calc(50px * 0.6);
+    border-radius:  calc(20px * 0.6);
+}
+.BackButton {
+  width:  calc(25px * 0.6);
+  height:  calc(25px * 0.6);
+}
+.Title {
+    font-size:  calc(16px * 0.6);
+}
+.ItemContainer {
+    margin-top:  calc(40px * 0.6);
+    gap:  calc(15px * 0.6);
+}
+.TitleItem {
+    font-size:  calc(15px * 0.6);
+}
+.AspectContainer {
+    border-radius:  calc(7px * 0.6);
+    border:  calc(1px * 0.6) solid var(--color-separation);
+    gap:  calc(4px * 0.6);
+    padding:  calc(4px * 0.6);
+}
+
+.AspectItem {
+    border-radius:  calc(7px * 0.6);
+    border:  calc(1px * 0.6) solid transparent;
+}
+
+.AspectItem.Selected {
+    border-radius:  calc(7px * 0.6);
+    border:  calc(1px * 0.6) solid var(--color-separation);
+}
+.NameAspectContainer {
+    top: calc(83px * 0.6);
+    padding:  calc(10px * 0.6);
+    font-size:  calc(14px * 0.6);
+    border-radius:  calc(7px * 0.6);
+    border:  calc(1px * 0.6) solid var(--color-separation);
+    box-shadow:  calc(-2px * 0.6)  calc(5px * 0.6)  calc(10px * 0.6) var(--color-shadow);
+}
+.AspectIcon {
+    width:  calc(20px * 0.6);
+    height:  calc(20px * 0.6);
+    margin:  calc(10px * 0.6) auto;
+}
+.ItemTitleContainer {
+    margin-top:  calc(40px * 0.6);
+    gap:  calc(15px * 0.6);
+}
+
+.ColorPicker :global(.react-colorful) {
+    height:  calc(200px * 0.6);
+}
+.ColorToolsContainer {
+    background-color: var(--color-secondary);
+    border-radius:  calc(7px * 0.6);
+    border:  calc(1px * 0.6) solid var(--color-separation);
+    gap:  calc(4px * 0.6);
+    padding:  calc(10px * 0.6);
+    gap:  calc(10px * 0.6);
+}
+.ActiveColor {
+    width:  calc(30px * 0.6);
+    height:  calc(30px * 0.6);
+    border:  calc(1px * 0.6) solid var(--color-separation);
+}
+.HexInput {
+    font-size:  calc(16px * 0.6);
+    letter-spacing:  calc(0.5px * 0.6);
+}
+.PipetteButton {
+    width:  calc(17px * 0.6);
+    height:  calc(17px * 0.6);
+}
+.SaveButton {
+    padding:  calc(10px * 0.6);
+    font-size:  calc(15px * 0.6);
+    letter-spacing:  calc(1px * 0.6);
+    border-radius:  calc(7px * 0.6);
+}
+
+}
+
+@media (max-width: 960px) {
+  .ThemeContainer {
+    top:calc((var(--size-topbar) + 15px) * 0.5);
+    right:  calc(50px * 0.5);
+    width: calc(385px * 0.5);
+    box-shadow:  0 0  calc(20px * 0.5) var(--color-shadow);
+    padding:  calc(40px * 0.5)  calc(50px * 0.5);
+    border-radius:  calc(20px * 0.5);
+}
+.BackButton {
+  width:  calc(25px * 0.5);
+  height:  calc(25px * 0.5);
+}
+.Title {
+    font-size:  calc(16px * 0.5);
+}
+.ItemContainer {
+    margin-top:  calc(40px * 0.5);
+    gap:  calc(15px * 0.5);
+}
+.TitleItem {
+    font-size:  calc(15px * 0.5);
+}
+.AspectContainer {
+    border-radius:  calc(7px * 0.5);
+    border:  calc(1px * 0.5) solid var(--color-separation);
+    gap:  calc(4px * 0.5);
+    padding:  calc(4px * 0.5);
+}
+
+.AspectItem {
+    border-radius:  calc(7px * 0.5);
+    border:  calc(1px * 0.5) solid transparent;
+}
+
+.AspectItem.Selected {
+    border-radius:  calc(7px * 0.5);
+    border:  calc(1px * 0.5) solid var(--color-separation);
+}
+.NameAspectContainer {
+    top: calc(83px * 0.5);
+    padding:  calc(10px * 0.5);
+    font-size:  calc(14px * 0.5);
+    border-radius:  calc(7px * 0.5);
+    border:  calc(1px * 0.5) solid var(--color-separation);
+    box-shadow:  calc(-2px * 0.5)  calc(5px * 0.5)  calc(10px * 0.5) var(--color-shadow);
+}
+.AspectIcon {
+    width:  calc(20px * 0.5);
+    height:  calc(20px * 0.5);
+    margin:  calc(10px * 0.5) auto;
+}
+.ItemTitleContainer {
+    margin-top:  calc(40px * 0.5);
+    gap:  calc(15px * 0.5);
+}
+
+.ColorPicker :global(.react-colorful) {
+    height:  calc(200px * 0.5);
+}
+.ColorToolsContainer {
+    background-color: var(--color-secondary);
+    border-radius:  calc(7px * 0.5);
+    border:  calc(1px * 0.5) solid var(--color-separation);
+    gap:  calc(4px * 0.5);
+    padding:  calc(10px * 0.5);
+    gap:  calc(10px * 0.5);
+}
+.ActiveColor {
+    width:  calc(30px * 0.5);
+    height:  calc(30px * 0.5);
+    border:  calc(1px * 0.5) solid var(--color-separation);
+}
+.HexInput {
+    font-size:  calc(16px * 0.5);
+    letter-spacing:  calc(0.5px * 0.5);
+}
+.PipetteButton {
+    width:  calc(17px * 0.5);
+    height:  calc(17px * 0.5);
+}
+.SaveButton {
+    padding:  calc(10px * 0.5);
+    font-size:  calc(15px * 0.5);
+    letter-spacing:  calc(1px * 0.5);
+    border-radius:  calc(7px * 0.5);
+}
+
 }
