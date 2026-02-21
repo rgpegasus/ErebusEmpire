@@ -105,14 +105,6 @@ const BackgroundCover = ({ coverInfo, whileWatching = false, isAnime = true}) =>
             const seasonId = result[0].url.split("/")[5]
             const episodeId = toSlug(episodesData[selectedLanguage][0].title);
             const path = `/erebus-empire/${animeId}/${seasonId}/${episodeId}`;
-            console.log(
-              episodesData[selectedLanguage][0].title,
-              episodesData,
-              coverInfo.title,
-              result[0].url,
-              languages,
-              selectedLanguage,
-            )
             navigate(path, {
             state: {
                 episodeTitle: episodesData[selectedLanguage][0].title,

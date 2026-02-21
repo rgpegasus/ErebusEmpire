@@ -1,6 +1,8 @@
 import React, { useState, useEffect} from 'react';
-import { Upload, Download, Bug, ShieldOff, ChevronLeftCircle} from 'lucide-react';
+import { Upload, Download, Bug, ShieldOff} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import BackgroundCover from "@components/background-cover/BackgroundCover"
+import { LoginPageBackground } from "@utils/dispatchers/Pictures"
 
 export const Profile = () => {
     const [isDev, setIsDev] = useState(() => {
@@ -44,13 +46,9 @@ const importData = async () => {
     const navigate = useNavigate();
   return (
     <div className="MainPage">
-      <div className="Space"></div>
-      <div className="Space"></div>
-      <div className="Space"></div>
-      <div className="Space"></div>
-      <div className="Space"></div>
-      <h1 className="CategorieTitle">Profil :</h1>
+      <BackgroundCover coverInfo={LoginPageBackground} whileWatching={false} isAnime={false} />
       <div className="SettingsPage">
+        <div className="SettingsTitle">Profile</div>
         <div className="SettingsGroupe">
           <div className="setting-item">
             <h2 className="setting-label">Données</h2>

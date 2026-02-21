@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from "./Season.module.css"
 import useEmblaCarousel from "embla-carousel-react";
 import { useParams, useNavigate } from 'react-router-dom';
@@ -10,7 +10,7 @@ import ContentsCarousel from '@components/contents-carousel/ContentsCarousel';
 export const Season = () => {
   const { animeId, seasonId } = useParams()
   const navigate = useNavigate()
-  const { setLoading } = useLoader()
+  const { loading, setLoading } = useLoader()
 
   const [animeUrl, setAnimeUrl] = useState(null)
   const [animeInfo, setAnimeInfo] = useState(null)
@@ -119,13 +119,13 @@ export const Season = () => {
   useEffect(() => {
     if (!selectedSeason || !selectedLanguage || contentType != "anime") return
     const fetchEpisodes = async () => {
+      setLoading(true)
       try {
         const currentLanguage = selectedLanguage.toLowerCase()
         if (episodeCache[selectedSeason]?.[currentLanguage]) {
           setEpisodes(episodeCache[selectedSeason][currentLanguage])
           return
         }
-        setLoading(true)
         const seasonLangUrl = `${selectedSeason}/${currentLanguage}`
         const languages = await window.electron.ipcRenderer.invoke(
           "get-available-languages",
@@ -158,12 +158,12 @@ export const Season = () => {
     if (!selectedSeason || !selectedLanguage || contentType != "manga") return
     const fetchScans = async () => {
       try {
+        setLoading(true)
         const currentLanguage = selectedLanguage.toLowerCase()
         if (episodeCache[selectedSeason]?.[currentLanguage]) {
           setEpisodes(episodeCache[selectedSeason][currentLanguage])
           return
         }
-        setLoading(true)
         const chapterTempLink = await window.electron.ipcRenderer.invoke(
           "get-scans-chapter",
           `${selectedSeason}/${selectedLanguage}`,
@@ -240,7 +240,6 @@ export const Season = () => {
             return [lang.toLowerCase(), eps]
           }),
         )
-
         const updatedCache = {
           ...currentCache,
           ...Object.fromEntries(missingEpisodes),
@@ -248,15 +247,15 @@ export const Season = () => {
         navigate(path, {
           state: {
             episodeTitle: episode.title,
-            episodes: updatedCache,
+            contents: updatedCache,
             animeId,
             seasonId,
-            animeTitle: animeInfo.title,
             seasonTitle: selectedSeasonData?.title,
-            animeCover: animeInfo.cover,
-            seasonUrl: selectedSeason,
+            seasonUrl: `${selectedSeason}/${selectedLanguage}`,
             availableLanguages,
             selectedLanguage,
+            contentType,
+            animeInfo,
           },
         })
       } else if (contentType === "manga") {
@@ -272,16 +271,16 @@ export const Season = () => {
           state: {
             episodeTitle: episode.title,
             scans: scansImg,
-            episodes: episode,
+            contents: episodeCache[selectedSeason] || {},
             chapterId: episode.id,
             animeId,
             seasonId,
-            animeTitle: animeInfo.title,
             seasonTitle: selectedSeasonData?.title,
-            animeCover: animeInfo.cover,
             seasonUrl: langUrl,
             availableLanguages,
             selectedLanguage,
+            contentType,
+            animeInfo,
           },
         })
       }
@@ -316,55 +315,54 @@ export const Season = () => {
       emblaApi.scrollTo(selectedIndex, true)
     }
   }, [emblaApi, selectedSeason, seasons])
-
-  return (
-    <div className="MainPage">
-      <BackgroundCover coverInfo={coverInfo} whileWatching={true} isAnime={true} />
-      <div className={styles.SeasonContainer}>
-        {filteredSeasons?.length > 0 && (
-          <div className={styles.EmblaViewport} ref={emblaRef}>
-            <div className={styles.EmblaContainer}>
-              {filteredSeasons?.map((season) => {
-                const isActive = season.url.split("/").slice(0, 6).join("/") === selectedSeason
-                return (
-                  <div
-                    key={toSlug(season.title)}
-                    onClick={() => handleSeasonSelect(season)}
-                    className={`${styles.SeasonItem} ${isActive ? styles.ActiveSeason : ""}`}
-                  >
-                    {season.title}
-                  </div>
-                )
-              })}
+    return (
+      <div className="MainPage">
+        <BackgroundCover coverInfo={coverInfo} whileWatching={true} isAnime={true} />
+        <div className={styles.SeasonContainer}>
+          {filteredSeasons?.length > 0 && (
+            <div className={styles.EmblaViewport} ref={emblaRef}>
+              <div className={styles.EmblaContainer}>
+                {filteredSeasons?.map((season) => {
+                  const isActive = season.url.split("/").slice(0, 6).join("/") === selectedSeason
+                  return (
+                    <div
+                      key={toSlug(season.title)}
+                      onClick={() => handleSeasonSelect(season)}
+                      className={`${styles.SeasonItem} ${isActive ? styles.ActiveSeason : ""}`}
+                    >
+                      {season.title}
+                    </div>
+                  )
+                })}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      <div className={styles.Container}>
-        <ContentsCarousel
-          data={episodes}
-          onClickEpisode={handleEpisodeClick}
-          getEpisodeCover={() => animeInfo?.cover}
-          getAnimeTitle={() => animeInfo?.title}
-          getEpisodeSubTitle={(ep) => {
-            const seasonTitle = seasons.find((season) =>
-              season.url.includes(`/${selectedSeason.split("/")[5]}/`),
-            )?.title
-            return `${seasonTitle} - ${ep.title}`
-          }}
-          getEpisodeTitle={(ep) => ep.title}
-          getUrlErebus={(ep) => `/erebus-empire/${ep.animeId}/${ep.seasonId}/${ep.episodeId}`}
-          currentLanguage={selectedLanguage}
-          isSeason={true}
-          availableLanguages={availableLanguages}
-          onLanguageChange={handleLanguageChange}
-          searchBy={"episode"}
-          onContentTypeChange={handleContentTypeChange}
-          availableContentTypes={availableContentTypes}
-          contentType={contentType}
-        />
+        <div className={styles.Container}>
+          <ContentsCarousel
+            data={episodes}
+            onClickEpisode={handleEpisodeClick}
+            getEpisodeCover={() => animeInfo?.cover}
+            getAnimeTitle={() => animeInfo?.title}
+            getEpisodeSubTitle={(ep) => {
+              const seasonTitle = seasons.find((season) =>
+                season.url.includes(`/${selectedSeason.split("/")[5]}/`),
+              )?.title
+              return `${seasonTitle} - ${ep.title}`
+            }}
+            getEpisodeTitle={(ep) => ep.title}
+            getUrlErebus={(ep) => `/erebus-empire/${ep.animeId}/${ep.seasonId}/${ep.episodeId}`}
+            currentLanguage={selectedLanguage}
+            isSeason={true}
+            availableLanguages={availableLanguages}
+            onLanguageChange={handleLanguageChange}
+            searchBy={"episode"}
+            onContentTypeChange={handleContentTypeChange}
+            availableContentTypes={availableContentTypes}
+            contentType={contentType}
+          />
+        </div>
       </div>
-    </div>
-  )
+    )
 };

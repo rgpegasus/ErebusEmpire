@@ -30,6 +30,9 @@ const ContentsCarousel = ({
   isGridMode = true,
   customType = "",
   customSearch,
+  onSearchKeyDown,
+  searchValue,
+  setSearchValue,
 }) => {
   const [watchedEpisodes, setWatchedEpisodes] = useState([])
   const [isInside, setIsInside] = useState(false)
@@ -40,7 +43,6 @@ const ContentsCarousel = ({
   const [canScrollPrev, setCanScrollPrev] = useState(false)
   const [canScrollNext, setCanScrollNext] = useState(false)
   const [gridMode, setGridMode] = useState(isGridMode)
-  const [searchValue, setSearchValue] = useState("")
   const [filteredData, setFilteredData] = useState(data)
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -57,7 +59,7 @@ const ContentsCarousel = ({
       return
     }
     if (customSearch) {
-      
+      console.log("custom")
     } else if (searchBy === "title") {
       setFilteredData(
         data.filter((ep) => getAnimeTitle(ep).toLowerCase().includes(searchValue.toLowerCase())),
@@ -78,6 +80,7 @@ const ContentsCarousel = ({
   }
 
   useEffect(() => {
+    if (onSearchKeyDown) return
     handleSearch()
   }, [searchValue])
 
@@ -155,7 +158,7 @@ const ContentsCarousel = ({
   const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi])
   const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi])
 
-  if (!data || data.length === 0 && !display) {
+  if (!data || (data.length === 0 && !display)) {
     return null
   }
 
@@ -181,6 +184,7 @@ const ContentsCarousel = ({
         contentType={contentType}
         customType={customType}
         customSearch={customSearch}
+        onSearchKeyDown={onSearchKeyDown}
       />
 
       {sortedData && sortedData.length > 0 ? (

@@ -113,16 +113,166 @@
     margin: calc(50px * 0.75);
     margin-top: calc(-100px * 0.75);
   }
+  .Title {
+    letter-spacing: calc(2px * 0.75);
+    font-size: calc(60px * 0.75);
+    line-height: calc(0.8 * 0.75);
+    margin-bottom: calc(33px * 0.75);
+  }
+  .ContainerProgress {
+    height: calc(350px * 0.75);
+    border-radius: calc(25px * 0.75);
+    margin-bottom: calc(100px * 0.75);
+  }
+  
+  .ProgressCover {
+    height: calc(350px * 0.75);
+  }
+  .ProgressWrapper {
+   
+    margin: calc(50px * 0.75);
+    height: calc(calc(100% - 100px) * 0.75);
+    width: calc(calc(100% - 100px) * 0.75);
+  }
+  .AnimeTitleProgress {
+    font-size: calc(35px * 0.75);
+    letter-spacing: calc(2px * 0.75);
+  }
+  .EpisodeTitleProgress {
+    font-size: calc(30px * 0.75);
+    letter-spacing: calc(3px * 0.75);
+  }
+  .DownloadProgress {
+    height: calc(50px * 0.75);
+    gap: calc(50px * 0.75);
+  }
+  
+  .PauseIcon {
+    height: calc(50px * 0.75);
+  }
+  .ProgressBar {
+    height: calc(15px * 0.75);
+    border-radius: calc(7.5px * 0.75);
+  }
+  .CurrentProgressBar {
+    height: calc(15px * 0.75);
+    border-radius: calc(7.5px * 0.75);
+  }
+  .SecondLeft {
+    width: calc(100px * 0.75);
+    font-size: calc(35px * 0.75);
+    letter-spacing: calc(3px * 0.75);
+  }
 }
 @media (max-width: 1300px) {
   .Container {
     margin: calc(50px * 0.6);
     margin-top: calc(-100px * 0.6);
   }
+  .Title {
+    letter-spacing: calc(2px * 0.6);
+    font-size: calc(60px * 0.6);
+    line-height: calc(0.8 * 0.6);
+    margin-bottom: calc(33px * 0.6);
+  }
+  .ContainerProgress {
+    height: calc(350px * 0.6);
+    border-radius: calc(25px * 0.6);
+    margin-bottom: calc(100px * 0.6);
+  }
+  
+  .ProgressCover {
+    height: calc(350px * 0.6);
+  }
+  .ProgressWrapper {
+   
+    margin: calc(50px * 0.6);
+    height: calc(calc(100% - 100px) * 0.6);
+    width: calc(calc(100% - 100px) * 0.6);
+  }
+  .AnimeTitleProgress {
+    font-size: calc(35px * 0.6);
+    letter-spacing: calc(2px * 0.6);
+  }
+  .EpisodeTitleProgress {
+    font-size: calc(30px * 0.6);
+    letter-spacing: calc(3px * 0.6);
+  }
+  .DownloadProgress {
+    height: calc(50px * 0.6);
+    gap: calc(50px * 0.6);
+  }
+  
+  .PauseIcon {
+    height: calc(50px * 0.6);
+  }
+  .ProgressBar {
+    height: calc(15px * 0.6);
+    border-radius: calc(7.5px * 0.6);
+  }
+  .CurrentProgressBar {
+    height: calc(15px * 0.6);
+    border-radius: calc(7.5px * 0.6);
+  }
+  .SecondLeft {
+    width: calc(100px * 0.6);
+    font-size: calc(35px * 0.6);
+    letter-spacing: calc(3px * 0.6);
+  }
 }
 @media (max-width: 960px) {
   .Container {
     margin: calc(50px * 0.5);
     margin-top: calc(-100px * 0.5);
+  }
+  .Title {
+    letter-spacing: calc(2px * 0.5);
+    font-size: calc(60px * 0.5);
+    line-height: calc(0.8 * 0.5);
+    margin-bottom: calc(33px * 0.5);
+  }
+  .ContainerProgress {
+    height: calc(350px * 0.5);
+    border-radius: calc(25px * 0.5);
+    margin-bottom: calc(100px * 0.5);
+  }
+  
+  .ProgressCover {
+    height: calc(350px * 0.5);
+  }
+  .ProgressWrapper {
+   
+    margin: calc(50px * 0.5);
+    height: calc(calc(100% - 100px) * 0.5);
+    width: calc(calc(100% - 100px) * 0.5);
+  }
+  .AnimeTitleProgress {
+    font-size: calc(35px * 0.5);
+    letter-spacing: calc(2px * 0.5);
+  }
+  .EpisodeTitleProgress {
+    font-size: calc(30px * 0.5);
+    letter-spacing: calc(3px * 0.5);
+  }
+  .DownloadProgress {
+    height: calc(50px * 0.5);
+    gap: calc(50px * 0.5);
+  }
+  
+  .PauseIcon {
+    height: calc(50px * 0.5);
+  }
+  .ProgressBar {
+    height: calc(15px * 0.5);
+    border-radius: calc(7.5px * 0.5);
+  }
+  .CurrentProgressBar {
+    height: calc(15px * 0.5);
+    border-radius: calc(7.5px * 0.5);
+  }
+  .SecondLeft {
+    width: calc(100px * 0.5);
+    font-size: calc(35px * 0.5);
+    letter-spacing: calc(3px * 0.5);
   }
 }

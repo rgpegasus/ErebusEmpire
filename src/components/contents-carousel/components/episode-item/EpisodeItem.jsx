@@ -77,7 +77,7 @@ const CarouselItem = ({
             <img
               className={styles.Language}
               src={FlagDispatcher(episode[currentLanguage])}
-              alt="Language flag"
+              alt={currentLanguage || "Language flag"}
             />
           ) : (
             episode.selectedLanguage &&
@@ -85,7 +85,7 @@ const CarouselItem = ({
               <img
                 className={styles.Language}
                 src={FlagDispatcher(episode.selectedLanguage)}
-                alt="Language flag"
+                alt={episode.selectedLanguage || "Language flag"}
               />
             )
           )}

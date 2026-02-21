@@ -3,8 +3,8 @@ import { UserContext } from '@context/user-context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { PinIcon, UnpinIcon, ProfileIcon } from '@utils/dispatchers/Icons';
 import { ChevronRight, Rocket, BatteryLow, Bell, LucideBellOff } from 'lucide-react';
-
-
+import BackgroundCover from "@components/background-cover/BackgroundCover"
+import { LoginPageBackground } from "@utils/dispatchers/Pictures"
 
   const getUsageTime = () => {
     const savedTime = localStorage.getItem('usageTime'); 
@@ -53,41 +53,49 @@ export const Settings = ({ openTheme }) => {
 
   return (
     <div className="MainPage">
-      <div className='Space'></div>
-      <div className='Space'></div>
-      <div className='Space'></div>
-      <div className='Space'></div>
-      <div className='Space'></div>
-      <h1 className="CategorieTitle">Paramètres</h1>          
-      <div className='SettingsPage'>
-        <div className='SettingsGroupe'>
-          <div className='setting-item profil' onClick={() =>navigate("/erebus-empire/settings/profile")}>
-            <div className='Settings-InfoUser'>
-              {profileImage? (
-                <img src={profileImage} alt="Profil" className="Settings-profile-img" draggable="false" />
-              ):(
-                <ProfileIcon className='Settings-profile-img'/>
+      <BackgroundCover coverInfo={LoginPageBackground} whileWatching={false} isAnime={false} />
+      <div className="SettingsPage">
+        <div className="SettingsTitle">Paramètres</div>
+        <div className="SettingsGroupe">
+          <div
+            className="setting-item profil"
+            onClick={() => navigate("/erebus-empire/settings/profile")}
+          >
+            <div className="Settings-InfoUser">
+              {profileImage ? (
+                <img
+                  src={profileImage}
+                  alt="Profil"
+                  className="Settings-profile-img"
+                  draggable="false"
+                />
+              ) : (
+                <ProfileIcon className="Settings-profile-img" />
               )}
               <div className="Settings-username">{username}</div>
             </div>
             <div className="Settings-usage-time">
               <span>Temps d'utilisation : {convertSecondsToTime(usageTime)}</span>
             </div>
-            <span className="Settings-ChevronIcon"><ChevronRight size={30} /></span>
+            <span className="Settings-ChevronIcon">
+              <ChevronRight />
+            </span>
           </div>
         </div>
-        <div className='Space'></div>
-        <div className='SettingsGroupe'>
-          <div className='setting-item theme' onClick={openTheme}>
+        <div className="Space"></div>
+        <div className="SettingsGroupe">
+          <div className="setting-item theme" onClick={openTheme}>
             <span className="setting-label">Personnaliser le thème</span>
-            <span className="Settings-ChevronIcon"><ChevronRight size={30} /></span>
+            <span className="Settings-ChevronIcon">
+              <ChevronRight />
+            </span>
           </div>
           {/* <div className="setting-item">
             <span className="setting-label">Mode performance</span>
             <label className="switch">
               <input type="checkbox" checked={isPerf} onChange={togglePerf} />
               <span className="slider">
-                <span className="icon">{isPerf ? <Rocket size={14} /> : <BatteryLow size={14} />}</span>
+                <span className="icon">{isPerf ? <Rocket /> : <BatteryLow />}</span>
               </span>
             </label>
           </div> */}
@@ -96,7 +104,9 @@ export const Settings = ({ openTheme }) => {
             <label className="switch">
               <input type="checkbox" checked={toolBar} onChange={togglePin} />
               <span className="slider">
-                <span className="icon">{toolBar ? <PinIcon size={14} /> : <UnpinIcon size={14} />}</span>
+                <span className="icon">
+                  {toolBar ? <PinIcon /> : <UnpinIcon />}
+                </span>
               </span>
             </label>
           </div>
@@ -105,17 +115,19 @@ export const Settings = ({ openTheme }) => {
             <label className="switch">
               <input type="checkbox" checked={isNotif} onChange={toggleNotif} />
               <span className="slider">
-                <span className="icon">{isNotif ? <Bell size={14} /> : <LucideBellOff size={14} />}</span>
+                <span className="icon">
+                  {isNotif ? <Bell /> : <LucideBellOff />}
+                </span>
               </span>
             </label>
           </div>
-          
+
           {/* <div className="setting-item">
             <span className="setting-label">Langue d'affichage</span>
           </div> */}
         </div>
       </div>
-      <div className='Space'></div>
+      <div className="Space"></div>
     </div>
-  );
+  )
 };

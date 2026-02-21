@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { useLoader, Loader } from "@utils/dispatchers/Page"
-import styles from './Scans.module.css';
-import { ArrowIcon } from '@utils/dispatchers/Icons';
+import styles from "./Scans.module.css"
+import { ArrowIcon } from "@utils/dispatchers/Icons"
 
 export const Scans = ({
   animeId,
@@ -18,10 +18,11 @@ export const Scans = ({
   selectedLanguage,
   getEpisodeTitle,
   getWatchDataRef,
-  getCurrentEpisodes,
+  getContents,
   getAvailableLanguages,
-  currentEpisodes,
+  contents,
   getRestored,
+  getEpisodeIndex,
 }) => {
   const location = useLocation()
   const navigate = useNavigate()
@@ -33,10 +34,17 @@ export const Scans = ({
   const [chapterId, setChapterId] = useState(location.state?.chapterId || null)
 
   const [widthPercent, setWidthPercent] = useState(100)
-  const [chapters, setChapters] = useState([])
-  const [prevChapter, setPrevChapter] = useState(currentEpisodes?.[selectedLanguage]?.[episodeIndex - 1])
-  const [nextChapter, setNextChapter] = useState(currentEpisodes?.[selectedLanguage]?.[episodeIndex + 1])
-  
+  const [prevChapter, setPrevChapter] = useState(
+    contents?.[selectedLanguage]?.[episodeIndex - 1] || {},
+  )
+  const [nextChapter, setNextChapter] = useState(
+    contents?.[selectedLanguage]?.[episodeIndex + 1] || {},
+  )
+  const isValidIndex  = (index) => {
+    return index && Array.isArray(index)
+                ? index.length > 0
+                : Object.keys(index).length > 0
+  } 
   const buildWatchData = () => ({
     animeId,
     seasonId,
@@ -50,49 +58,47 @@ export const Scans = ({
     seasonUrl,
     availableLanguages,
     selectedLanguage,
+    contentType: "manga",
   })
   useEffect(() => {
     const fetchMissingData = async () => {
       try {
         setLoading(true)
 
-        if (!availableLanguages) {
+        if (!availableLanguages || (Array.isArray(availableLanguages) && availableLanguages.length === 0)) {
           getAvailableLanguages([selectedLanguage])
         }
         const chapterTempLink = await window.electron.ipcRenderer.invoke(
           "get-scans-chapter",
           seasonUrl,
         )
-        const chapterLink = chapterTempLink?.scans.map((chap, index) =>
-          ({
-            id: index,
-            numberImg: chap.numberImg,
-            title: chap.title,
-          })
-        )
+        const chapterLink = chapterTempLink?.scans.map((chap, index) => ({
+          id: index,
+          numberImg: chap.numberImg,
+          title: chap.title,
+        }))
         const currentChapter = chapterLink.find((ep) => {
           return ep?.title?.toLowerCase().replace(/\s+/g, "-") === location.pathname.split("/")[4]
         })
-        
-        getCurrentEpisodes(currentChapter)
-        setChapters(chapterLink)
+
+        getContents({ [selectedLanguage]: chapterLink })
         const prev = chapterLink.find((ep) => {
-          return ep?.id === episodeIndex - 1 
-        }) 
+          return ep?.id === episodeIndex - 1
+        })
         if (prev) {
-        setPrevChapter(prev)
+          setPrevChapter(prev)
         } else {
-          setPrevChapter([])
+          setPrevChapter({})
         }
         const next = chapterLink.find((ep) => {
-          return ep?.id === episodeIndex + 1 
-        }) 
+          return ep?.id === episodeIndex + 1
+        })
         if (next) {
-        setNextChapter(next)
+          setNextChapter(next)
         } else {
-          setNextChapter([])
+          setNextChapter({})
         }
-        
+
         getEpisodeTitle(currentChapter?.title)
         setChapterId(currentChapter?.id)
         const scansImg = await window.electron.ipcRenderer.invoke(
@@ -112,10 +118,15 @@ export const Scans = ({
       }
     }
 
-    if (!currentEpisodes || imgScans?.length <= 0 || !availableLanguages) {
+    if (
+      !contents ||
+      imgScans?.length <= 0 ||
+      !availableLanguages ||
+      (Array.isArray(availableLanguages) && availableLanguages.length === 0)
+    ) {
       fetchMissingData()
     }
-  }, [animeId, seasonId, episodeId, currentEpisodes, availableLanguages, selectedLanguage])
+  }, [animeId, seasonId, episodeId, contents, availableLanguages, selectedLanguage])
 
   useEffect(() => {
     getWatchDataRef(buildWatchData())
@@ -159,14 +170,16 @@ export const Scans = ({
     return () => container.removeEventListener("wheel", handleWheel)
   }, [widthPercent])
 
-  const handleChapterNavigation = (chapter) => {
-    if (!chapter) return
-
+  const handleChapterNavigation = (chapter, newIndex) => {
     getEpisodeTitle(chapter.title)
-
-    navigate(`/erebus-empire/${animeId}/${seasonId}/${chapter.id}`, {
+    getEpisodeIndex(newIndex)
+    const chapterId = chapter.title?.toLowerCase().replace(/\s+/g, "-")
+    setImgScans([])
+    navigate(`/erebus-empire/${animeId}/${seasonId}/${chapterId}`, {
       state: {
         ...location.state,
+        scans: [],
+        chapterId: chapter.id,
         episodeTitle: chapter.title,
       },
     })
@@ -199,9 +212,23 @@ export const Scans = ({
       </div>
       <div className={styles.NavigationContainer}>
         <div className={styles.NavigationBox}>
-          <div className={styles.Navigation} onClick={() => prevChapter && handleChapterNavigation(prevChapter)}><ArrowIcon className={styles.ArrowIconLeft}/></div>
+          <div
+            className={`${styles.Navigation} ${isValidIndex(prevChapter) ? styles.Activate : styles.Desactivate}`}
+            onClick={() =>
+              isValidIndex(prevChapter) && handleChapterNavigation(prevChapter, episodeIndex - 1)
+            }
+          >
+            <ArrowIcon className={styles.ArrowIconLeft} />
+          </div>
           <div className={styles.ChapterTitle}>{episodeTitle}</div>
-          <div className={styles.Navigation} onClick={() => nextChapter && handleChapterNavigation(nextChapter)}><ArrowIcon className={styles.ArrowIconRight}/></div>
+          <div
+            className={`${styles.Navigation} ${isValidIndex(nextChapter) ? styles.Activate : styles.Desactivate}`}
+            onClick={() =>
+              isValidIndex(nextChapter) && handleChapterNavigation(nextChapter, episodeIndex + 1)
+            }
+          >
+            <ArrowIcon className={styles.ArrowIconRight} />
+          </div>
         </div>
       </div>
     </div>

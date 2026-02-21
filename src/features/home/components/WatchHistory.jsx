@@ -31,7 +31,7 @@ const WatchHistory = () => {
     let tempScans = []
     
     for (const element of data) {
-      if (!element.seasonUrl.includes("scan")) {
+      if (!element.seasonUrl?.includes("scan")) {
         tempEpisodes.push(element)
         setWatchedEpisodes(episodes)
       } else {
@@ -148,7 +148,7 @@ const WatchHistory = () => {
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "")
-    if (!episode.seasonUrl.includes("scan")) {
+    if (episode.contentType === "anime") {
       navigate(`/erebus-empire/${episode.animeId}/${episode.seasonId}/${episodeId}`, {
         state: {
           episodeTitle: episode.episodeTitle,
@@ -161,9 +161,10 @@ const WatchHistory = () => {
           seasonUrl: episode.seasonUrl,
           availableLanguages: episode.availableLanguages,
           selectedLanguage: episode.selectedLanguage,
+          contentType: episode.contentType,
         },
       })
-    } else {
+    } else if (episode.contentType === "manga") {
       navigate(`/erebus-empire/${episode.animeId}/${episode.seasonId}/${episodeId}`, {
         state: {
           episodeTitle: episode.episodeTitle,
@@ -176,6 +177,7 @@ const WatchHistory = () => {
           seasonUrl: episode.seasonUrl,
           availableLanguages: episode.availableLanguages,
           selectedLanguage: episode.selectedLanguage,
+          contentType: episode.contentType,
         },
       })
     }

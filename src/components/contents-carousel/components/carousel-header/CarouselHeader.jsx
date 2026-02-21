@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { GridModeIcon, CarouselModeIcon, SortIcon, SearchIcon } from '@utils/dispatchers/Icons';
-import { FlagDispatcher } from '@utils/dispatchers/Flags';
-import styles from '../../ContentsCarousel.module.css';
+import React, { useState } from "react"
+import { GridModeIcon, CarouselModeIcon, SortIcon, SearchIcon } from "@utils/dispatchers/Icons"
+import { FlagDispatcher } from "@utils/dispatchers/Flags"
+import styles from "../../ContentsCarousel.module.css"
 
 const CarouselHeader = ({
   data,
@@ -19,7 +19,7 @@ const CarouselHeader = ({
   availableContentTypes,
   contentType,
   customType,
-  customSearch,
+  onSearchKeyDown,
 }) => {
   const handleContentTypeToggle = () => {
     if (availableContentTypes.hasAnime && availableContentTypes.hasManga) {
@@ -60,21 +60,23 @@ const CarouselHeader = ({
           </div>
         )}
 
-        {data && <h2 className={`${styles.ActionsTitle} ${styles.NoHover}`}>
-          {data.length === 0
-            ? `Aucun ${getContentTypeDisplay() === "Anime" ? "épisode" : "chapitre"}`
-            : `${!customType.startsWith("~~") ? data.length : ""} ${
-                getContentTypeDisplay() === customType && !customType.startsWith("~")
-                  ? customType
-                  : customType && customType.startsWith("~~")
-                    ? customType.slice(2)
-                    : customType && customType.startsWith("~")
-                      ? customType.slice(1)
-                      : "Anime"
-                        ? "Episode"
-                        : "Chapitre"
-              }${data.length > 1 && !customType.startsWith("~") ? "s" : ""}`}
-        </h2>}
+        {data && (
+          <h2 className={`${styles.ActionsTitle} ${styles.NoHover}`}>
+            {data.length === 0
+              ? `Aucun ${getContentTypeDisplay() === "Anime" ? "épisode" : "chapitre"}`
+              : `${!customType.startsWith("~~") ? data.length : ""} ${
+                  getContentTypeDisplay() === customType && !customType.startsWith("~")
+                    ? customType
+                    : customType && customType.startsWith("~~")
+                      ? customType.slice(2)
+                      : customType && customType.startsWith("~")
+                        ? customType.slice(1)
+                        : "Anime"
+                          ? "Episode"
+                          : "Chapitre"
+                }${data.length > 1 && !customType.startsWith("~") ? "s" : ""}`}
+          </h2>
+        )}
 
         <div
           className={styles.SortContainer}
@@ -99,7 +101,11 @@ const CarouselHeader = ({
             type="text"
             placeholder="Rechercher..."
             value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value
+              setSearchValue(value)
+            }}
+            onKeyDown={onSearchKeyDown}
             className={styles.SearchInput}
           />
         </div>
@@ -132,4 +138,4 @@ const CarouselHeader = ({
   )
 }
 
-export default CarouselHeader;
+export default CarouselHeader

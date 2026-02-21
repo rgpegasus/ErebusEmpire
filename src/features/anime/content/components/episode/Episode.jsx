@@ -16,12 +16,13 @@ export const Episode = ({
   availableLanguages,
   getEpisodeTitle,
   getWatchDataRef,
-  getCurrentEpisodes,
+  getContents,
   getAvailableLanguages,
-  currentEpisodes,
+  contents,
   getRestored,
   restored,
   storageKey,
+  clearSeasonHistory,
 }) => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -34,16 +35,15 @@ export const Episode = ({
   const [videoTime, setVideoTime] = useState(0)
   const lastPresenceUpdateRef = useRef(0)
   const [availableLanguagesEpisode, setAvailableLanguagesEpisode] = useState(undefined)
- 
 
   const newEpisodeId = episodeTitle?.toLowerCase().replace(/\s+/g, "-")
 
   const intervalRef = useRef(null)
 
-  const [selectedLanguage, setSelectedLanguage] = useState(location.state?.selectedLanguage || "")
+  const [selectedLanguage, setSelectedLanguage] = useState(location.state?.selectedLanguage || null)
   const skipFinalSaveRef = useRef(false)
 
-  const nextEpisode = currentEpisodes?.[selectedLanguage]?.[episodeIndex + 1]
+  const nextEpisode = contents?.[selectedLanguage]?.[episodeIndex + 1]
   const updatePresence = (title, episodeNumber, cover, currentTime, duration) => {
     const now = Date.now()
     const start = now - (currentTime || 0) * 1000
@@ -75,6 +75,7 @@ export const Episode = ({
     seasonUrl,
     availableLanguages,
     selectedLanguage,
+    contentType:"anime",
   })
   useEffect(() => {
     if (
@@ -142,10 +143,10 @@ export const Episode = ({
 
   const changeLanguage = (lang) => {
     const lower = lang?.toLowerCase()
-    if (!lower || !currentEpisodes?.[lower]) return
+    if (!lower || !contents?.[lower]) return
     setSelectedLanguage(lower)
 
-    const newEpisode = currentEpisodes[lower]?.[episodeIndex]
+    const newEpisode = contents[lower]?.[episodeIndex]
     if (!newEpisode) return
 
     setEpisodeSources(newEpisode)
@@ -166,11 +167,13 @@ export const Episode = ({
         seasonTitle,
         animeTitle,
         animeCover,
+        seasonUrl,
       })
 
       alert("Téléchargement terminé !")
     } catch (error) {
       console.error("Erreur lors du téléchargement de la vidéo :", error)
+      alert("Erreur lors du téléchargement")
     }
   }
   const BackMenu = () => navigate("/erebus-empire/home")
@@ -204,8 +207,9 @@ export const Episode = ({
         let chosenLang = selectedLanguage || ""
         if (!chosenLang) {
           chosenLang = seasonUrl.split("/").slice(6, 7).join("/")
+          setSelectedLanguage(chosenLang)
         }
-        if (!availableLanguages || !chosenLang) {
+        if ((!availableLanguages || (Array.isArray(availableLanguages) && availableLanguages.length === 0)) || !chosenLang) {
           const langs = await window.electron.ipcRenderer.invoke(
             "get-available-languages",
             `${BASE_URL}/catalogue/${animeId}/${seasonId}/${selectedLanguage}`,
@@ -219,21 +223,19 @@ export const Episode = ({
             setSelectedLanguage(chosenLang)
           }
         }
-        if (!currentEpisodes && chosenLang) {
+        if ((!contents || (contents && Object.keys(contents).length === 0)) && chosenLang) {
           const eps = await window.electron.ipcRenderer.invoke(
             "get-episodes",
             `${BASE_URL}/catalogue/${animeId}/${seasonId}/${chosenLang}`,
             true,
           )
-          const newEpisodes = { [chosenLang]: eps || [] }
-
-          if (!episodeTitle && episodeId && newEpisodes[chosenLang]) {
-            const ep = newEpisodes[chosenLang].find(
+          if (!episodeTitle && episodeId && eps) {
+            const ep = eps.find(
               (e) => e.title?.toLowerCase().replace(/\s+/g, "-") === episodeId,
             )
             if (ep) getEpisodeTitle(ep.title)
           }
-          getCurrentEpisodes(newEpisodes)
+          getContents({[chosenLang]: eps || [] })
         }
       } catch (error) {
         console.error("Erreur dans le recalcul Episode:", error)
@@ -241,7 +243,7 @@ export const Episode = ({
         setLoading(false)
       }
     }
-    if (!currentEpisodes || !selectedLanguage) {
+    if (!contents || (contents && Object.keys(contents).length === 0) || !selectedLanguage) {
       fetchMissingData()
     }
   }, [animeId, seasonId, episodeId, selectedLanguage])
@@ -259,6 +261,7 @@ export const Episode = ({
 
         for (let i = 0; i < urls.length; i++) {
           const realUrl = await window.electron.ipcRenderer.invoke("get-url", urls[i], hosts[i])
+          
           if (cancelled) return
 
           if (hosts[i] === "vidmoly" && realUrl != null) {
@@ -288,7 +291,7 @@ export const Episode = ({
       } catch (err) {
         if (!cancelled) console.error("Erreur lors de la résolution des sources :", err)
       } finally {
-        setLoading(false)
+        setLoading(false) 
       }
     }
 
@@ -304,24 +307,27 @@ export const Episode = ({
   }, [storageKey])
 
   useEffect(() => {
-    if (!currentEpisodes || !availableLanguages) return
-
+    if (!contents || !availableLanguages) return
+    if (
+      Object.keys(contents).length === 0 ||
+      (Array.isArray(availableLanguages) && availableLanguages.length === 0)
+    )
+      return
     const EpisodeLanguages = availableLanguages.filter((lang) => {
-      const epList = currentEpisodes[lang.toLowerCase()]
+      const epList = contents[lang.toLowerCase()]
       return epList && episodeIndex != null && episodeIndex !== -1 && epList[episodeIndex]?.title
     })
 
     setAvailableLanguagesEpisode(EpisodeLanguages)
-
     if (
       selectedLanguage &&
       episodeIndex !== -1 &&
-      currentEpisodes[selectedLanguage] &&
-      currentEpisodes[selectedLanguage][episodeIndex]
+      contents[selectedLanguage] &&
+      contents[selectedLanguage][episodeIndex]
     ) {
-      setEpisodeSources(currentEpisodes[selectedLanguage][episodeIndex])
+      setEpisodeSources(contents[selectedLanguage][episodeIndex])
     }
-  }, [selectedLanguage, episodeIndex, currentEpisodes, availableLanguages])
+  }, [selectedLanguage, episodeIndex, contents, availableLanguages])
 
   useEffect(() => {
     if (location.state?.episodeTitle && location.state.episodeTitle !== episodeTitle) {
@@ -330,10 +336,10 @@ export const Episode = ({
     }
     if (episodeId) {
       const langToCheck = selectedLanguage || (availableLanguages && availableLanguages[0])
-      if (langToCheck && currentEpisodes) {
+      if (langToCheck && contents) {
         let found
-        if (currentEpisodes.title?.toLowerCase().replace(/\s+/g, "-") === episodeId) {
-          found = currentEpisodes
+        if (contents.title?.toLowerCase().replace(/\s+/g, "-") === episodeId) {
+          found = contents
         }
         if (found && found.title !== episodeTitle) {
           getEpisodeTitle(found.title)
@@ -341,14 +347,14 @@ export const Episode = ({
         }
       }
 
-      if (!currentEpisodes) {
+      if (!contents) {
         getEpisodeTitle("")
       }
     }
   }, [
     episodeId,
     location.state?.episodeTitle,
-    currentEpisodes,
+    contents,
     selectedLanguage,
     availableLanguages,
   ])
@@ -389,12 +395,12 @@ export const Episode = ({
       onNextClick={() => nextEpisode && EndEpisodeNext(nextEpisode)}
       onClickItemListReproduction={(slug) => {
         const lang = selectedLanguage || (availableLanguages && availableLanguages[0])
-        const episode = currentEpisodes?.[lang]?.find(
+        const episode = contents?.[lang]?.find(
           (ep) => ep.title.toLowerCase().replace(/\s+/g, "-") === slug,
         )
         if (episode) handleNavigation(episode)
       }}
-      reprodutionList={currentEpisodes?.[selectedLanguage]?.map((ep) => ({
+      reprodutionList={contents?.[selectedLanguage]?.map((ep) => ({
         id: ep.title.toLowerCase().replace(/\s+/g, "-"),
         name: ep.title,
         playing:

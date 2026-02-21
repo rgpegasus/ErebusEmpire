@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { ErebusPlayer } from '@components/video-player/VideoPlayer'
-import { useNavigate } from 'react-router-dom'
 import { LoginPageBackground } from '@utils/dispatchers/Pictures'
 import BackgroundCover from '@components/background-cover/BackgroundCover'
 import styles from './Download.module.css'
@@ -15,8 +14,6 @@ export const Download = () => {
   const [selectedEpisode, setSelectedEpisode] = useState(null)
   const [downloadProgress, setDownloadProgress] = useState({})
   const { setLoading } = useLoader()
-  const navigate = useNavigate()
-
 
   useEffect(() => {
     const fetchDownloads = async () => {
@@ -187,30 +184,27 @@ export const Download = () => {
           enableShiftDelete={true}
           display={false}
         />
-        
-
-        {/* Lecteur vidéo */}
-        {selectedEpisode && (
-          <div>
-            <div className="video-player mt-6">
-              <ErebusPlayer
-                key={`${selectedEpisode.animeTitle}-${selectedEpisode.seasonTitle}-${selectedEpisode.episodeTitle}`}
-                src={selectedEpisode.filePath}
-                overlayEnabled={true}
-                title={selectedEpisode.animeTitle}
-                subTitle={`${selectedEpisode.seasonTitle} - ${selectedEpisode.episodeTitle}`}
-                titleMedia={`${selectedEpisode.animeTitle} - ${selectedEpisode.seasonTitle} : ${selectedEpisode.episodeTitle}`}
-                autoControllCloseEnabled={true}
-                fullPlayer={false}
-                autoPlay={true}
-                onCrossClick={onClose}
-                settingsEnabled={false}
-              />
-            </div>
-            <div className="Space"></div>
-          </div>
-        )}
       </div>
+      {selectedEpisode && (
+        <div>
+          <div className="video-player mt-6">
+            <ErebusPlayer
+              key={`${selectedEpisode.animeTitle}-${selectedEpisode.seasonTitle}-${selectedEpisode.episodeTitle}`}
+              src={selectedEpisode.filePath}
+              overlayEnabled={true}
+              title={selectedEpisode.animeTitle}
+              subTitle={`${selectedEpisode.seasonTitle} - ${selectedEpisode.episodeTitle}`}
+              titleMedia={`${selectedEpisode.animeTitle} - ${selectedEpisode.seasonTitle} : ${selectedEpisode.episodeTitle}`}
+              autoControllCloseEnabled={true}
+              fullPlayer={false}
+              autoPlay={true}
+              onCrossClick={onClose}
+              settingsEnabled={false}
+            />
+          </div>
+          <div className="Space"></div>
+        </div>
+      )}
     </div>
   )
 }

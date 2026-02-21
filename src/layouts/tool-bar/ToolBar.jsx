@@ -36,9 +36,10 @@ export default function ToolBar() {
     setSlug(cleanPath.startsWith('/') ? cleanPath.slice(1) : cleanPath);
   }, [location]);
 
-  useEffect(() => {
+  useEffect(() => { 
     setInputValue('/' + slug);
   }, [slug]);
+
   useEffect(() => {
     const index = window.history.state?.idx ?? 0;
     const length = window.history.length;
@@ -48,7 +49,7 @@ export default function ToolBar() {
   }, [location]);
 
   const handleFocus = () => {
-    setInputValue(`https://erebusempire.github.io/?id=${slug}`);
+    setInputValue(`https://erebusempire.github.io/?id=${slug}${location.search}`)
   };
 
   const handleBlur = () => {
@@ -71,10 +72,16 @@ const handleChange = (e) => {
 };
 
 
-  const handleUrlSubmit = (e) => {
-    e.preventDefault();
-    navigate('/erebus-empire/' + (slug || 'home'));
-  };
+const handleUrlSubmit = (e) => {
+  e.preventDefault()
+
+  const targetPath = "/erebus-empire/" + (slug || "home")
+
+  if (location.pathname === targetPath) return 
+
+  navigate(targetPath)
+}
+
 
   useEffect(() => {
     const handleMouseMove = (e) => {

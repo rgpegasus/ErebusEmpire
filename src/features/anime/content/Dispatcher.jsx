@@ -1,38 +1,48 @@
 import React, { useState, useEffect, useRef } from "react"
-import { useLocation, useNavigate, useParams } from "react-router-dom"
-import { useLoader, Loader, Episode, Scans } from "@utils/dispatchers/Page"
+import { useLocation, useParams } from "react-router-dom"
+import { useLoader, Episode, Scans } from "@utils/dispatchers/Page"
 
 export const Dispatcher = () => {
   const location = useLocation()
   const { setLoading } = useLoader()
 
   const { animeId, seasonId, episodeId } = useParams()
-  const [animeTitle, setAnimeTitle] = useState(location.state?.animeTitle || "")
-  const [animeCover, setAnimeCover] = useState(location.state?.animeCover || "")
-  const [seasonUrl, setSeasonUrl] = useState(location.state?.seasonUrl || "")
-  const [seasonTitle, setSeasonTitle] = useState(location.state?.seasonTitle || "")
-  const [seasonData, setSeasonData] = useState({})
-  const [selectedLanguage, setSelectedLanguage] = useState(location.state?.selectedLanguage || "")
-  const [animeInfo, setAnimeInfo] = useState({})
-  const [episodeTitle, setEpisodeTitle] = useState(location.state?.episodeTitle || "")
-  const [currentEpisodes, setCurrentEpisodes] = useState(location.state?.episodes || null)
-  const [availableLanguages, setAvailableLanguages] = useState(
-    location.state?.availableLanguages || null,
-  )
   
-  const [contentType, setContentType] = useState("anime")
-  const [restored, setRestored] = useState(false)
-  const episodesObj = currentEpisodes?.[selectedLanguage] || {}
-  const episodeIndex = Object.values(episodesObj).findIndex((ep) => {
-    const normalizedEp = ep.title?.toLowerCase().replace(/\s+/g, "-")
-    const normalizedCurrent = episodeTitle?.toLowerCase().replace(/\s+/g, "-")
-    return normalizedEp === normalizedCurrent
-  })
+  const [seasonUrl, setSeasonUrl] = useState(location.state?.seasonUrl || "")
+  const [animeTitle, setAnimeTitle] = useState(
+    location.state?.animeInfo?.title || location.state?.animeTitle || "",
+  )
+  const [seasonTitle, setSeasonTitle] = useState(location.state?.seasonTitle || "")
+  const [episodeTitle, setEpisodeTitle] = useState(location.state?.episodeTitle || "")
+  const [animeCover, setAnimeCover] = useState(location.state?.animeInfo?.cover || location.state?.animeCover || "")
+  const [contentType, setContentType] = useState(location.state?.contentType || "")
+  const [contents, setContents] = useState(location.state?.contents || {})
+  const [availableLanguages, setAvailableLanguages] = useState(
+    location.state?.availableLanguages || [],
+  )
+  const [selectedLanguage, setSelectedLanguage] = useState(location.state?.selectedLanguage || "")
 
+  const [restored, setRestored] = useState(false)
+  const episodesObj = contents?.[selectedLanguage] || {}
+  const normalizedCurrent = episodeTitle?.toLowerCase().replace(/\s+/g, "-")
+  const [episodeIndex, setEpisodeIndex] = useState(location.state?.chapterId || -1)
+  
+  
   const storageKey = episodeId ? `/erebus-empire/${animeId}/${seasonId}/${episodeId}` : null
   const skipFinalSaveRef = useRef(false)
   const intervalRef = useRef(null)
   const watchDataRef = useRef({})
+
+  useEffect(() => {
+    if (!episodesObj?.length) return
+
+    const index = episodesObj.findIndex((ep) => {
+      const normalizedEp = ep.title?.toLowerCase().replace(/\s+/g, "-")
+
+      return normalizedEp === normalizedCurrent
+    })
+    setEpisodeIndex(index)
+  }, [episodesObj, normalizedCurrent])
   useEffect(() => {
     const fetchMissingData = async () => {
       try {
@@ -44,11 +54,8 @@ export const Dispatcher = () => {
             "info-anime",
             `${BASE_URL}/catalogue/${animeId}/`,
           )
-          setAnimeTitle(info.title)
-          setAnimeCover(info.cover)
-          setAnimeInfo(info || {})
-        } else {
-          setAnimeInfo({ title: animeTitle, cover: animeCover })
+          setAnimeTitle(info?.title)
+          setAnimeCover(info?.cover)
         }
         let currentSeason;
         if (!seasonTitle || !seasonUrl) {
@@ -59,20 +66,18 @@ export const Dispatcher = () => {
           currentSeason = result?.find(
             (season) => season.url.split("/")[5] === seasonId,
           )
-          setSeasonData(currentSeason)
           setSeasonUrl(currentSeason?.url)
           setSeasonTitle(currentSeason?.title)
         }
         if (!selectedLanguage) {
           setSelectedLanguage(currentSeason?.language)
         }
-        console.log(currentSeason, seasonData, "oui")
         setContentType(
           currentSeason
             ? currentSeason?.type?.toLowerCase() === "scans"
               ? "manga"
               : "anime"
-            : seasonData?.type?.toLowerCase() === "scans"
+            : contentType?.toLowerCase() === "scans"
               ? "manga"
               : "anime",
         )
@@ -82,10 +87,10 @@ export const Dispatcher = () => {
         setLoading(false)
       }
     }
-    if (Object.keys(animeInfo).length === 0) {
+    if (!animeTitle || !animeCover || !contentType) {
       fetchMissingData()
     }
-  }, [animeId])
+  }, [animeId, seasonId])
 
   useEffect(() => {
     if (!restored || !storageKey) return
@@ -128,52 +133,48 @@ export const Dispatcher = () => {
     }
   }
   const getEpisodeTitle = (title) => {
-    console.log("title", title)
     setEpisodeTitle(title)
   }
-  const getCurrentEpisodes = (episode) => {
-    // console.log("episode",episode)
-    setCurrentEpisodes(episode)
+  const getEpisodeIndex = (index) => {
+    setEpisodeIndex(index)
+  }
+  const getContents = (episode) => {
+    setContents(episode)
   }
   const getAvailableLanguages = (languages) => {
-    // console.log("languages",languages)
     setAvailableLanguages(languages)
   }
   const getRestored = (bool) => {
-    // console.log("languages",languages)
     setRestored(bool)
   }
   const getWatchDataRef = (data) => {
-    // console.log("data", data)
     watchDataRef.current = data
   }
 
   if (contentType == "manga") {
-    // console.log("scan")
     return (
       <Scans
         animeId={animeId}
         seasonId={seasonId}
         episodeId={episodeId}
         episodeIndex={episodeIndex}
-        storageKey={storageKey}
         animeTitle={animeTitle}
         episodeTitle={episodeTitle}
         animeCover={animeCover}
         seasonUrl={seasonUrl}
         seasonTitle={seasonTitle}
         selectedLanguage={selectedLanguage}
-        currentEpisodes={currentEpisodes}
+        contents={contents}
         availableLanguages={availableLanguages}
         getEpisodeTitle={getEpisodeTitle}
         getWatchDataRef={getWatchDataRef}
-        getCurrentEpisodes={getCurrentEpisodes}
+        getContents={getContents}
         getAvailableLanguages={getAvailableLanguages}
         getRestored={getRestored}
+        getEpisodeIndex={getEpisodeIndex}
       />
     )
-  } else {
-    // console.log(contentType, "caca")
+  } else if (contentType == "anime") {
     return (
       <Episode
         animeId={animeId}
@@ -187,15 +188,18 @@ export const Dispatcher = () => {
         seasonUrl={seasonUrl}
         seasonTitle={seasonTitle}
         selectedLanguage={selectedLanguage}
-        currentEpisodes={currentEpisodes}
+        contents={contents}
         availableLanguages={availableLanguages}
         restored={restored}
         getEpisodeTitle={getEpisodeTitle}
         getWatchDataRef={getWatchDataRef}
-        getCurrentEpisodes={getCurrentEpisodes}
+        getContents={getContents}
         getAvailableLanguages={getAvailableLanguages}
         getRestored={getRestored}
+        clearSeasonHistory={clearSeasonHistory}
       />
     )
+  } else {
+
   }
 }

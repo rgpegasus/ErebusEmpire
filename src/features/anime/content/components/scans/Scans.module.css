@@ -9,29 +9,36 @@
 }
 
 .NavigationBox {
-    background-color: rgba(var(--color-background-rgb), 0.5);
+    background-color: rgba(var(--color-surface-rgb), 0.6);
     display: flex;
     width: 300px;
     justify-content: space-between;
     align-items: center;
     border-radius: 25px;
     overflow: hidden;
-    padding: 3px;
+    padding: 4px;
 }
 
 .Navigation {
     display: flex;
     align-items: center;
-    justify-content: center;border-radius: 20px;
-    background-color: rgba(var(--color-background-rgb), 0.4); 
+    justify-content: center;
+    border-radius: 20px;
+    background-color: rgba(var(--color-background-rgb), 0.3); 
     cursor: pointer;
+}
+.Desactivate {
+    background-color: rgba(var(--color-background-rgb), 0.1); 
+}
+.Desactivate .ArrowIconLeft {
+    color: rgba(var(--color-text-secondary-rgb), 0.7); 
 }
 .ArrowIconLeft, 
 .ArrowIconRight {
     border-radius: 30px;
-    margin: 10px;
+    margin: 10px 13px;
     transform: rotate(90deg);
-    width: 20px;
+    width: 14px;
     height: 20px;
     color: var(--color-text-secondary);
     opacity: 0.75;
@@ -45,16 +52,12 @@
     font-size: 17px;
     font-family: var(--font-family-main);
 }
-.ChapterTitle:hover {
-    color: var(--color-logo);
-    opacity: 1;
-}
-.Navigation:hover,
-.Navigation:hover {
+.Activate:hover {
     background-color: var(--color-logo);
+    opacity: 0.9;
 }
 .NavigationBox:hover {
-    background-color: rgba(var(--color-background-rgb), 0.65); 
+    background-color: rgba(var(--color-surface-rgb), 0.8); 
 }
 
 .ArrowIconRight {

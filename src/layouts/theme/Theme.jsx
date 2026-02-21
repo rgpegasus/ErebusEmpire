@@ -189,9 +189,9 @@ export default function Theme({ visible = false, onClose }) {
                 <span className="slider">
                   <span className="icon">
                     {colorTheme ? (
-                      <ColorPaletteIcon size={14} />
+                      <ColorPaletteIcon />
                     ) : (
-                      <ColorPickerIcon size={14} />
+                      <ColorPickerIcon />
                     )}
                   </span>
                 </span>
