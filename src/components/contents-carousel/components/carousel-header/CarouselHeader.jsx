@@ -15,7 +15,7 @@ const CarouselHeader = ({
   setGridMode,
   searchValue,
   setSearchValue,
-  onContentTypeChange,
+  onContentTypeChange, 
   availableContentTypes,
   contentType,
   customType,
@@ -111,7 +111,7 @@ const CarouselHeader = ({
         </div>
       </div>
 
-      {availableLanguages.length > 0 && isSeason && (
+      {availableLanguages.length > 0 && onLanguageChange && (
         <div className={styles.FlagsContainer}>
           {`Langue${availableLanguages.length > 1 ? "s" : ""} :`}
           {availableLanguages.map((lang, index) => {

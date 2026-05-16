@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback, useRef } from "react"
 import useEmblaCarousel from "embla-carousel-react"
 import { toSlug } from "@utils/functions/toSlug"
 import styles from "./ContentsCarousel.module.css"
@@ -15,7 +15,7 @@ const ContentsCarousel = ({
   getEpisodeSubTitle = () => "",
   getEpisodeTitle = () => "",
   getUrlErebus = () => "",
-  getAnimeUrl = "",
+  getAnimeUrl = () => "",
   currentLanguage = "language",
   title = "",
   enableShiftDelete = false,
@@ -29,7 +29,6 @@ const ContentsCarousel = ({
   contentType = "anime",
   isGridMode = true,
   customType = "",
-  customSearch,
   onSearchKeyDown,
   searchValue,
   setSearchValue,
@@ -44,7 +43,6 @@ const ContentsCarousel = ({
   const [canScrollNext, setCanScrollNext] = useState(false)
   const [gridMode, setGridMode] = useState(isGridMode)
   const [filteredData, setFilteredData] = useState(data)
-
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
     align: "center",
@@ -52,16 +50,17 @@ const ContentsCarousel = ({
     containScroll: "trimSnaps",
     dragFree: true,
   })
-
+  const timeoutRef = useRef(null)
   const handleSearch = () => {
     if (!searchValue) {
       setFilteredData(data)
       return
     }
-    if (customSearch) {
-      console.log("custom")
-    } else if (searchBy === "title") {
+    if (searchBy === "title") {
       setFilteredData(
+        data.filter((ep) => getAnimeTitle(ep).toLowerCase().includes(searchValue.toLowerCase())),
+      )
+      console.log(
         data.filter((ep) => getAnimeTitle(ep).toLowerCase().includes(searchValue.toLowerCase())),
       )
     } else if (searchBy === "episode") {
@@ -74,17 +73,20 @@ const ContentsCarousel = ({
           return textMatch || numberMatch
         }),
       )
-    } else if (searchBy) {
-      setFilteredData(searchBy)
+    } else if (searchBy == "library") {
+      setFilteredData(
+        data.filter((ep) => getEpisodeTitle(ep).toLowerCase().includes(searchValue.toLowerCase())),
+      )
     }
   }
 
   useEffect(() => {
     if (onSearchKeyDown) return
     handleSearch()
-  }, [searchValue])
+  }, [searchValue, data, currentLanguage])
 
   useEffect(() => {
+    if (!onSearchKeyDown) return
     setFilteredData(data)
   }, [data])
 
@@ -165,7 +167,22 @@ const ContentsCarousel = ({
   const sortedData = isAscending ? filteredData : [...filteredData].reverse()
 
   return (
-    <div className={styles.Container}>
+    <div
+      onMouseLeave={() => {
+        if (!onSearchKeyDown) {
+          timeoutRef.current = setTimeout(() => {
+            setSearchValue("")
+          }, 500)
+        }
+      }}
+      onMouseEnter={() => {
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current)
+          timeoutRef.current = null
+        }
+      }}
+      className={styles.Container}
+    >
       {title && <div className={styles.CarouselTitle}>{title}</div>}
       <CarouselHeader
         data={sortedData}
@@ -183,12 +200,11 @@ const ContentsCarousel = ({
         availableContentTypes={availableContentTypes}
         contentType={contentType}
         customType={customType}
-        customSearch={customSearch}
         onSearchKeyDown={onSearchKeyDown}
       />
 
       {sortedData && sortedData.length > 0 ? (
-        gridMode & (sortedData.length > 4) ? (
+        gridMode && sortedData.length > 4 ? (
           <div
             className={styles.GridWrapper}
             onMouseEnter={() => setIsInside(true)}

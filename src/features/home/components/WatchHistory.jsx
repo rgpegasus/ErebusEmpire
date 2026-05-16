@@ -11,12 +11,15 @@ const WatchHistory = () => {
   const navigate = useNavigate()
   const { setLoading } = useLoader()
   const [contentType, setContentType] = useState("anime")
-  const [episodes, setEpisodes] = useState([])
+  const [episodes, setEpisodes] = useState({})
   const [scans, setScans] = useState([])
+  const [searchValue, setSearchValue] = useState("")
   const [availableContentTypes, setAvailableContentTypes] = useState({
     hasAnime: false,
     hasManga: false, 
   })
+  const [availableLanguages, setAvailableLanguages] = useState([])
+  const [selectedLanguage, setSelectedLanguage] = useState("")
   useEffect(() => {
     loadWatchedEpisodes()
   }, [])
@@ -27,68 +30,54 @@ const WatchHistory = () => {
 
     const data = Object.entries(all).map(([key, data]) => ({ key, ...data }))
     data.sort((a, b) => b.timestamp - a.timestamp)
-    let tempEpisodes = []
-    let tempScans = []
-    
+
+    const tempEpisodes = {}
+    const tempScans = []
+    const tempLanguages = []
+
     for (const element of data) {
       if (!element.seasonUrl?.includes("scan")) {
-        tempEpisodes.push(element)
-        setWatchedEpisodes(episodes)
+        if (!tempLanguages.includes(element.selectedLanguage)) {
+          tempLanguages.push(element.selectedLanguage)
+        }
+
+        tempEpisodes[element.selectedLanguage] ??= []
+        tempEpisodes[element.selectedLanguage].push(element)
       } else {
         tempScans.push(element)
       }
-      setEpisodes(tempEpisodes)
-      setScans(tempScans)
-      setAvailableContentTypes({
-        hasAnime: tempEpisodes.length > 0,
-        hasManga: tempScans.length > 0,
-      })
-      if (tempEpisodes.length === 0) {
-        setWatchedEpisodes(tempScans)
-      } else {
-        setWatchedEpisodes(tempEpisodes)
-      }
+    }
+    tempLanguages.sort((a, b) => tempEpisodes[b].length - tempEpisodes[a].length)
+    setEpisodes(tempEpisodes)
+    setScans(tempScans)
+    setAvailableLanguages(tempLanguages)
+
+    if (tempLanguages.length > 0 && !(selectedLanguage && tempLanguages.includes(selectedLanguage))) {
+      setSelectedLanguage(tempLanguages[0])
+    }
+
+    setAvailableContentTypes({
+      hasAnime: Object.keys(tempEpisodes).length > 0,
+      hasManga: tempScans.length > 0,
+    })
+
+    if (Object.keys(tempEpisodes).length === 0) {
+      setWatchedEpisodes(tempScans)
+    } else if (tempLanguages.length > 0) {
+      setWatchedEpisodes(tempEpisodes[!(selectedLanguage && tempLanguages.includes(selectedLanguage)) ? tempLanguages[0] : selectedLanguage])
     }
   }
   const handleContentTypeChange = (newType) => {
     setContentType(newType)    
     if (newType === "anime") {
-      setWatchedEpisodes(episodes)
+      setWatchedEpisodes(episodes[selectedLanguage])
     } else {
       setWatchedEpisodes(scans)
     }
   }
   const deleteEpisode = async (episode) => {
     await animeData.delete("animeWatchHistory", episode.key)
-    const all = await animeData.loadAll("animeWatchHistory")
-    if (Object.keys(all).length === 0) {
-      setWatchedEpisodes([])
-    } else {
-      const data = Object.entries(all).map(([key, data]) => ({ key, ...data })) 
-      data.sort((a, b) => b.timestamp - a.timestamp)
-      let tempEpisodes = []
-      let tempScans = []
-
-      for (const element of data) {
-        if (!element.seasonUrl.includes("scan")) {
-          tempEpisodes.push(element)
-          setWatchedEpisodes(episodes)
-        } else {
-          tempScans.push(element)
-        }
-        setEpisodes(tempEpisodes)
-        setScans(tempScans)
-        setAvailableContentTypes({
-          hasAnime: tempEpisodes.length > 0,
-          hasManga: tempScans.length > 0,
-        })
-        if (tempEpisodes.length === 0 || episode.seasonUrl.includes("scan") && tempScans.length > 0) {
-          setWatchedEpisodes(tempScans)
-        } else {
-          setWatchedEpisodes(tempEpisodes)
-        }
-      }
-    }
+    loadWatchedEpisodes()
   }
 
   const fetchEpisodes = async (episode) => {
@@ -117,10 +106,8 @@ const WatchHistory = () => {
         languageResults = [{ lang: "vf", data: episodeLinks }]
       }
       if (languageResults) {
-        
-            
         languageResults.forEach((item) => {
-          if (item) {
+          if(item) {
             const { lang, data } = item
             result[lang.toLowerCase()] = data
           }
@@ -183,6 +170,12 @@ const WatchHistory = () => {
     }
     setLoading(false)
   }
+  const handleLanguageChange = (lang) => {
+    if (contentType == "anime") {
+      setSelectedLanguage(lang.toLowerCase())
+      setWatchedEpisodes(episodes[lang.toLowerCase()] || [])
+    }
+  }
   return (
     <ContentsCarousel
       title="Liste de lecture"
@@ -194,13 +187,17 @@ const WatchHistory = () => {
       getAnimeUrl={(ep) => `${ep.seasonUrl}/`}
       getEpisodeSubTitle={(ep) => `${ep.seasonTitle} - ${ep.episodeTitle}`}
       getUrlErebus={(ep) => `/erebus-empire/${ep.animeId}/${ep.seasonId}/${ep.episodeId}`}
-      currentLanguage={(ep) => ep.selectedLanguage}
+      currentLanguage={contentType == "anime" ? selectedLanguage : "vf"}
       enableShiftDelete={true}
       display={false}
       isGridMode={false}
       onContentTypeChange={handleContentTypeChange}
       availableContentTypes={availableContentTypes}
+      availableLanguages={contentType == "anime" ? availableLanguages : ["vf"]}
+      onLanguageChange={handleLanguageChange}
       contentType={contentType}
+      searchValue={searchValue}
+      setSearchValue={setSearchValue}
     />
   )
 }

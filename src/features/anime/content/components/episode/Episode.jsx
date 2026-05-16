@@ -362,7 +362,7 @@ export const Episode = ({
     if (!storageKey) return
     animeData.load("animeWatchHistory", storageKey).then((data) => {
       const time = parseFloat(data?.videoTime || 0)
-      setVideoTime(time)
+      setVideoTime(time > 5 ? time - 5 : 0)
       getRestored(true)
     })
   }, [storageKey])

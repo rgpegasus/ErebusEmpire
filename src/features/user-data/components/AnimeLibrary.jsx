@@ -12,6 +12,7 @@ export const AnimeLibrary = ({
 }) => {
   const [animeList, setAnimeList] = useState([]);
   const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState("")
   const loadAnimeList = async () => {
     const all = await animeData.loadAll(storageKey);  
     if (!all) return;
@@ -53,12 +54,14 @@ const deleteAnime = async (anime) => {
           title={title}
           onClickEpisode={(anime) => navigate(`/erebus-empire/${anime.animeId}`)}
           getEpisodeCover={(anime) => anime.animeCover}
-          getAnimeTitle={(anime) => anime.animeTitle}
+          getEpisodeTitle={(anime) => anime.animeTitle}
           enableShiftDelete={true}
           isSeason={true}
-          searchBy={"title"}
+          searchBy={"library"}
           onDeleteEpisode={(anime) => deleteAnime(anime)}
           customType={customType}
+          searchValue={searchValue}
+          setSearchValue={setSearchValue}
         />
       </div>
     </div>

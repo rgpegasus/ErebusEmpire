@@ -29,7 +29,7 @@ export const Season = () => {
   const [animeEncodedTitle, setAnimeEncodedTitle] = useState("")
   const [episodes, setEpisodes] = useState([])
   const [episodeCache, setEpisodeCache] = useState({})
-
+  const [searchValue, setSearchValue] = useState("")
   
   const [emblaRef, emblaApi] = useEmblaCarousel({ align: "start", dragFree: true, skipSnaps: false })
 
@@ -361,6 +361,8 @@ export const Season = () => {
             onContentTypeChange={handleContentTypeChange}
             availableContentTypes={availableContentTypes}
             contentType={contentType}
+            searchValue={searchValue}
+            setSearchValue={setSearchValue}
           />
         </div>
       </div>

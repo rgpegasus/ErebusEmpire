@@ -9,3 +9,4 @@ bin
 *.log*
 **/HELPER/
 **/.vscode
+**/.env

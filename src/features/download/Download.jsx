@@ -14,7 +14,7 @@ export const Download = () => {
   const [selectedEpisode, setSelectedEpisode] = useState(null)
   const [downloadProgress, setDownloadProgress] = useState({})
   const { setLoading } = useLoader()
-
+  const [searchValue, setSearchValue] = useState("")
   useEffect(() => {
     const fetchDownloads = async () => {
       try {
@@ -181,6 +181,8 @@ export const Download = () => {
           getEpisodeSubTitle={(ep) => `${ep.seasonTitle} - ${ep.episodeTitle}`}
           getUrlErebus={(ep) => `/erebus-empire/${ep.animeId}/${ep.seasonId}/${ep.episodeId}`}
           availableLanguageKey="selectedLanguage"
+          searchValue={searchValue}
+          setSearchValue={setSearchValue}
           enableShiftDelete={true}
           display={false}
         />

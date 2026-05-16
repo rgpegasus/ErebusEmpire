@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 const CarouselItem = ({
   episode,
   index,
-  activeIndex, 
+  activeIndex,
   shiftPressed,
   enableShiftDelete,
   getProgressForEpisode,
@@ -25,6 +25,7 @@ const CarouselItem = ({
   onMouseLeave,
   isGrabing,
   contentType,
+  onLanguageChange,
 }) => {
   const navigate = useNavigate()
   const episodeTitle = getEpisodeTitle ? getEpisodeTitle(episode) : ""
@@ -73,27 +74,18 @@ const CarouselItem = ({
             </div>
           )}
 
-          {episode[currentLanguage] && !isSeason ? (
+          {episode[currentLanguage] && !isSeason && (
             <img
               className={styles.Language}
               src={FlagDispatcher(episode[currentLanguage])}
               alt={currentLanguage || "Language flag"}
             />
-          ) : (
-            episode.selectedLanguage &&
-            !isSeason && (
-              <img
-                className={styles.Language}
-                src={FlagDispatcher(episode.selectedLanguage)}
-                alt={episode.selectedLanguage || "Language flag"}
-              />
-            )
           )}
 
           <div className={styles.Information}>
-            <div
+            {!isSeason && (<div
               onClick={(e) => {
-                if (!isSeason && !isGrabing && !shiftPressed) {
+                if (!isGrabing && !shiftPressed) {
                   e.stopPropagation()
                   navigateAnime(getAnimeUrl(episode))
                 }
@@ -101,8 +93,8 @@ const CarouselItem = ({
               className={`${styles.CoverTitle} ${getAnimeUrl && !isGrabing && !shiftPressed ? styles.TitleHover : ""}`}
             >
               <ScrollTitle title={getAnimeTitle(episode)} />
-            </div>
-            <div className={styles.CoverEpisodeTitle}>
+            </div>)}
+            <div className={`${!isSeason ? styles.CoverEpisodeTitle : styles.CoverTitle}`}>
               <ScrollTitle title={displayTitle} />
             </div>
           </div>

@@ -1,4 +1,4 @@
-import React from "react"
+import {React, useState} from "react"
 import { useNavigate } from "react-router-dom"
 import { getRealEpisodeName } from "@utils/functions/getRealEpisodeName"
 import { getRealChapterName } from "@utils/functions/getRealChapterName"
@@ -10,9 +10,13 @@ const LatestReleases = ({
   handleContentTypeChange,
   contentType,
   availableContentTypes,
+  availableLanguages,
+  selectedLanguage,
+  handleLanguageChange,
 }) => {
   const navigate = useNavigate()
   const { setLoading } = useLoader()
+  const [searchValue, setSearchValue] = useState("")
   const handleReleasesClick = async (releases) => {
     try {
       setLoading(true)
@@ -33,11 +37,12 @@ const LatestReleases = ({
               seasonUrl: releases.url,
               availableLanguages: [releases.language],
               selectedLanguage: releases.language,
-            }, 
+            },
           })
         }
       } else {
-        const { path, ChapterName, matchedEmbed, animeId, seasonId, seasonTitle } = await getRealChapterName(releases)
+        const { path, ChapterName, matchedEmbed, animeId, seasonId, seasonTitle } =
+          await getRealChapterName(releases)
         const scansImg = await window.electron.ipcRenderer.invoke(
           "get-scans-img",
           releases.url,
@@ -82,6 +87,11 @@ const LatestReleases = ({
       onContentTypeChange={handleContentTypeChange}
       availableContentTypes={availableContentTypes}
       contentType={contentType}
+      availableLanguages={availableLanguages}
+      currentLanguage={selectedLanguage}
+      onLanguageChange={handleLanguageChange}
+      searchValue={searchValue}
+      setSearchValue={setSearchValue}
     />
   )
 }

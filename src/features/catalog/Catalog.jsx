@@ -99,7 +99,7 @@ export const Catalog = () => {
           title="Catalogue"
           onClickEpisode={(anime) => navigate(`/erebus-empire/${anime.url.split("/")[4]}/`)}
           getEpisodeCover={(anime) => anime.cover}
-          getAnimeTitle={(anime) => anime.title}
+          getEpisodeTitle={(anime) => anime.title}
           isSeason={true}
           customType={`~~Page ${page}`}
           searchValue={inputValue}

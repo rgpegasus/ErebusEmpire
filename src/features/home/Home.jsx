@@ -16,7 +16,9 @@ export const Home = () => {
   })
   const [latestEpisodes, setLatestEpisodes] = useState([])
   const [latestScans, setLatestScans] = useState([])
-
+  const [latestEpisodesByLanguage, setLatestEpisodesByLanguage] = useState({})
+  const [availableLanguages, setAvailableLanguages] = useState([])
+  const [selectedLanguage, setSelectedLanguage] = useState("")
   const filterValidUrls = async (items) => {
     const results = await Promise.all(
       items.map(async (item) => {
@@ -45,14 +47,41 @@ export const Home = () => {
           setCoverInfo(animeData)
         }
 
-        const episodes = await window.electron.ipcRenderer.invoke("get-latest-episode")     
+        const episodes = await window.electron.ipcRenderer.invoke("get-latest-episode")
         const filteredEpisodes = await filterValidUrls(episodes)
+
+        const tempEpisodes = {}
+        const tempLanguages = []
+
+        for (const episode of filteredEpisodes) {
+          const lang = episode.language?.toLowerCase() || "vf"
+
+          if (!tempLanguages.includes(lang)) {
+            tempLanguages.push(lang)
+          }
+
+          tempEpisodes[lang] ??= []
+          tempEpisodes[lang].push(episode)
+        }
+        
+        tempLanguages.sort((a, b) => tempEpisodes[b].length - tempEpisodes[a].length)
+
+        setLatestEpisodesByLanguage(tempEpisodes)
+        setAvailableLanguages(tempLanguages)
+
+        if (tempLanguages.length > 0) {
+          setSelectedLanguage(tempLanguages[0])
+        }
 
         const scans = await window.electron.ipcRenderer.invoke("get-latest-scans")     
         const filteredScans = await filterValidUrls(scans)
 
-        setLatestReleases(filteredEpisodes.length > 0 ? filteredEpisodes : filteredScans)
-        setLatestEpisodes(filteredEpisodes)
+        if (tempLanguages.length > 0) {
+          setLatestReleases(tempEpisodes[tempLanguages[0]])
+        } else {
+          setLatestReleases(filteredScans)
+        }
+        setLatestEpisodes(tempEpisodes)
         setLatestScans(filteredScans)
         setAvailableContentTypes({
           hasAnime: filteredEpisodes.length > 0,
@@ -71,10 +100,20 @@ export const Home = () => {
 
   const handleContentTypeChange = (newType) => {
     setContentType(newType)
+  
     if (newType === "anime") {
-      setLatestReleases(latestEpisodes)
+      setLatestReleases(latestEpisodes[selectedLanguage] || [])
     } else {
       setLatestReleases(latestScans)
+    }
+  }
+  const handleLanguageChange = (lang) => {
+    const normalized = lang.toLowerCase()
+
+    setSelectedLanguage(normalized)
+
+    if (contentType === "anime") {
+      setLatestReleases(latestEpisodes[normalized] || [])
     }
   }
   return (
@@ -87,6 +126,9 @@ export const Home = () => {
           handleContentTypeChange={handleContentTypeChange}
           contentType={contentType}
           availableContentTypes={availableContentTypes}
+          availableLanguages={contentType === "anime" ? availableLanguages : ["vf"]}
+          selectedLanguage={contentType === "anime" ? selectedLanguage : "vf"}
+          handleLanguageChange={handleLanguageChange}
         />
       </div>
     </div>
