@@ -2,6 +2,8 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import '@utils/CssImport'
 import App from '@src/App'
+import { LoaderProvider } from "@utils/dispatchers/Page"
+import { UserProvider } from "@context/user-context/UserContext"
 
 function applyTheme() {
   const theme = localStorage.getItem('theme') || 'dark'
@@ -14,6 +16,10 @@ const root = ReactDOM.createRoot(document.getElementById('root'))
 
 root.render(
   <React.StrictMode>
-    <App />
-  </React.StrictMode> 
+    <LoaderProvider>
+      <UserProvider>
+        <App />
+      </UserProvider>
+    </LoaderProvider>
+  </React.StrictMode>,
 )

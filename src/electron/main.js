@@ -13,7 +13,6 @@ const rpc = new Client({ transport: { type: 'ipc' }, clientId });
 const scraper = new AnimeScraper("animesama");
 
 
-
 import {
   SearchAnime,
   RandomAnime,
@@ -33,6 +32,7 @@ import {
   ScansChapter,
   ScansImg,
   WorkingUrl,
+  Session,
 } from "@utils/dispatchers/IpcHandler" 
 import { AnimeCoverTemp, AnimeData } from '@utils/dispatchers/ServicesData'
 import { spawn } from 'child_process';
@@ -279,6 +279,7 @@ if (!gotTheLock) {
     ScansChapter(scraper)
     ScansImg(scraper)
     WorkingUrl(scraper)
+    Session()
     AnimeData()
     DownloadEpisode()
     DownloadList()

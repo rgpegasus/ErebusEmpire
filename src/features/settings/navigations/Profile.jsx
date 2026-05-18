@@ -1,9 +1,9 @@
 import React, { useState, useEffect} from 'react';
-import { Upload, Download, Bug, ShieldOff} from 'lucide-react';
+import { Upload, Download, Bug, ShieldOff, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BackgroundCover from "@components/background-cover/BackgroundCover"
 import { LoginPageBackground } from "@utils/dispatchers/Pictures"
-
+import { supabase } from "@services/supabase/Client"
 export const Profile = () => {
     const [isDev, setIsDev] = useState(() => {
        return localStorage.getItem('dev') == 'false'; 
@@ -11,7 +11,7 @@ export const Profile = () => {
     const [isDevVisible, setIsDevVisible] = useState(() => {
       return localStorage.getItem('devUnlocked') == 'true';
     });
-
+    const [session, setSession] = useState(null);
     useEffect(() => {
       if (isDev && isDevVisible) {
         window.electron.ipcRenderer.send('open-devtools');
@@ -41,15 +41,44 @@ const importData = async () => {
     localStorage.setItem('devUnlocked', isDevVisible  ? 'true' : 'false');
   }
 };
+  const navigate = useNavigate();
+  useEffect(() => {
+    const loadSession = async () => {
+      const {
+        data: { session: res },
+      } = await supabase.auth.getSession()
+      
+      setSession(res)
+    }
 
+    loadSession()
+  }, [])
+  
    
-    const navigate = useNavigate();
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    navigate("/erebus-empire/home")
+    setSession(null)
+  }
+
   return (
     <div className="MainPage">
       <BackgroundCover coverInfo={LoginPageBackground} whileWatching={false} isAnime={false} />
       <div className="SettingsPage">
         <div className="SettingsTitle">Profile</div>
         <div className="SettingsGroupe">
+          {!session ? (
+            <div className="setting-item theme" onClick={() => navigate("/erebus-empire/login")}>
+              <span className="setting-label">Se connecter</span>
+              <span className="Settings-ChevronIcon">
+                <ChevronRight />
+              </span>
+            </div>
+          ) : (
+            <div className="setting-item theme" onClick={handleSignOut}>
+              <span className="setting-label">Se déconnecter</span>
+            </div>
+          )}
           <div className="setting-item">
             <h2 className="setting-label">Données</h2>
             <div className="buttons-wrapper">

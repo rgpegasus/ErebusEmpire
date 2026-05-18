@@ -72,7 +72,6 @@ function UserDropdown() {
                 label="Paramètres"
                 onNavigate={() => setMenuVisible(false)}
               />
-              {/* <Navigation to="/erebus-empire/switchAccount" icon={SwitchAccountIcon} label="Changer de profil" onNavigate={() => setMenuVisible(false)}/> */}
               <div className={styles.Separation}></div>
               <Navigation
                 to="/erebus-empire/favorites"

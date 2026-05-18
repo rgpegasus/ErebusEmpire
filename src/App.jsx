@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import ToolBar from '@layouts/tool-bar/ToolBar';
 import TopBar from '@layouts/top-bar/TopBar';
 import Theme from '@layouts/theme/Theme'
-import { LoaderProvider, Catalog, Home, Download, Season, Dispatcher, Settings, SwitchAccount, Favorites, Watchlist, History, OnHold, AlreadySeen, Profile, NotFound } from '@utils/dispatchers/Page';
-import { UserProvider } from '@context/user-context/UserContext';
-
+import { Catalog, Home, Download, Season, Dispatcher, Settings, Login, Favorites, Watchlist, History, OnHold, AlreadySeen, Profile, NotFound } from '@utils/dispatchers/Page';
+import { supabase } from "@services/supabase/Client"
+import { useLoader, Loader } from "@utils/dispatchers/Page"
 const Logger = () => {
   const location = useLocation();
   console.log("🧭 Chemin actuel :", location.pathname + location.search);
@@ -13,10 +13,10 @@ const Logger = () => {
 };
 
 const App = () => { 
-  const [showTheme, setShowTheme] = React.useState(false); 
+  const [showTheme, setShowTheme] = useState(false); 
   const openTheme = () => setShowTheme(true);
   const closeTheme = () => setShowTheme(false);
-
+  const [authReady, setAuthReady] = useState(false)
   useEffect(() => {
     window.electron.ipcRenderer.on('log-from-main', (_, msg) => {
       console.log('[FROM MAIN]', msg);
@@ -53,39 +53,56 @@ const App = () => {
     return null; 
   };
 
+  useEffect(() => {
+    const initSupabaseSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
 
+      if (session) {
+        // console.log("Session restaurée :", session.user.email)
+
+        window.electron?.ipcRenderer?.invoke("set-supabase-session", session)
+      } else {
+        console.log("Aucune session Supabase")
+      }
+      setAuthReady(true)
+    }
+
+    initSupabaseSession()
+  }, [])
+
+  if (!authReady) {
+    return <Loader />
+  }
   return (
-    <LoaderProvider>
-      <UserProvider>
-        <Router>
-          <ToolBar />
-          {/* <LoginPage/> */}
-          <Logger />
-          <Theme visible={showTheme} onClose={closeTheme} />
-          <DeepLinkHandler />
-          <div>
-            <TopBar />
-            <Routes>
-              <Route path="/" element={<Navigate to="/erebus-empire/home" replace />} />
-              <Route path="/erebus-empire/home" element={<Home />} />
-              <Route path="/erebus-empire/catalog" element={<Catalog />} />
-              <Route path="/erebus-empire/downloads" element={<Download />} />
-              <Route path="/erebus-empire/:animeId/:seasonId?" element={<Season />} />
-              <Route path="/erebus-empire/:animeId/:seasonId/:episodeId" element={<Dispatcher key={location.pathname} />} />
-              <Route path="/erebus-empire/settings" element={<Settings openTheme={openTheme} />} />
-              <Route path="/erebus-empire/settings/profile" element={<Profile />} />
-              <Route path="/erebus-empire/switchAccount" element={<SwitchAccount />} />
-              <Route path="/erebus-empire/favorites" element={<Favorites />} />
-              <Route path="/erebus-empire/watchlist" element={<Watchlist />} />
-              <Route path="/erebus-empire/history" element={<History />} />
-              <Route path="/erebus-empire/onHold" element={<OnHold />} />
-              <Route path="/erebus-empire/alreadySeen" element={<AlreadySeen />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </div>
-        </Router>
-      </UserProvider>
-    </LoaderProvider>
+    <Router>
+      <ToolBar />
+      {/* <LoginPage/> */}
+      <Logger />
+      <Theme visible={showTheme} onClose={closeTheme} />
+      <DeepLinkHandler />
+      <div>
+        <TopBar />
+        <Routes>
+          <Route path="/" element={<Navigate to="/erebus-empire/home" replace />} />
+          <Route path="/erebus-empire/home" element={<Home />} />
+          <Route path="/erebus-empire/catalog" element={<Catalog />} />
+          <Route path="/erebus-empire/downloads" element={<Download />} />
+          <Route path="/erebus-empire/:animeId/:seasonId?" element={<Season />} />
+          <Route path="/erebus-empire/:animeId/:seasonId/:episodeId" element={<Dispatcher key={location.pathname} />} />
+          <Route path="/erebus-empire/settings" element={<Settings openTheme={openTheme} />} />
+          <Route path="/erebus-empire/settings/profile" element={<Profile />} />
+          <Route path="/erebus-empire/login" element={<Login />} />
+          <Route path="/erebus-empire/favorites" element={<Favorites />} />
+          <Route path="/erebus-empire/watchlist" element={<Watchlist />} />
+          <Route path="/erebus-empire/history" element={<History />} />
+          <Route path="/erebus-empire/onHold" element={<OnHold />} />
+          <Route path="/erebus-empire/alreadySeen" element={<AlreadySeen />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
+    </Router>
   )
 }
 
