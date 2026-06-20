@@ -160,7 +160,7 @@ const BackgroundCover = ({ coverInfo, whileWatching = false, isAnime = true}) =>
                     <div className={`${styles.AnimeTitle} ${!whileWatching? styles.TitleHover : ""}`} onClick={()=> {if (!whileWatching) {navigate(`/erebus-empire/${getAnimeId(coverInfo?.url)}/`)}}}>
                         <ScrollTitle title={coverInfo?.title}/>
                     </div>
-                    <h2 className={styles.AltTitles}>{coverInfo?.altTitles.slice(0, 1).join(', ')}</h2>
+                    <h2 className={styles.AltTitles}>{coverInfo?.altTitles?.slice(0, 1).join(', ')}</h2>
                     <div className={styles.Buttons}>
                         <div className={styles.SeeContainer} onClick={()=> navigateToEpisode(coverInfo)}>
                             <PlayIcon className={styles.SeeIcon}/>

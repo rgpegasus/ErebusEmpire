@@ -1,6 +1,5 @@
 node_modules
 build
-puppeteer
 dist
 out
 .DS_Store

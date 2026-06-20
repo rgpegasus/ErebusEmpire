@@ -4,6 +4,7 @@ import styles from './AnimeLibrary.module.css';
 import {LoginPageBackground} from "@utils/dispatchers/Pictures"
 import BackgroundCover from "@components/background-cover/BackgroundCover"
 import ContentsCarousel from '@components/contents-carousel/ContentsCarousel';
+import { useLoader, Loader } from "@utils/dispatchers/Page"
 export const AnimeLibrary = ({
   storageKey,           
   title,
@@ -13,7 +14,9 @@ export const AnimeLibrary = ({
   const [animeList, setAnimeList] = useState([]);
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState("")
+  const { loading, setLoading } = useLoader()
   const loadAnimeList = async () => {
+    setLoading(true)
     const all = await animeData.loadAll(storageKey);  
     if (!all) return;
     let animes = Object.entries(all).map(([key, data]) => ({ key, ...data }));
@@ -22,11 +25,15 @@ export const AnimeLibrary = ({
       animes = animes.filter((anime, index, self) => index === 0 || anime.animeTitle !== self[index - 1].animeTitle);
     }
     setAnimeList(animes);
+    setLoading(false)
   }; 
   useEffect(() => {
-    loadAnimeList(); 
+    loadAnimeList();
   }, []);
   
+  if(loading) {
+    return <Loader/>
+  }
 const deleteAnime = async (anime) => {
   const all = await animeData.loadAll(storageKey);
   if (!all) return;

@@ -52,17 +52,27 @@ async function LoadAnimeDataFromSupabase(fileKey, storageKey) {
   }
 }
 
-async function DeleteAnimeDataFromSupabase(fileKey, storageKey) {
+async function DeleteAnimeDataFromSupabase(fileKey, storageKey, isSame = false) {
   try {
     const { data: userData, error: userError } = await supabase.auth.getUser()
     if (userError || !userData.user)
       throw new Error(userError?.message || "Utilisateur non connecté")
     const id = userData.user.id
-    const { error } = await supabase
-      .from(fileKey)
-      .delete()
-      .eq("id", id)
-      .eq("storageKey", storageKey)
+
+    let query
+    if (!isSame) {
+      query = supabase.from(fileKey).delete().eq("id", id).eq("storageKey", storageKey)
+    } else {
+      const seasonPattern = storageKey.split("/").slice(0, -1).join("/") + "/%"
+      query = supabase
+        .from(fileKey)
+        .delete()
+        .eq("id", id)
+        .like("storageKey", seasonPattern)
+        .neq("storageKey", storageKey)
+    }
+
+    const { error } = await query
     if (error) throw error
     return true
   } catch (err) {

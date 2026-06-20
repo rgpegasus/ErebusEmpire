@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import '@utils/CssImport'
 import App from '@src/App'
+import { HashRouter as Router } from 'react-router-dom';
 import { LoaderProvider } from "@utils/dispatchers/Page"
 import { UserProvider } from "@context/user-context/UserContext"
 
@@ -18,7 +19,9 @@ root.render(
   <React.StrictMode>
     <LoaderProvider>
       <UserProvider>
-        <App />
+        <Router>
+          <App />
+        </Router>
       </UserProvider>
     </LoaderProvider>
   </React.StrictMode>,

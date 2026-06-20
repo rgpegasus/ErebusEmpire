@@ -21,7 +21,7 @@ function UserDropdown() {
   const [editMode, setEditMode] = useState(false)
   const [menuVisible, setMenuVisible] = useState(false)
   const OpenUserDropdownRef = useRef(null)
-  const userDropdownRef = useRef(null)
+  const userDropdownRef = useRef(null) 
   const [isCropping, setIsCropping] = useState(false)
 
   const CloseMenu = () => {

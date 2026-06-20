@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import BackgroundCover from "@components/background-cover/BackgroundCover"
 import { LoginPageBackground } from "@utils/dispatchers/Pictures"
 import { supabase } from "@services/supabase/Client"
+
+
 export const Profile = () => {
     const [isDev, setIsDev] = useState(() => {
        return localStorage.getItem('dev') == 'false'; 
@@ -29,16 +31,24 @@ export const Profile = () => {
       alert('Échec de l\'exportation');
     }
   };
-
+  async function isUserLoggedIn() {
+    const { data: userData } = await supabase.auth.getUser()
+    return !!userData?.user
+  }
 const importData = async () => {
-  const result = await window.electron.ipcRenderer.invoke('import-data');
-  
-  alert(result.message); 
-  console.log(result.success, result.devUnlocked)
-  if (result.success && result.devUnlocked) {
-    setIsDevVisible(true)
-    console.log(isDevVisible)
-    localStorage.setItem('devUnlocked', isDevVisible  ? 'true' : 'false');
+  const loggedIn = await isUserLoggedIn()
+  if (!loggedIn) {
+    const result = await window.electron.ipcRenderer.invoke('import-data');
+    
+    alert(result.message); 
+    console.log(result.success, result.devUnlocked)
+    if (result.success && result.devUnlocked) {
+      setIsDevVisible(true)
+      console.log(isDevVisible)
+      localStorage.setItem('devUnlocked', isDevVisible  ? 'true' : 'false');
+    }
+  } else {
+    await window.electron.ipcRenderer.invoke("import-data-to-supabase")
   }
 };
   const navigate = useNavigate();
@@ -58,6 +68,7 @@ const importData = async () => {
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     navigate("/erebus-empire/home")
+    localStorage.removeItem("numberStartErebus")
     setSession(null)
   }
 

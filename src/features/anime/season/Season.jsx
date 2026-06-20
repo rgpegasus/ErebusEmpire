@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styles from "./Season.module.css"
 import useEmblaCarousel from "embla-carousel-react";
 import { useParams, useNavigate } from 'react-router-dom';
-import { useLoader } from '@utils/dispatchers/Page';
+import { useLoader, Loader } from '@utils/dispatchers/Page';
 import { toSlug } from '@utils/functions/toSlug'
 import BackgroundCover from "@components/background-cover/BackgroundCover"
 import ContentsCarousel from '@components/contents-carousel/ContentsCarousel';
@@ -30,7 +30,7 @@ export const Season = () => {
   const [episodes, setEpisodes] = useState([])
   const [episodeCache, setEpisodeCache] = useState({})
   const [searchValue, setSearchValue] = useState("")
-  
+  const [searchValueSimilaire, setSearchValueSimilaire] = useState("")
   const [emblaRef, emblaApi] = useEmblaCarousel({ align: "start", dragFree: true, skipSnaps: false })
 
   useEffect(() => {
@@ -51,7 +51,7 @@ export const Season = () => {
     if (!animeUrl) return
     const fetchAnimeInfo = async () => {
       try {
-        setLoading(true)
+        
         const info = await window.electron.ipcRenderer.invoke("info-anime", animeUrl)
         if (!info?.title) {
           return
@@ -66,7 +66,6 @@ export const Season = () => {
     }
     fetchAnimeInfo()
   }, [animeUrl])
-
   useEffect(() => {
     if (!animeUrl) return
     const fetchSeasons = async () => {
@@ -79,7 +78,6 @@ export const Season = () => {
             console.warn("Aucune saison trouvée ou erreur:", result?.error)
             setSeasons([])
             setSelectedSeason(null)
-            setLoading(false)
             return
           }
           if (!seasonId) {
@@ -306,7 +304,11 @@ export const Season = () => {
       return true
     })
   })()
-
+  useEffect(() => {
+    setAnimeUrl(null)
+    setSelectedSeason(null)
+    setSelectedLanguage(null)
+  }, [animeId])
   useEffect(() => {
     if (!emblaApi || seasons?.length === 0) return
 
@@ -315,6 +317,9 @@ export const Season = () => {
       emblaApi.scrollTo(selectedIndex, true)
     }
   }, [emblaApi, selectedSeason, seasons])
+  if(loading || !animeUrl || !selectedSeason || !selectedLanguage) {
+    return <Loader/>
+  }
     return (
       <div className="MainPage">
         <BackgroundCover coverInfo={coverInfo} whileWatching={true} isAnime={true} />
@@ -363,6 +368,22 @@ export const Season = () => {
             contentType={contentType}
             searchValue={searchValue}
             setSearchValue={setSearchValue}
+          />
+        </div>
+        <div className='Space'></div>
+        <div className={styles.Container}>
+          <ContentsCarousel
+            data={animeInfo?.similaires}
+            title="Oeuvres similaires"
+            onClickEpisode={(ep) => navigate(`/erebus-empire/${ep?.url.split("/").slice(4, 5)}`)}
+            getEpisodeCover={(ep) => ep?.cover}
+            getAnimeTitle={(ep) => ep?.title}
+            getEpisodeTitle={(ep) => ep?.title}
+            isGridMode={false}
+            contentType={contentType}
+            customType={"Oeuvre"}
+            searchValue={searchValueSimilaire}
+            setSearchValue={setSearchValueSimilaire}
           />
         </div>
       </div>

@@ -60,9 +60,6 @@ const ContentsCarousel = ({
       setFilteredData(
         data.filter((ep) => getAnimeTitle(ep).toLowerCase().includes(searchValue.toLowerCase())),
       )
-      console.log(
-        data.filter((ep) => getAnimeTitle(ep).toLowerCase().includes(searchValue.toLowerCase())),
-      )
     } else if (searchBy === "episode") {
       setFilteredData(
         data.filter((ep) => {

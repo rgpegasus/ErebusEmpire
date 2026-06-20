@@ -10,7 +10,6 @@ files:
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
 asarUnpack:
   - resources/**
-  - puppeteer/**
 win:
   executableName: erebus-empire
   

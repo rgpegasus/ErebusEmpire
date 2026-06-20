@@ -1,17 +1,17 @@
-import { app, shell, session, BrowserWindow, ipcMain } from 'electron';
-import { join } from 'path';
-import path from 'path';
-import { electronApp, optimizer, is } from '@electron-toolkit/utils';
-import { ErebusIcon } from '@utils/dispatchers/Pictures';
+import { app, shell, session, BrowserWindow, ipcMain } from "electron"
+import { join } from "path"
+import path from "path"
+import { electronApp, optimizer, is } from "@electron-toolkit/utils"
+import { ErebusIcon } from "@utils/dispatchers/Pictures"
 import { AnimeScraper } from 'better-ani-scraped';
 // import { AnimeScraper } from "../../../../BOT/better-ani-scraped/index.js"
-import fsExtra from 'fs-extra'; 
-import fs from 'fs';
-import { Client } from '@xhayper/discord-rpc';
-const clientId = '1366193765701783604';
-const rpc = new Client({ transport: { type: 'ipc' }, clientId });
-const scraper = new AnimeScraper("animesama");
-
+import fsExtra from "fs-extra"
+import fs from "fs"
+import { Client } from "@xhayper/discord-rpc"
+const clientId = "1366193765701783604"
+const rpc = new Client({ transport: { type: "ipc" }, clientId })
+const scraper = new AnimeScraper("animesama")
+import { ImportDataToSupabase } from "@utils/dispatchers/ServicesData"
 
 import {
   SearchAnime,
@@ -33,65 +33,64 @@ import {
   ScansImg,
   WorkingUrl,
   Session,
-} from "@utils/dispatchers/IpcHandler" 
-import { AnimeCoverTemp, AnimeData } from '@utils/dispatchers/ServicesData'
-import { spawn } from 'child_process';
-
+} from "@utils/dispatchers/IpcHandler"
+import { AnimeCoverTemp, AnimeData } from "@utils/dispatchers/ServicesData"
+import { spawn } from "child_process"
 
 function launchBackgroundScript() {
-  const scriptPath = join(__dirname, 'background', 'background.js');
+  const scriptPath = join(__dirname, "background", "background.js")
 
   const subprocess = spawn(process.execPath, [scriptPath], {
     detached: false,
-    stdio: 'ignore'
-  });
+    stdio: "ignore",
+  })
 
-  subprocess.unref();
+  subprocess.unref()
 }
 
-launchBackgroundScript();
-const sessionStorage = join(app.getPath('appData'), 'Erebus Empire', 'userData', 'sessionStorage');
+launchBackgroundScript()
+const sessionStorage = join(app.getPath("appData"), "Erebus Empire", "userData", "sessionStorage")
 
-let startTimestamp = null;
-let mainWindow = null;
-let deeplinkingUrl = null;
+let startTimestamp = null
+let mainWindow = null
+let deeplinkingUrl = null
 
-async function setActivity(details = "Dans la liste d'animés", state = 'Sur Erebus Empire') {
-  if (!rpc) return;
-  if (!startTimestamp) startTimestamp = new Date();
+async function setActivity(details = "Dans la liste d'animés", state = "Sur Erebus Empire") {
+  if (!rpc) return
+  if (!startTimestamp) startTimestamp = new Date()
 
   rpc.user.setActivity({
     details,
     state,
     startTimestamp,
-    largeImageKey: 'icon',
-    largeImageText: 'Erebus Empire',
+    largeImageKey: "icon",
+    largeImageText: "Erebus Empire",
     instance: false,
-    type: 3, 
+    type: 3,
     buttons: [
       { label: "Discord", url: "https://discord.gg/Mj9cYRQTcU" },
-      { label: "Installer", url: "https://github.com/rgpegasus/ErebusEmpire/releases/latest" }
+      { label: "Installer", url: "https://github.com/rgpegasus/ErebusEmpire/releases/latest" },
     ],
-  });
+  })
 }
 
-rpc.on('ready', () => {
-  setActivity();
-});
+rpc.on("ready", () => {
+  setActivity()
+})
 
-rpc.login({ clientId }).catch(console.error);
+rpc.login({ clientId }).catch(console.error)
 function handleDeepLink(url) {
   if (mainWindow) {
     if (mainWindow.webContents.isLoading()) {
-      mainWindow.webContents.once('did-finish-load', () => {
-        mainWindow.webContents.send('deep-link', url);
-      });
+      mainWindow.webContents.once("did-finish-load", () => {
+        mainWindow.webContents.send("deep-link", url)
+      })
     } else {
-      mainWindow.webContents.send('deep-link', url);
+      mainWindow.webContents.send("deep-link", url)
     }
   }
 }
-function createWindow(route = '/') {
+function createWindow(route = "/") {
   mainWindow = new BrowserWindow({
     width: 1500,
     height: 1000,
@@ -111,90 +110,92 @@ function createWindow(route = '/') {
       contextIsolation: false,
     },
   })
-  
+
   if (process.defaultApp) {
     if (process.argv.length >= 2) {
-      app.setAsDefaultProtocolClient('erebusempire', process.execPath, [path.resolve(process.argv[1])]);
+      app.setAsDefaultProtocolClient("erebusempire", process.execPath, [
+        path.resolve(process.argv[1]),
+      ])
     }
   } else {
-    app.setAsDefaultProtocolClient('erebusempire');
+    app.setAsDefaultProtocolClient("erebusempire")
   }
   const logToRenderer = (msg) => {
-    if (mainWindow) mainWindow.webContents.send('log-from-main', msg);
-  };
-
-  const originalStdoutWrite = process.stdout.write.bind(process.stdout);
-  process.stdout.write = (chunk, encoding, callback) => {
-    logToRenderer(chunk.toString());
-    originalStdoutWrite(chunk, encoding, callback);
-  };
-
-  mainWindow.on('ready-to-show', () => {
-    if (mainWindow) {
-      mainWindow.maximize();
-      mainWindow.show();
-    }
-  });
-
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url);
-    return { action: 'deny' };
-  });
-
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'] + '#' + route);
-  } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'), { hash: route });
+    if (mainWindow) mainWindow.webContents.send("log-from-main", msg)
   }
 
-  mainWindow.on('closed', () => {
+  const originalStdoutWrite = process.stdout.write.bind(process.stdout)
+  process.stdout.write = (chunk, encoding, callback) => {
+    logToRenderer(chunk.toString())
+    originalStdoutWrite(chunk, encoding, callback)
+  }
+
+  mainWindow.on("ready-to-show", () => {
+    if (mainWindow) {
+      mainWindow.maximize()
+      mainWindow.show()
+    }
+  })
+
+  mainWindow.webContents.setWindowOpenHandler((details) => {
+    shell.openExternal(details.url)
+    return { action: "deny" }
+  })
+
+  if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
+    mainWindow.loadURL(process.env["ELECTRON_RENDERER_URL"] + "#" + route)
+  } else {
+    mainWindow.loadFile(join(__dirname, "../renderer/index.html"), { hash: route })
+  }
+
+  mainWindow.on("closed", () => {
     try {
       if (fs.existsSync(sessionStorage)) {
-        fsExtra.removeSync(sessionStorage);
+        fsExtra.removeSync(sessionStorage)
       }
     } catch (error) {
-      console.error('Erreur suppression sessionStorage :', error);
+      console.error("Erreur suppression sessionStorage :", error)
     }
 
-    mainWindow = null;
-  });
+    mainWindow = null
+  })
 }
 
 module.exports = {
-  getMainWindow: () => mainWindow
-};
-app.on('open-url', (event, url) => {
-  event.preventDefault();
-  deeplinkingUrl = url;
-  handleDeepLink(url);
-});
+  getMainWindow: () => mainWindow,
+}
+app.on("open-url", (event, url) => {
+  event.preventDefault()
+  deeplinkingUrl = url
+  handleDeepLink(url)
+})
 
-if (process.platform === 'win32') {
-  const url = process.argv.find(arg => arg.startsWith('erebusempire://'));
+if (process.platform === "win32") {
+  const url = process.argv.find((arg) => arg.startsWith("erebusempire://"))
   if (url) {
-    deeplinkingUrl = url;
+    deeplinkingUrl = url
   }
 }
 
-const gotTheLock = app.requestSingleInstanceLock();
+const gotTheLock = app.requestSingleInstanceLock()
 
 if (!gotTheLock) {
-  app.quit();
+  app.quit()
 } else {
-  app.on('second-instance', (event, argv) => {
-    const url = argv.find(arg => arg.startsWith('erebusempire://'));
+  app.on("second-instance", (event, argv) => {
+    const url = argv.find((arg) => arg.startsWith("erebusempire://"))
     if (url) {
-      deeplinkingUrl = url;
+      deeplinkingUrl = url
       if (mainWindow) {
-        mainWindow.webContents.send('deep-link', deeplinkingUrl);
+        mainWindow.webContents.send("deep-link", deeplinkingUrl)
       }
     }
     if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore();
-      mainWindow.focus();
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.focus()
     }
-  });
-  app.whenReady().then(async  () => {
+  })
+  app.whenReady().then(async () => {
     session.defaultSession.setUserAgent(
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
     )
@@ -236,30 +237,27 @@ if (!gotTheLock) {
         })
       },
     )
-    ipcMain.on(
-      "scan-discord-presence",
-      (event, { anime, episode, cover }) => {
-        if (!rpc || !rpc.user || typeof rpc.user.setActivity !== "function") {
-          console.warn("Rich Presence non prêt : rpc ou rpc.user non défini")
-          return
-        }
-        rpc.user.setActivity({
-          details: `Lit ${anime}`,
-          state: `${episode}`,
-          largeImageKey: `${cover}`,
-          largeImageText: `${anime}`,
-          instance: false,
-          type: 3,
-          buttons: [
-            { label: "Discord", url: "https://discord.gg/Mj9cYRQTcU" },
-            {
-              label: "Installer",
-              url: "https://github.com/rgpegasus/ErebusEmpire/releases/latest",
-            },
-          ],
-        })
-      },
-    )
+    ipcMain.on("scan-discord-presence", (event, { anime, episode, cover }) => {
+      if (!rpc || !rpc.user || typeof rpc.user.setActivity !== "function") {
+        console.warn("Rich Presence non prêt : rpc ou rpc.user non défini")
+        return
+      }
+      rpc.user.setActivity({
+        details: `Lit ${anime}`,
+        state: `${episode}`,
+        largeImageKey: `${cover}`,
+        largeImageText: `${anime}`,
+        instance: false,
+        type: 3,
+        buttons: [
+          { label: "Discord", url: "https://discord.gg/Mj9cYRQTcU" },
+          {
+            label: "Installer",
+            url: "https://github.com/rgpegasus/ErebusEmpire/releases/latest",
+          },
+        ],
+      })
+    })
 
     ipcMain.on("defaul-rich-presence", () => {
       if (!rpc) return
@@ -287,6 +285,7 @@ if (!gotTheLock) {
     ExportData()
     ImportData()
     AnimeCoverTemp()
+    ImportDataToSupabase()
 
     ipcMain.on("open-devtools", () => {
       if (mainWindow && !mainWindow.webContents.isDevToolsOpened()) {
@@ -304,24 +303,23 @@ if (!gotTheLock) {
       if (BrowserWindow.getAllWindows().length === 0) createWindow()
     })
   })
-  app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-      app.quit();
+  app.on("window-all-closed", () => {
+    if (process.platform !== "darwin") {
+      app.quit()
     }
-  });
-  ipcMain.on('window-minimize', () => mainWindow.minimize());
+  })
+  ipcMain.on("window-minimize", () => mainWindow.minimize())
 
-  ipcMain.on('window-toggle-fullscreen', () => {
+  ipcMain.on("window-toggle-fullscreen", () => {
     if (mainWindow.isMaximized()) {
-      mainWindow.unmaximize();
+      mainWindow.unmaximize()
     } else {
-      mainWindow.maximize();
+      mainWindow.maximize()
     }
-  });
+  })
 
-
-  ipcMain.on('window-close', () => {
-    mainWindow = null;
-    app.quit(); 
-  });
+  ipcMain.on("window-close", () => {
+    mainWindow = null
+    app.quit()
+  })
 }

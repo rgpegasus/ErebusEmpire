@@ -34,26 +34,42 @@ function ProfileEditor({ editMode, setEditMode, setIsCropping }) {
       e.target.value = null
     }
   }
+  const deleteAvatar = async () => {
+    const path = localStorage.getItem("croppedProfileImage")
+    const { error } = await supabase.storage.from("avatars").remove([path.split("/").slice(8, 10).join("/")])
 
-  // Upload avatar dans Supabase Storage et retourne l'URL publique
+    if (error) {
+      console.error("Erreur delete avatar:", error.message)
+      return false
+    }
+
+    return true
+  }
   const uploadAvatar = async (fileDataUrl) => {
     try {
-      const user = await supabase.auth.getUser()
-      if (!user.data.user) throw new Error("Utilisateur non connecté")
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) throw new Error("Utilisateur non connecté")
 
-      const id = user.data.user.id
-      const fileName = `avatars/${id}_${Date.now()}.png`
+      const id = user.id
+      const type = fileDataUrl.split(";")[0].split(":")[1] 
+
+      const fileName = `${id}/avatar.${type.split("/")[1]}`
+
       const base64 = fileDataUrl.split(",")[1]
+      deleteAvatar()
       const file = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0))
 
-      const { error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(fileName, file, { upsert: true })
+      const { error: uploadError } = await supabase.storage.from("avatars").upload(fileName, file, {
+        contentType: type,
+        upsert: true,
+      })
 
       if (uploadError) throw uploadError
 
-      const { data: publicData } = supabase.storage.from("avatars").getPublicUrl(fileName)
-      return publicData.publicUrl
+      const { data } = supabase.storage.from("avatars").getPublicUrl(fileName)
+      return `${data.publicUrl}?t=${Date.now()}`
     } catch (err) {
       console.error("Erreur uploadAvatar:", err.message)
       return null
@@ -66,24 +82,21 @@ function ProfileEditor({ editMode, setEditMode, setIsCropping }) {
       if (userError || !userData.user) throw new Error("Utilisateur non connecté")
       const id = userData.user.id
 
-      // Vérifie si le profil existe
       const { data: existing, error: selectError } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", id)
         .single()
 
-      // si erreur autre que "no rows found", throw
       if (selectError && selectError.code !== "PGRST116") {
         throw selectError
       }
 
       if (existing) {
-        // UPDATE si existe
         const { error: updateError } = await supabase
           .from("profiles")
           .update({ username: usernameToUpdate, avatar_url })
-          .eq("id", id)
+          .eq("id", id) 
         if (updateError) throw updateError
       } else {
         // INSERT sinon

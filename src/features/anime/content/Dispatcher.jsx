@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react"
 import { useLocation, useParams } from "react-router-dom"
 import { useLoader, Episode, Scans } from "@utils/dispatchers/Page"
+import { supabase } from "@services/supabase/Client"
 
 export const Dispatcher = () => {
   const location = useLocation()
@@ -93,41 +94,40 @@ export const Dispatcher = () => {
   }, [animeId, seasonId])
 
   useEffect(() => {
+    watchDataRef.current = {}
+  }, [storageKey])
+
+  useEffect(() => {
     if (!restored || !storageKey) return
 
-    const cleanupOldHistory = async () => {
-      try {
-        await clearSeasonHistory()
-      } catch (err) {
-        console.error("Erreur lors du nettoyage de l'historique :", err)
-      }
+    const capturedStorageKey = storageKey
+
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
     }
-    cleanupOldHistory()
+
+    clearSeasonHistory(capturedStorageKey) // 👈 on passe la clé explicitement
 
     intervalRef.current = setInterval(() => {
-      animeData.save("animeWatchHistory", storageKey, watchDataRef.current)
+      if (Object.keys(watchDataRef.current).length === 0) return
+      animeData.save("animeWatchHistory", capturedStorageKey, watchDataRef.current)
     }, 5000)
 
     return () => {
       clearInterval(intervalRef.current)
-      if (!skipFinalSaveRef.current) {
-        animeData.save("animeWatchHistory", storageKey, watchDataRef.current)
+      intervalRef.current = null
+      const snapshot = structuredClone(watchDataRef.current)
+      if (!skipFinalSaveRef.current && Object.keys(snapshot).length > 0) {
+        animeData.save("animeWatchHistory", capturedStorageKey, snapshot)
       }
+      skipFinalSaveRef.current = false
     }
   }, [storageKey, restored])
-  useEffect(() => {
-    skipFinalSaveRef.current = false
-  }, [storageKey])
 
-  const clearSeasonHistory = async () => {
+  const clearSeasonHistory = async (currentKey) => {
     try {
-      const allData = await animeData.loadAll("animeWatchHistory")
-      const allKeys = Object.keys(allData || {})
-      const seasonKeys = allKeys.filter((key) =>
-        key.startsWith(`/erebus-empire/${animeId}/${seasonId}/`),
-      )
-      const keysToDelete = seasonKeys.filter((key) => key !== storageKey)
-      await Promise.all(keysToDelete.map((key) => animeData.delete("animeWatchHistory", key)))
+      await animeData.delete("animeWatchHistory", currentKey, true)
     } catch (err) {
       console.error("Erreur lors du nettoyage de l'historique :", err)
     }
