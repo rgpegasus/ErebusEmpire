@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styles from "./Season.module.css"
 import useEmblaCarousel from "embla-carousel-react";
 import { useParams, useNavigate } from 'react-router-dom';
@@ -6,8 +6,10 @@ import { useLoader, Loader } from '@utils/dispatchers/Page';
 import { toSlug } from '@utils/functions/toSlug'
 import BackgroundCover from "@components/background-cover/BackgroundCover"
 import ContentsCarousel from '@components/contents-carousel/ContentsCarousel';
+import { UserContext } from '@context/user-context/UserContext';
 
 export const Season = () => {
+  const { favoriteLanguage } = useContext(UserContext);
   const { animeId, seasonId } = useParams()
   const navigate = useNavigate()
   const { loading, setLoading } = useLoader()
@@ -51,7 +53,6 @@ export const Season = () => {
     if (!animeUrl) return
     const fetchAnimeInfo = async () => {
       try {
-        
         const info = await window.electron.ipcRenderer.invoke("info-anime", animeUrl)
         if (!info?.title) {
           return
@@ -66,6 +67,7 @@ export const Season = () => {
     }
     fetchAnimeInfo()
   }, [animeUrl])
+
   useEffect(() => {
     if (!animeUrl) return
     const fetchSeasons = async () => {
@@ -98,10 +100,11 @@ export const Season = () => {
           seasons?.find((season) => season.url.split("/")[5] === seasonId) ||
           seasons?.[0] ||
           result?.[0]
+        
         const baseSeasonUrl = currentSeason?.url.split("/").slice(0, 6).join("/")
         setSelectedSeason(baseSeasonUrl)
         setContentType(currentSeason?.type.toLowerCase() === "scans" ? "manga" : "anime")
-        setSelectedLanguage(currentSeason.language)
+        setSelectedLanguage(favoriteLanguage)
       } catch (error) {
         console.error("Erreur lors de la récupération des saisons :", error)
         setSeasons([])
@@ -119,17 +122,28 @@ export const Season = () => {
     const fetchEpisodes = async () => {
       setLoading(true)
       try {
-        const currentLanguage = selectedLanguage.toLowerCase()
+        const languages = await window.electron.ipcRenderer.invoke(
+          "get-available-languages",
+          selectedSeason,
+        )
+        const currentLanguage = selectedLanguage && selectedLanguage.length > 0 
+        ? selectedLanguage : 
+        languages.includes(favoriteLanguage.toLowerCase())
+        ? favoriteLanguage.toLowerCase()
+        : languages[0].toLowerCase()
+        
         if (episodeCache[selectedSeason]?.[currentLanguage]) {
           setEpisodes(episodeCache[selectedSeason][currentLanguage])
           return
         }
-        const seasonLangUrl = `${selectedSeason}/${currentLanguage}`
-        const languages = await window.electron.ipcRenderer.invoke(
-          "get-available-languages",
-          seasonLangUrl,
-        )
-        setAvailableLanguages(languages)
+        const seasonLangUrl = `${selectedSeason}/${selectedLanguage}`
+
+        const sortedLanguages = [...languages].sort((a, b) => {
+          if (a.toLowerCase() === favoriteLanguage) return -1
+          if (b.toLowerCase() === favoriteLanguage) return 1
+          return 0
+        })
+        setAvailableLanguages(sortedLanguages)
         const episodeLinks = await window.electron.ipcRenderer.invoke(
           "get-episodes",
           seasonLangUrl,

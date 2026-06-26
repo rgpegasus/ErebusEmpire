@@ -260,5 +260,6 @@
         }
       ]
     }
-  ]
+  ],
+  "snyk.advanced.autoSelectOrganization": true
 }

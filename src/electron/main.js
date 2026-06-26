@@ -264,6 +264,10 @@ if (!gotTheLock) {
       if (!startTimestamp) startTimestamp = new Date()
       setActivity()
     })
+    ipcMain.handle("get-install-date", () => {
+      const stats = fs.statSync(app.getPath("userData"));
+      return stats.birthtime.toISOString();
+    });
     SearchAnime(scraper)
     RandomAnime(scraper)
     InfoAnime(scraper)
@@ -286,7 +290,6 @@ if (!gotTheLock) {
     ImportData()
     AnimeCoverTemp()
     ImportDataToSupabase()
-
     ipcMain.on("open-devtools", () => {
       if (mainWindow && !mainWindow.webContents.isDevToolsOpened()) {
         mainWindow.webContents.openDevTools({ mode: "detach" })

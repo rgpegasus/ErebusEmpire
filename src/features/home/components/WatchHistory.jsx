@@ -1,12 +1,14 @@
-import React, { useRef, useEffect, useState } from "react"
+import React, { useRef, useEffect, useState, useContext } from "react"
 import { useNavigate } from "react-router-dom"
 import { useLoader } from "@utils/dispatchers/Page"
 import "swiper/css"
 import "swiper/css/navigation"
 import "swiper/css/effect-coverflow"
 import ContentsCarousel from "@components/contents-carousel/ContentsCarousel"
+import { UserContext } from '@context/user-context/UserContext';
 
 const WatchHistory = () => {
+  const { favoriteLanguage } = useContext(UserContext);
   const [watchedEpisodes, setWatchedEpisodes] = useState([])
   const navigate = useNavigate()
   const { setLoading } = useLoader()
@@ -47,7 +49,14 @@ const WatchHistory = () => {
         tempScans.push(element)
       }
     }
-    tempLanguages.sort((a, b) => tempEpisodes[b].length - tempEpisodes[a].length)
+    tempLanguages.sort((a, b) => {
+      if (favoriteLanguage) {
+        if (a === favoriteLanguage) return -1
+        if (b === favoriteLanguage) return 1
+      
+        return tempEpisodes[b].length - tempEpisodes[a].length
+      }
+    })
     setEpisodes(tempEpisodes)
     setScans(tempScans)
     setAvailableLanguages(tempLanguages)

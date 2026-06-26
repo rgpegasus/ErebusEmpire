@@ -1,9 +1,9 @@
 import { ipcMain } from 'electron';
 
 function SeasonsAnime(scraper) {
-  ipcMain.handle("get-seasons", async (event, animeUrl)=> {
+  ipcMain.handle("get-seasons", async (event, animeUrl, wantedLanguage = [])=> {
     try {
-      return await scraper.getSeasons(animeUrl, [], ["Anime", "Scans"])
+      return await scraper.getSeasons(animeUrl, wantedLanguage, ["Anime", "Scans"])
     } catch (error){
       console.error('Erreur dans le main process:', error);
       return [];

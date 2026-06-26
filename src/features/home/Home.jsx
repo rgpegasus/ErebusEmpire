@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useContext } from "react"
 import styles from "./Home.module.css"
 import { useLoader } from "@utils/dispatchers/Page"
 import BackgroundCover from "@components/background-cover/BackgroundCover"
 import LatestReleases from "./components/LatestReleases"
 import WatchHistory from "./components/WatchHistory"
+import { UserContext } from '@context/user-context/UserContext';
 
 export const Home = () => {
+  const { favoriteLanguage } = useContext(UserContext);
   const [coverInfo, setCoverInfo] = useState(null)
   const [latestReleases, setLatestReleases] = useState([])
   const { setLoading } = useLoader()
@@ -63,8 +65,14 @@ export const Home = () => {
           tempEpisodes[lang] ??= []
           tempEpisodes[lang].push(episode)
         }
-        
-        tempLanguages.sort((a, b) => tempEpisodes[b].length - tempEpisodes[a].length)
+        tempLanguages.sort((a, b) => {
+          if (favoriteLanguage) {
+            if (a === favoriteLanguage) return -1
+            if (b === favoriteLanguage) return 1
+          }
+
+          return tempEpisodes[b].length - tempEpisodes[a].length
+        })
 
         setLatestEpisodesByLanguage(tempEpisodes)
         setAvailableLanguages(tempLanguages)

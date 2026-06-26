@@ -13,7 +13,7 @@ function ProfileEditor({ editMode, setEditMode, setIsCropping }) {
   const [zoom, setZoom] = useState(1)
   const [showOptions, setShowOptions] = useState(false)
   const [isEditingName, setIsEditingName] = useState(false)
-
+  const [imageError, setImageError] = useState(false);
   const handleProfileClick = () => {
     if (editMode) {
       setShowOptions(!showOptions)
@@ -152,12 +152,13 @@ function ProfileEditor({ editMode, setEditMode, setIsCropping }) {
     <div className={styles.ProfileEditorContainer}>
       <div className={styles.ProfileEditor}>
         <div onClick={handleProfileClick}>
-          {profileImage ? (
+          {profileImage && !imageError ? (
             <img
               src={profileImage}
-              alt="Profil"
+              alt="Profile"
               className={`${styles.ProfileImg} ${editMode ? styles.editable : ""}`}
               draggable="false"
+              onError={() => setImageError(true)}
             />
           ) : (
             <ProfileIcon className={`${styles.ProfileImg} ${editMode ? styles.editable : ""}`} />

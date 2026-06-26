@@ -8,6 +8,7 @@ export const UserProvider = ({ children }) => {
   const [theme, setTheme] = useState("dark");
   const [colorTheme, setColorTheme] = useState("");
   const [toolBar, setToolBar] = useState(false);
+  const [favoriteLanguage, setFavoriteLanguage] = useState("vostfr");
 
   useEffect(() => {
     const savedName = localStorage.getItem("username");
@@ -15,7 +16,7 @@ export const UserProvider = ({ children }) => {
     const savedTheme = localStorage.getItem("theme");
     const savedColorTheme = localStorage.getItem("colorTheme") || "";
     const savedToolBar = localStorage.getItem("toolBar") || "";
-
+    const savedFavoriteLanguage = localStorage.getItem("favoriteLanguage")
     if (savedName?.trim()) setUsername(savedName);
     if (savedImage) setProfileImage(savedImage);
     if (savedTheme?.trim()) setTheme(savedTheme);
@@ -23,6 +24,9 @@ export const UserProvider = ({ children }) => {
     if (savedColorTheme?.trim()) setColorTheme(savedColorTheme);
     if (savedToolBar !== null) {
       setToolBar(savedToolBar === "true"); 
+    }
+    if (savedFavoriteLanguage) {
+      setFavoriteLanguage(savedFavoriteLanguage)
     }
   }, []);
 
@@ -52,7 +56,10 @@ export const UserProvider = ({ children }) => {
     setToolBar(statePin);
     localStorage.setItem("toolBar", statePin);
   };
-
+const updateFavoriteLanguage = (newLanguage) => {
+    setFavoriteLanguage(newLanguage);
+    localStorage.setItem("favoriteLanguage", newLanguage);
+  };
   return (
     <UserContext.Provider
       value={{
@@ -61,10 +68,12 @@ export const UserProvider = ({ children }) => {
         theme,
         colorTheme,
         toolBar,
+        favoriteLanguage,
         updateUser,
         updateTheme,
         updateColorTheme,
         updateToolBar,
+        updateFavoriteLanguage
       }}
     >
       {children}
