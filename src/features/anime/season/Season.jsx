@@ -104,7 +104,7 @@ export const Season = () => {
         const baseSeasonUrl = currentSeason?.url.split("/").slice(0, 6).join("/")
         setSelectedSeason(baseSeasonUrl)
         setContentType(currentSeason?.type.toLowerCase() === "scans" ? "manga" : "anime")
-        setSelectedLanguage(favoriteLanguage)
+        setSelectedLanguage("")
       } catch (error) {
         console.error("Erreur lors de la récupération des saisons :", error)
         setSeasons([])
@@ -118,25 +118,26 @@ export const Season = () => {
   }, [animeUrl, seasonId])
 
   useEffect(() => {
-    if (!selectedSeason || !selectedLanguage || contentType != "anime") return
+    if (!selectedSeason || contentType != "anime") return
     const fetchEpisodes = async () => {
       setLoading(true)
       try {
-        const languages = await window.electron.ipcRenderer.invoke(
+        let languages = await window.electron.ipcRenderer.invoke(
           "get-available-languages",
           selectedSeason,
         )
+        languages = languages.map((lang) => lang.toLowerCase())
         const currentLanguage = selectedLanguage && selectedLanguage.length > 0 
         ? selectedLanguage : 
         languages.includes(favoriteLanguage.toLowerCase())
         ? favoriteLanguage.toLowerCase()
         : languages[0].toLowerCase()
-        
+        setSelectedLanguage(currentLanguage);
         if (episodeCache[selectedSeason]?.[currentLanguage]) {
           setEpisodes(episodeCache[selectedSeason][currentLanguage])
           return
         }
-        const seasonLangUrl = `${selectedSeason}/${selectedLanguage}`
+        const seasonLangUrl = `${selectedSeason}/${currentLanguage}`
 
         const sortedLanguages = [...languages].sort((a, b) => {
           if (a.toLowerCase() === favoriteLanguage) return -1

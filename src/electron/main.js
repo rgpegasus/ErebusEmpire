@@ -11,7 +11,6 @@ import { Client } from "@xhayper/discord-rpc"
 const clientId = "1366193765701783604"
 const rpc = new Client({ transport: { type: "ipc" }, clientId })
 const scraper = new AnimeScraper("animesama")
-import { ImportDataToSupabase } from "@utils/dispatchers/ServicesData"
 
 import {
   SearchAnime,
@@ -27,14 +26,13 @@ import {
   DownloadList,
   DeleteDownloadEpisode,
   ExportData,
-  ImportData,
   AvailableLanguages,
   ScansChapter,
   ScansImg,
   WorkingUrl,
   Session,
 } from "@utils/dispatchers/IpcHandler"
-import { AnimeCoverTemp, AnimeData } from "@utils/dispatchers/ServicesData"
+import { AnimeCoverTemp, AnimeData, ImportData} from "@utils/dispatchers/ServicesData"
 import { spawn } from "child_process"
 
 function launchBackgroundScript() {
@@ -289,7 +287,6 @@ if (!gotTheLock) {
     ExportData()
     ImportData()
     AnimeCoverTemp()
-    ImportDataToSupabase()
     ipcMain.on("open-devtools", () => {
       if (mainWindow && !mainWindow.webContents.isDevToolsOpened()) {
         mainWindow.webContents.openDevTools({ mode: "detach" })

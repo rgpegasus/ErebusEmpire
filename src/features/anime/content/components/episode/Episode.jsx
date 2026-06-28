@@ -75,7 +75,7 @@ export const Episode = ({
     seasonUrl,
     availableLanguages,
     selectedLanguage,
-    contentType:"anime",
+    contentType: "anime",
   })
   useEffect(() => {
     if (
@@ -107,8 +107,8 @@ export const Episode = ({
   ])
   const EndEpisodeNext = async (episode) => {
     if (!episode) return
-    await clearSeasonHistory()
     await animeData.save("animeWatchHistory", storageKey, buildWatchData())
+    await clearSeasonHistory(storageKey)
 
     skipFinalSaveRef.current = true
     clearInterval(intervalRef.current)
@@ -127,8 +127,8 @@ export const Episode = ({
   const handleNavigation = async (episode) => {
     if (!episode) return
 
-    await clearSeasonHistory()
     await animeData.save("animeWatchHistory", storageKey, buildWatchData())
+    await clearSeasonHistory(storageKey)
 
     const navId = `${episode.title.toLowerCase().replace(/\s+/g, "-")}`
     getEpisodeTitle(episode.title)
@@ -209,7 +209,11 @@ export const Episode = ({
           chosenLang = seasonUrl.split("/").slice(6, 7).join("/")
           setSelectedLanguage(chosenLang)
         }
-        if ((!availableLanguages || (Array.isArray(availableLanguages) && availableLanguages.length === 0)) || !chosenLang) {
+        if (
+          !availableLanguages ||
+          (Array.isArray(availableLanguages) && availableLanguages.length === 0) ||
+          !chosenLang
+        ) {
           const langs = await window.electron.ipcRenderer.invoke(
             "get-available-languages",
             `${BASE_URL}/catalogue/${animeId}/${seasonId}/${selectedLanguage}`,
@@ -230,12 +234,10 @@ export const Episode = ({
             true,
           )
           if (!episodeTitle && episodeId && eps) {
-            const ep = eps.find(
-              (e) => e.title?.toLowerCase().replace(/\s+/g, "-") === episodeId,
-            )
+            const ep = eps.find((e) => e.title?.toLowerCase().replace(/\s+/g, "-") === episodeId)
             if (ep) getEpisodeTitle(ep.title)
           }
-          getContents({[chosenLang]: eps || [] })
+          getContents({ [chosenLang]: eps || [] })
         }
       } catch (error) {
         console.error("Erreur dans le recalcul Episode:", error)
@@ -261,7 +263,7 @@ export const Episode = ({
 
         for (let i = 0; i < urls.length; i++) {
           const realUrl = await window.electron.ipcRenderer.invoke("get-url", urls[i], hosts[i])
-          
+
           if (cancelled) return
 
           if (hosts[i] === "vidmoly" && realUrl != null) {
@@ -291,7 +293,7 @@ export const Episode = ({
       } catch (err) {
         if (!cancelled) console.error("Erreur lors de la résolution des sources :", err)
       } finally {
-        setLoading(false) 
+        setLoading(false)
       }
     }
 
@@ -351,13 +353,7 @@ export const Episode = ({
         getEpisodeTitle("")
       }
     }
-  }, [
-    episodeId,
-    location.state?.episodeTitle,
-    contents,
-    selectedLanguage,
-    availableLanguages,
-  ])
+  }, [episodeId, location.state?.episodeTitle, contents, selectedLanguage, availableLanguages])
   useEffect(() => {
     if (!storageKey) return
     animeData.load("animeWatchHistory", storageKey).then((data) => {

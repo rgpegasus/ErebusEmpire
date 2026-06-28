@@ -1,6 +1,6 @@
 .Container {
   margin: 50px;
-  margin-top: -100px;
+  margin-top: 200px;
 }
 .Title {
   font-family: var(--font-family-main);
@@ -111,7 +111,7 @@
 @media (max-width: 1920px) {
   .Container {
     margin: calc(50px * 0.75);
-    margin-top: calc(-100px * 0.75);
+    margin-top: calc(200px * 0.75);
   }
   .Title {
     letter-spacing: calc(2px * 0.75);
@@ -167,7 +167,7 @@
 @media (max-width: 1300px) {
   .Container {
     margin: calc(50px * 0.6);
-    margin-top: calc(-100px * 0.6);
+    margin-top: calc(200px * 0.6);
   }
   .Title {
     letter-spacing: calc(2px * 0.6);
@@ -223,7 +223,7 @@
 @media (max-width: 960px) {
   .Container {
     margin: calc(50px * 0.5);
-    margin-top: calc(-100px * 0.5);
+    margin-top: calc(200px * 0.5);
   }
   .Title {
     letter-spacing: calc(2px * 0.5);

@@ -37,18 +37,15 @@ export const Profile = () => {
     return !!userData?.user
   }
 const importData = async () => {
-  const loggedIn = await isUserLoggedIn()
-  if (!loggedIn) {
-    const result = await window.electron.ipcRenderer.invoke('import-data');
-    
-    alert(result.message); 
-    if (result.success && result.devUnlocked) {
+  const result = await window.electron.ipcRenderer.invoke('import-data');
+  if(result) {
+    alert(result?.message)
+    if (result?.success && result?.devUnlocked) {
       setIsDevVisible(true)
-      localStorage.setItem('devUnlocked', 'true');
+      localStorage.setItem("devUnlocked", "true")
     }
-  } else {
-    await window.electron.ipcRenderer.invoke("import-data-to-supabase")
   }
+
 };
   const navigate = useNavigate();
   useEffect(() => {

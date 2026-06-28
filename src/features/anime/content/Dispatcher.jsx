@@ -8,14 +8,16 @@ export const Dispatcher = () => {
   const { setLoading } = useLoader()
 
   const { animeId, seasonId, episodeId } = useParams()
-  
+
   const [seasonUrl, setSeasonUrl] = useState(location.state?.seasonUrl || "")
   const [animeTitle, setAnimeTitle] = useState(
     location.state?.animeInfo?.title || location.state?.animeTitle || "",
   )
   const [seasonTitle, setSeasonTitle] = useState(location.state?.seasonTitle || "")
   const [episodeTitle, setEpisodeTitle] = useState(location.state?.episodeTitle || "")
-  const [animeCover, setAnimeCover] = useState(location.state?.animeInfo?.cover || location.state?.animeCover || "")
+  const [animeCover, setAnimeCover] = useState(
+    location.state?.animeInfo?.cover || location.state?.animeCover || "",
+  )
   const [contentType, setContentType] = useState(location.state?.contentType || "")
   const [contents, setContents] = useState(location.state?.contents || {})
   const [availableLanguages, setAvailableLanguages] = useState(
@@ -27,8 +29,7 @@ export const Dispatcher = () => {
   const episodesObj = contents?.[selectedLanguage] || {}
   const normalizedCurrent = episodeTitle?.toLowerCase().replace(/\s+/g, "-")
   const [episodeIndex, setEpisodeIndex] = useState(location.state?.chapterId || -1)
-  
-  
+
   const storageKey = episodeId ? `/erebus-empire/${animeId}/${seasonId}/${episodeId}` : null
   const skipFinalSaveRef = useRef(false)
   const intervalRef = useRef(null)
@@ -58,15 +59,13 @@ export const Dispatcher = () => {
           setAnimeTitle(info?.title)
           setAnimeCover(info?.cover)
         }
-        let currentSeason;
+        let currentSeason
         if (!seasonTitle || !seasonUrl) {
           const result = await window.electron.ipcRenderer.invoke(
             "get-seasons",
             `${BASE_URL}/catalogue/${animeId}/`,
           )
-          currentSeason = result?.find(
-            (season) => season.url.split("/")[5] === seasonId,
-          )
+          currentSeason = result?.find((season) => season.url.split("/")[5] === seasonId)
           setSeasonUrl(currentSeason?.url)
           setSeasonTitle(currentSeason?.title)
         }
@@ -107,12 +106,12 @@ export const Dispatcher = () => {
       intervalRef.current = null
     }
 
-    clearSeasonHistory(capturedStorageKey) // 👈 on passe la clé explicitement
-
     intervalRef.current = setInterval(() => {
       if (Object.keys(watchDataRef.current).length === 0) return
       animeData.save("animeWatchHistory", capturedStorageKey, watchDataRef.current)
     }, 5000)
+
+    clearSeasonHistory(capturedStorageKey)
 
     return () => {
       clearInterval(intervalRef.current)
@@ -200,6 +199,5 @@ export const Dispatcher = () => {
       />
     )
   } else {
-
   }
 }

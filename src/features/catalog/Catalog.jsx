@@ -92,7 +92,7 @@ export const Catalog = () => {
 
   return (
     <div className="MainPage">
-      <BackgroundCover coverInfo={LoginPageBackground} whileWatching={false} isAnime={false} />
+      {/* <BackgroundCover coverInfo={LoginPageBackground} whileWatching={false} isAnime={false} /> */}
       <div className={styles.Container}>
         <ContentsCarousel
           data={animeList}

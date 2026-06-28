@@ -1,7 +1,7 @@
 import { supabase } from "@services/supabase/Client"
 import { ipcMain } from "electron"
-import { SaveAnimeDataToLocal, LoadAnimeDataFromLocal, LoadAllAnimeDataFromLocal, DeleteAnimeDataFromLocal } from "@services/data/AnimeData"
-import { SaveAnimeDataToSupabase, LoadAnimeDataFromSupabase, LoadAllAnimeDataFromSupabase, DeleteAnimeDataFromSupabase } from "@services/supabase/AnimeData"
+import { SaveAnimeDataToLocal, LoadAnimeDataFromLocal, LoadAllAnimeDataFromLocal, DeleteAnimeDataFromLocal, ImportDataFromLocal } from "@services/data/AnimeData"
+import { SaveAnimeDataToSupabase, LoadAnimeDataFromSupabase, LoadAllAnimeDataFromSupabase, DeleteAnimeDataFromSupabase, ImportDataFromSupabase } from "@services/supabase/AnimeData"
 
 async function isUserLoggedIn() {
   const { data: userData } = await supabase.auth.getUser()
@@ -39,15 +39,26 @@ function AnimeData() {
     }
   })
 
-  ipcMain.handle("delete-anime-data", async (event, fileKey, storageKey) => {
+  ipcMain.handle("delete-anime-data", async (event, fileKey, storageKey, isSame = false) => {
     const loggedIn = await isUserLoggedIn()
 
     if (loggedIn) {
-      return DeleteAnimeDataFromSupabase(fileKey, storageKey)
+      return DeleteAnimeDataFromSupabase(fileKey, storageKey, isSame)
     } else {
-      return DeleteAnimeDataFromLocal(fileKey, storageKey)
+      return DeleteAnimeDataFromLocal(fileKey, storageKey, isSame)
     }
   })
 }
 
-export { AnimeData }
+function ImportData() {
+  ipcMain.handle("import-data", async (event) => {
+    const loggedIn = await isUserLoggedIn()
+
+    if (loggedIn) {
+      return ImportDataFromSupabase()
+    } else {
+      return ImportDataFromLocal()
+    }
+  })
+}
+export { AnimeData, ImportData }

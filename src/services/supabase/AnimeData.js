@@ -1,4 +1,5 @@
 import { supabase } from "@services/supabase/Client"
+import { LoadAllAnimeDataFromLocal } from "@services/data/AnimeData"
 
 async function SaveAnimeDataToSupabase(fileKey, storageKey, data) {
   try {
@@ -96,4 +97,30 @@ async function LoadAllAnimeDataFromSupabase(fileKey) {
   }
 }
 
-export { SaveAnimeDataToSupabase, LoadAnimeDataFromSupabase, DeleteAnimeDataFromSupabase, LoadAllAnimeDataFromSupabase }
+async function ImportDataFromSupabase() {
+  try {
+    for(const fileKey of ["animeAlreadySeen", "animeFavorites", "animeOnHold", "animeWatchHistory", "animeWatchlist"]) {
+      const localData = await LoadAllAnimeDataFromLocal(fileKey)
+      const supabaseData = await LoadAllAnimeDataFromSupabase(fileKey)
+      for(const storageKey in localData) {
+          const rivalKey = fileKey == "animeWatchHistory" && Object.keys(supabaseData).find(k => k !== storageKey && k.split("/").slice(0, -1).join("/") === storageKey.split("/").slice(0, -1).join("/"))
+          if(rivalKey && supabaseData[rivalKey].timestamp >= localData[storageKey].timestamp) continue
+          if(rivalKey) await DeleteAnimeDataFromSupabase(fileKey, rivalKey)
+          if(!(storageKey in supabaseData) || localData[storageKey].timestamp > supabaseData[storageKey].timestamp) {
+              SaveAnimeDataToSupabase(fileKey, storageKey, localData[storageKey])
+          }
+      }
+    }
+  } catch (err) {
+    console.error(`Erreur load-all-anime-data:`, err)
+    throw new Error(err.message || JSON.stringify(err))
+  }
+}
+
+export {
+  SaveAnimeDataToSupabase,
+  LoadAnimeDataFromSupabase,
+  DeleteAnimeDataFromSupabase,
+  LoadAllAnimeDataFromSupabase,
+  ImportDataFromSupabase,
+}

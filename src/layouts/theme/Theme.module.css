@@ -4,7 +4,7 @@
     top:calc(var(--size-topbar) + 15px);
     right: 50px;
     background-color: var(--color-secondary);
-    width: 385px;
+    width: 450px;
     box-shadow: 0 0 20px var(--color-shadow);
     padding: 40px 50px;
     border-radius: 20px;
@@ -31,11 +31,16 @@
     justify-content: space-between;
     align-items: center;
     display: flex;
+    cursor: grab;
+    user-select: none;
+}
+.TopContainer:active {
+    cursor: grabbing;
 }
 .ItemContainer {
     display: flex;
     flex-direction: column;
-    margin-top: 40px;
+    margin-top: 20px;
     gap: 15px;
 }
 .TitleItem {
@@ -105,7 +110,6 @@
     align-items: center;
     display: flex;
     flex-direction: row;
-    margin-top: 40px;
     gap: 15px;
 }
 
@@ -165,13 +169,57 @@
 .SaveButton:hover {
     opacity: 0.9;
 }
-
+.Switch {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 23px;
+  }
+  .Switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .Slider {
+    background-color: var(--color-background);
+    border-radius: 34px;
+    box-shadow: -2px 5px 10px var(--color-shadow);
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    transition: background-color 0.3s;
+  }
+  .Switch input:checked + .Slider {
+    background-color: var(--color-logo);
+  }
+  
+  
+  .Slider .Icon {
+    position: absolute;
+    top: 50%;
+    left: 2px;
+    padding: 5px;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background: var(--color-text-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: left 0.3s;
+    color: var(--color-background);
+  }
+  .Switch input:checked + .Slider .Icon {
+    left: 20px;
+    background: var(--color-text-primary);
+  }
 
 @media (max-width: 1920px) {
   .ThemeContainer {
     top:calc((var(--size-topbar) + 15px) * 0.75);
     right:  calc(50px * 0.75);
-    width: calc(385px * 0.75);
+    width: calc(450px * 0.75);
     box-shadow:  0 0  calc(20px * 0.75) var(--color-shadow);
     padding:  calc(40px * 0.75)  calc(50px * 0.75);
     border-radius:  calc(20px * 0.75);
@@ -184,7 +232,7 @@
     font-size:  calc(16px * 0.75);
 }
 .ItemContainer {
-    margin-top:  calc(40px * 0.75);
+    margin-top:  calc(20px * 0.75);
     gap:  calc(15px * 0.75);
 }
 .TitleItem {
@@ -220,7 +268,6 @@
     margin:  calc(10px * 0.75) auto;
 }
 .ItemTitleContainer {
-    margin-top:  calc(40px * 0.75);
     gap:  calc(15px * 0.75);
 }
 
@@ -261,7 +308,7 @@
   .ThemeContainer {
     top:calc((var(--size-topbar) + 15px) * 0.6);
     right:  calc(50px * 0.6);
-    width: calc(385px * 0.6);
+    width: calc(450px * 0.6);
     box-shadow:  0 0  calc(20px * 0.6) var(--color-shadow);
     padding:  calc(40px * 0.6)  calc(50px * 0.6);
     border-radius:  calc(20px * 0.6);
@@ -274,7 +321,7 @@
     font-size:  calc(16px * 0.6);
 }
 .ItemContainer {
-    margin-top:  calc(40px * 0.6);
+    margin-top:  calc(20px * 0.6);
     gap:  calc(15px * 0.6);
 }
 .TitleItem {
@@ -310,7 +357,6 @@
     margin:  calc(10px * 0.6) auto;
 }
 .ItemTitleContainer {
-    margin-top:  calc(40px * 0.6);
     gap:  calc(15px * 0.6);
 }
 
@@ -351,7 +397,7 @@
   .ThemeContainer {
     top:calc((var(--size-topbar) + 15px) * 0.5);
     right:  calc(50px * 0.5);
-    width: calc(385px * 0.5);
+    width: calc(450px * 0.5);
     box-shadow:  0 0  calc(20px * 0.5) var(--color-shadow);
     padding:  calc(40px * 0.5)  calc(50px * 0.5);
     border-radius:  calc(20px * 0.5);
@@ -364,7 +410,7 @@
     font-size:  calc(16px * 0.5);
 }
 .ItemContainer {
-    margin-top:  calc(40px * 0.5);
+    margin-top:  calc(20px * 0.5);
     gap:  calc(15px * 0.5);
 }
 .TitleItem {
@@ -400,7 +446,6 @@
     margin:  calc(10px * 0.5) auto;
 }
 .ItemTitleContainer {
-    margin-top:  calc(40px * 0.5);
     gap:  calc(15px * 0.5);
 }
 
