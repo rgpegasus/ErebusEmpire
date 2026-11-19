@@ -1,6 +1,9 @@
+import { toSlug } from "@utils/functions/toSlug"
+import { animeData } from "@services/data/animeRepository"
 import React, { useState, useEffect, useRef } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
-import { useLoader, Loader } from "@utils/dispatchers/Page"
+import { useLoader } from "@context/loader-context/LoaderContext"
+import { Loader } from "@features/loader/Loader"
 import { ErebusPlayer } from "@components/video-player/VideoPlayer"
 
 export const Episode = ({
@@ -36,8 +39,7 @@ export const Episode = ({
   const lastPresenceUpdateRef = useRef(0)
   const [availableLanguagesEpisode, setAvailableLanguagesEpisode] = useState(undefined)
 
-  const newEpisodeId = episodeTitle?.toLowerCase().replace(/\s+/g, "-")
-
+  const newEpisodeId = toSlug(episodeTitle)
   const intervalRef = useRef(null)
 
   const [selectedLanguage, setSelectedLanguage] = useState(location.state?.selectedLanguage || null)
@@ -48,7 +50,7 @@ export const Episode = ({
     const now = Date.now()
     const start = now - (currentTime || 0) * 1000
     const end = start + (duration || 0) * 1000
-    window.electron.ipcRenderer.send("update-rich-presence", {
+    window.api.send("update-rich-presence", {
       anime: title,
       episode: episodeNumber,
       cover,
@@ -58,7 +60,7 @@ export const Episode = ({
   }
   useEffect(() => {
     return () => {
-      window.electron.ipcRenderer.send("defaul-rich-presence")
+      window.api.send("default-rich-presence")
     }
   }, [])
   const buildWatchData = () => ({
@@ -113,7 +115,7 @@ export const Episode = ({
     skipFinalSaveRef.current = true
     clearInterval(intervalRef.current)
 
-    const nextId = `${episode.title.toLowerCase().replace(/\s+/g, "-")}`
+    const nextId = `${toSlug(episode.title)}`
     getEpisodeTitle(episode.title)
     setResolvedSources([])
     setEpisodeUrl(undefined)
@@ -130,7 +132,7 @@ export const Episode = ({
     await animeData.save("animeWatchHistory", storageKey, buildWatchData())
     await clearSeasonHistory(storageKey)
 
-    const navId = `${episode.title.toLowerCase().replace(/\s+/g, "-")}`
+    const navId = `${toSlug(episode.title)}`
     getEpisodeTitle(episode.title)
     setResolvedSources([])
     setEpisodeUrl(undefined)
@@ -162,7 +164,7 @@ export const Episode = ({
     try {
       alert("Téléchargement commence")
 
-      await window.electron.ipcRenderer.invoke("download-video", episodeUrl, {
+      await window.api.invoke("download-video", episodeUrl, {
         episodeTitle,
         seasonTitle,
         animeTitle,
@@ -180,7 +182,7 @@ export const Episode = ({
   const BackSeason = () => navigate(`/erebus-empire/${animeId}/${seasonId}`)
 
   const handleVideoTimeUpdate = ({ currentTime, duration }) => {
-    if (typeof currentTime === "number" && currentTime !== videoTime) {
+  if (typeof currentTime === "number" && Math.abs(currentTime - videoTime) >= 5) {
       setVideoTime(currentTime)
     }
     if (typeof duration === "number" && duration !== videoDuration) {
@@ -203,7 +205,7 @@ export const Episode = ({
     const fetchMissingData = async () => {
       try {
         setLoading(true)
-        const BASE_URL = await window.electron.ipcRenderer.invoke("get-working-url")
+        const BASE_URL = await window.api.invoke("get-working-url")
         let chosenLang = selectedLanguage || ""
         if (!chosenLang) {
           chosenLang = seasonUrl.split("/").slice(6, 7).join("/")
@@ -214,7 +216,7 @@ export const Episode = ({
           (Array.isArray(availableLanguages) && availableLanguages.length === 0) ||
           !chosenLang
         ) {
-          const langs = await window.electron.ipcRenderer.invoke(
+          const langs = await window.api.invoke(
             "get-available-languages",
             `${BASE_URL}/catalogue/${animeId}/${seasonId}/${selectedLanguage}`,
           )
@@ -228,13 +230,13 @@ export const Episode = ({
           }
         }
         if ((!contents || (contents && Object.keys(contents).length === 0)) && chosenLang) {
-          const eps = await window.electron.ipcRenderer.invoke(
+          const eps = await window.api.invoke(
             "get-episodes",
             `${BASE_URL}/catalogue/${animeId}/${seasonId}/${chosenLang}`,
             true,
           )
           if (!episodeTitle && episodeId && eps) {
-            const ep = eps.find((e) => e.title?.toLowerCase().replace(/\s+/g, "-") === episodeId)
+            const ep = eps.find((e) => toSlug(e.title) === episodeId)
             if (ep) getEpisodeTitle(ep.title)
           }
           getContents({ [chosenLang]: eps || [] })
@@ -251,57 +253,30 @@ export const Episode = ({
   }, [animeId, seasonId, episodeId, selectedLanguage])
 
   useEffect(() => {
+    if (!episodeSources?.url || !episodeSources?.host) return
     let cancelled = false
-
-    const resolveAllSources = async () => {
-      if (!episodeSources?.url || !episodeSources?.host) return
+    ;(async () => {
+      setLoading(true)
       try {
-        setLoading(true)
-        const hosts = episodeSources.host || []
-        const urls = episodeSources.url || []
-        const resolvedUrls = []
-
-        for (let i = 0; i < urls.length; i++) {
-          const realUrl = await window.electron.ipcRenderer.invoke("get-url", urls[i], hosts[i])
-
-          if (cancelled) return
-
-          if (hosts[i] === "vidmoly" && realUrl != null) {
-            resolvedUrls.push(realUrl.videoUrl)
-            setOpeningTime(realUrl.openingTime)
-          } else {
-            resolvedUrls.push(realUrl)
-          }
-        }
-
-        const filteredSources = []
-        for (let i = 0; i < resolvedUrls.length; i++) {
-          if (resolvedUrls[i]) {
-            filteredSources.push({ url: resolvedUrls[i], host: hosts[i] })
-          }
-        }
-
+        const resolved = await window.api.invoke("resolve-sources", {
+          url: episodeSources.url,
+          host: episodeSources.host,
+        })
         if (cancelled) return
-        const updatedSources = {
+        setOpeningTime(resolved.find((r) => r.openingTime)?.openingTime ?? [0, 0])
+        setResolvedSources({
           ...episodeSources,
-          url: filteredSources.map((s) => s.url),
-          host: filteredSources.map((s) => s.host),
-        }
-        setResolvedSources(updatedSources)
-        const working = filteredSources[0]?.url || null
-        setEpisodeUrl(working)
+          url: resolved.map((r) => r.url),
+          host: resolved.map((r) => r.host),
+        })
+        setEpisodeUrl(resolved[0]?.url ?? null)
       } catch (err) {
         if (!cancelled) console.error("Erreur lors de la résolution des sources :", err)
       } finally {
         setLoading(false)
       }
-    }
-
-    resolveAllSources()
-
-    return () => {
-      cancelled = true
-    }
+    })()
+    return () => { cancelled = true }
   }, [episodeSources, selectedLanguage])
 
   useEffect(() => {
@@ -340,7 +315,7 @@ export const Episode = ({
       const langToCheck = selectedLanguage || (availableLanguages && availableLanguages[0])
       if (langToCheck && contents) {
         let found
-        if (contents.title?.toLowerCase().replace(/\s+/g, "-") === episodeId) {
+        if (toSlug(contents.title) === episodeId) {
           found = contents
         }
         if (found && found.title !== episodeTitle) {
@@ -383,7 +358,7 @@ export const Episode = ({
       dataNext={
         nextEpisode
           ? {
-              id: nextEpisode.title.toLowerCase().replace(/\s+/g, "-"),
+              id: toSlug(nextEpisode.title),
               title: nextEpisode.title,
             }
           : null
@@ -392,16 +367,16 @@ export const Episode = ({
       onClickItemListReproduction={(slug) => {
         const lang = selectedLanguage || (availableLanguages && availableLanguages[0])
         const episode = contents?.[lang]?.find(
-          (ep) => ep.title.toLowerCase().replace(/\s+/g, "-") === slug,
+          (ep) => toSlug(ep.title) === slug,
         )
         if (episode) handleNavigation(episode)
       }}
       reprodutionList={contents?.[selectedLanguage]?.map((ep) => ({
-        id: ep.title.toLowerCase().replace(/\s+/g, "-"),
+        id: toSlug(ep.title),
         name: ep.title,
         playing:
-          ep.title.toLowerCase().replace(/\s+/g, "-") ===
-          episodeTitle.toLowerCase().replace(/\s+/g, "-"),
+          toSlug(ep.title) ===
+          toSlug(episodeTitle),
       }))}
       onTimeUpdate={handleVideoTimeUpdate}
       onCrossClick={BackMenu}

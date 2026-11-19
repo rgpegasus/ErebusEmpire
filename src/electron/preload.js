@@ -1,58 +1,43 @@
 import { contextBridge, ipcRenderer } from "electron"
-import { electronAPI } from "@electron-toolkit/preload"
 
-const animeCover = {
-  save: (data) => ipcRenderer.invoke("save-anime-temp", data),
-  load: () => ipcRenderer.invoke("load-anime-temp"),
-}
-const animeData = {
-  save: (fileKey, storageKey, data) =>
-    ipcRenderer.invoke("save-anime-data", fileKey, storageKey, data),
-  load: (fileKey, storageKey) => ipcRenderer.invoke("load-anime-data", fileKey, storageKey),
-  loadAll: (fileKey) => ipcRenderer.invoke("load-all-anime-data", fileKey),
-  delete: (fileKey, storageKey, isSame = false) =>
-    ipcRenderer.invoke("delete-anime-data", fileKey, storageKey, isSame),
+const INVOKE = new Set([
+  "get-working-url", "search-anime", "random-anime", "info-anime", "get-seasons",
+  "get-available-languages", "get-episodes", "get-latest-episode", "get-latest-scans",
+  "get-all-anime", "get-scans-chapter", "get-scans-img", "get-url", "resolve-sources",
+  "download-video", "cancel-download", "get-downloads", "delete-episode",
+  "export-data", "import-data", "get-install-date",
+  "local:load", "local:loadAll", "local:save", "local:remove", "local:removeSiblings",
+])
+const SEND = new Set([
+  "update-rich-presence", "scan-discord-presence", "default-rich-presence",
+  "open-devtools", "close-devtools",
+  "window-minimize", "window-toggle-fullscreen", "window-close",
+])
+const LISTEN = new Set(["download-progress", "deep-link"])
+
+const guard = (set, channel) => {
+  if (!set.has(channel)) throw new Error(`Canal IPC refusé : ${channel}`)
 }
 
-const api = {
-  ipcRenderer: {
-    invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args),
-    send: (channel, ...args) => ipcRenderer.send(channel, ...args),
-    on: (channel, func) => ipcRenderer.on(channel, func),
-    removeListener: (channel, func) => ipcRenderer.removeListener(channel, func),
+contextBridge.exposeInMainWorld("api", {
+  invoke: (channel, ...args) => (guard(INVOKE, channel), ipcRenderer.invoke(channel, ...args)),
+  send: (channel, ...args) => (guard(SEND, channel), ipcRenderer.send(channel, ...args)),
+  on: (channel, callback) => {
+    guard(LISTEN, channel)
+    const handler = (_event, ...args) => callback(...args)
+    ipcRenderer.on(channel, handler)
+    return () => ipcRenderer.removeListener(channel, handler)
   },
-}
-
-if (process.contextIsolated) {
-  try {
-    contextBridge.exposeInMainWorld("electron", { ...electronAPI, ...api })
-    contextBridge.exposeInMainWorld("api", api)
-    contextBridge.exposeInMainWorld("animeCover", animeCover)
-    contextBridge.exposeInMainWorld("animeData", animeData)
-    contextBridge.exposeInMainWorld("electronAPI", {
-      minimize: () => ipcRenderer.send("window-minimize"),
-      toggleFullScreen: () => ipcRenderer.send("window-toggle-fullscreen"),
-      close: () => ipcRenderer.send("window-close"),
-    })
-    contextBridge.exposeInMainWorld("deeplinkAPI", {
-      onDeepLink: (callback) => {
-        ipcRenderer.on("deep-link", (event, url) => callback(url))
-      },
-    })
-  } catch (error) {
-    console.error(error)
-  }
-} else {
-  window.electron = { ...electronAPI, ...api }
-  window.api = api
-  window.animeCover = animeCover
-  window.animeData = animeData
-  window.electronAPI = {
+  localData: {
+    save: (c, k, v) => ipcRenderer.invoke("local:save", c, k, v),
+    load: (c, k) => ipcRenderer.invoke("local:load", c, k),
+    loadAll: (c) => ipcRenderer.invoke("local:loadAll", c),
+    remove: (c, k) => ipcRenderer.invoke("local:remove", c, k),
+    removeSiblings: (c, k) => ipcRenderer.invoke("local:removeSiblings", c, k),
+  },
+  window: {
     minimize: () => ipcRenderer.send("window-minimize"),
     toggleFullScreen: () => ipcRenderer.send("window-toggle-fullscreen"),
     close: () => ipcRenderer.send("window-close"),
-  }
-  window.deeplinkAPI = {
-    onDeepLink: (callback) => ipcRenderer.on("deep-link", (event, url) => callback(url)),
-  }
-}
+  },
+})

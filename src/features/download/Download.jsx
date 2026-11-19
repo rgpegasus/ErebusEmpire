@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
+import { toMediaUrl } from '@utils/media'
 import { ErebusPlayer } from '@components/video-player/VideoPlayer'
 import { LoginPageBackground } from '@utils/dispatchers/Pictures'
 import BackgroundCover from '@components/background-cover/BackgroundCover'
 import styles from './Download.module.css'
-import { useLoader } from '@utils/dispatchers/Page'
+import { useLoader } from "@context/loader-context/LoaderContext"
 import { PauseCircleIcon } from 'lucide-react'
 import ContentsCarousel from "@components/contents-carousel/ContentsCarousel"
 const naturalSort = (a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
@@ -19,7 +20,7 @@ export const Download = () => {
     const fetchDownloads = async () => {
       try {
         setLoading(true)
-        const { episodes } = await window.electron.ipcRenderer.invoke('get-downloads')
+        const { episodes } = await window.api.invoke('get-downloads')
         const downloadingEpisodes = []
         const animeMap = {}
 
@@ -71,8 +72,7 @@ export const Download = () => {
       }))
     }
 
-    window.electron.ipcRenderer.on('download-progress', handler)
-    return () => window.electron.ipcRenderer.removeListener('download-progress', handler)
+    return window.api.on('download-progress', (data) => handler(null, data))
   }, [])
   const flattenedData = groupedData.flatMap((anime) =>
     Object.entries(anime.seasons).flatMap(([seasonTitle, episodes]) =>
@@ -89,14 +89,13 @@ export const Download = () => {
   const handleEpisodeClick = async (episode) => {  
     setLoading(true)
     const { animeTitle, seasonTitle, episodeTitle, animeCover } = episode
-    const normalizedPath = episode.path.replace(/\\/g, '/')
-    const filePath = `file:///${encodeURI(normalizedPath)}`
+    const filePath = toMediaUrl(episode.path)
     setSelectedEpisode({ animeTitle, seasonTitle, episodeTitle, animeCover, filePath })
     setLoading(false)
   }
   const deleteEpisode = async (episode) => {
     try {
-      await window.electron.ipcRenderer.invoke("delete-episode", episode.path)
+      await window.api.invoke("delete-episode", episode.path)
       setGroupedData((prevData) =>
         prevData
           .map((anime) => {
@@ -137,7 +136,7 @@ export const Download = () => {
                       <div className={styles.ContainerProgressCover}>
                         <img
                           className={styles.ProgressCover}
-                          src={`file://${episode.cover.replace(/\\/g, "/")}`}
+                          src={toMediaUrl(episode.cover)}
                           alt={`${animeTitle} cover`}
                         />
                       </div>
@@ -175,7 +174,7 @@ export const Download = () => {
           data={flattenedData}
           onClickEpisode={(episode) => handleEpisodeClick(episode)}
           onDeleteEpisode={(ep) => deleteEpisode(ep)}
-          getEpisodeCover={(anime) => `file://${anime.cover.replace(/\\/g, "/")}`}
+          getEpisodeCover={(anime) => toMediaUrl(anime.cover)}
           getAnimeTitle={(ep) => ep.animeTitle}
           getAnimeUrl={(ep) => ep.seasonUrl}
           getEpisodeSubTitle={(ep) => `${ep.seasonTitle} - ${ep.episodeTitle}`}

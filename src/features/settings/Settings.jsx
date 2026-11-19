@@ -24,7 +24,7 @@ const getDownloadDate = async () => {
   let savedDate = localStorage.getItem("downloadDate");
 
   if (!savedDate) {
-    savedDate = await window.electron.ipcRenderer.invoke(
+    savedDate = await window.api.invoke(
       "get-install-date"
     );
 
@@ -199,7 +199,6 @@ export const Settings = ({ openTheme }) => {
               <div className={styles.DropdownButton}>
                 <div className={styles.LangContainer}>
                   <img
-                    onClick={() => onLanguageChange(lang)}
                     src={FlagDispatcher(favoriteLanguage.toLowerCase())}
                     alt={favoriteLanguage}
                     draggable="false"

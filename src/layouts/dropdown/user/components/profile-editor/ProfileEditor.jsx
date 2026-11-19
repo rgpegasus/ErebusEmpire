@@ -14,6 +14,7 @@ function ProfileEditor({ editMode, setEditMode, setIsCropping }) {
   const [showOptions, setShowOptions] = useState(false)
   const [isEditingName, setIsEditingName] = useState(false)
   const [imageError, setImageError] = useState(false);
+  const [error, setError] = useState(null)
   const handleProfileClick = () => {
     if (editMode) {
       setShowOptions(!showOptions)
@@ -34,101 +35,54 @@ function ProfileEditor({ editMode, setEditMode, setIsCropping }) {
       e.target.value = null
     }
   }
-  const deleteAvatar = async () => {
-    const path = localStorage.getItem("croppedProfileImage")
-    const { error } = await supabase.storage.from("avatars").remove([path.split("/").slice(8, 10).join("/")])
+  const avatarPath = (uid) => `${uid}/avatar.jpg`
 
-    if (error) {
-      console.error("Erreur delete avatar:", error.message)
-      return false
-    }
-
-    return true
-  }
-  const uploadAvatar = async (fileDataUrl) => {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (!user) throw new Error("Utilisateur non connecté")
-
-      const id = user.id
-      const type = fileDataUrl.split(";")[0].split(":")[1] 
-
-      const fileName = `${id}/avatar.${type.split("/")[1]}`
-
-      const base64 = fileDataUrl.split(",")[1]
-      deleteAvatar()
-      const file = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0))
-
-      const { error: uploadError } = await supabase.storage.from("avatars").upload(fileName, file, {
-        contentType: type,
-        upsert: true,
-      })
-
-      if (uploadError) throw uploadError
-
-      const { data } = supabase.storage.from("avatars").getPublicUrl(fileName)
-      return `${data.publicUrl}?t=${Date.now()}`
-    } catch (err) {
-      console.error("Erreur uploadAvatar:", err.message)
-      return null
-    }
+  const uploadAvatar = async (userId, dataUrl) => {
+    const blob = await (await fetch(dataUrl)).blob()
+    const path = avatarPath(userId)
+    const { error } = await supabase.storage
+      .from("avatars")
+      .upload(path, blob, { contentType: "image/jpeg", upsert: true, cacheControl: "3600" })
+    if (error) throw error
+    const { data } = supabase.storage.from("avatars").getPublicUrl(path)
+    return `${data.publicUrl}?t=${Date.now()}`
   }
 
-  const updateProfile = async (usernameToUpdate, avatar_url) => {
+  const saveProfile = async (userId, name, avatarUrl) => {
+    const { error } = await supabase
+      .from("profiles")
+      .upsert({ id: userId, username: name, avatar_url: avatarUrl, updated_at: new Date().toISOString(), is_dev: false })
+    if (error) throw error
+  }
+
+  const applyProfile = async (name, newAvatar) => {
+    setError(null)
     try {
-      const { data: userData, error: userError } = await supabase.auth.getUser()
-      if (userError || !userData.user) throw new Error("Utilisateur non connecté")
-      const id = userData.user.id
-
-      const { data: existing, error: selectError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", id)
-        .single()
-
-      if (selectError && selectError.code !== "PGRST116") {
-        throw selectError
+      const { data: { session } } = await supabase.auth.getSession()
+      const uid = session?.user?.id
+      let avatar = profileImage
+      if (newAvatar === null) {
+        if (uid) await supabase.storage.from("avatars").remove([avatarPath(uid)])
+        avatar = null
+      } else if (newAvatar) {
+        avatar = uid ? await uploadAvatar(uid, newAvatar) : newAvatar
       }
-
-      if (existing) {
-        const { error: updateError } = await supabase
-          .from("profiles")
-          .update({ username: usernameToUpdate, avatar_url })
-          .eq("id", id) 
-        if (updateError) throw updateError
-      } else {
-        // INSERT sinon
-        const { error: insertError } = await supabase
-          .from("profiles")
-          .insert({
-            id,
-            username: usernameToUpdate,
-            avatar_url,
-            created_at: new Date().toISOString(),
-          })
-        if (insertError) throw insertError
-      }
-
-      updateUser(usernameToUpdate, avatar_url)
-      console.log("Profil mis à jour avec succès !")
+      if (uid) await saveProfile(uid, name, avatar)
+      updateUser(name, avatar)
     } catch (err) {
-      console.error("Erreur updateProfile:", err.message)
+      console.error("[profile]", err)
+      setError(err.message?.includes("check") ? "Pseudo invalide (1 à 16 caractères)." : "Impossible d'enregistrer le profil.")
     }
   }
 
   const handleSaveCropped = async (img) => {
-    const avatarUrl = await uploadAvatar(img)
-    if (avatarUrl) {
-      await updateProfile(tempUsername, avatarUrl)
-    }
+    await applyProfile(tempUsername, img)
     setImageSrc(null)
     setIsCropping(false)
   }
 
   const resetProfilePhoto = async () => {
-    await updateProfile(tempUsername, null)
+    await applyProfile(tempUsername, null)
     setShowOptions(false)
   }
 
@@ -137,7 +91,7 @@ function ProfileEditor({ editMode, setEditMode, setIsCropping }) {
   const validateUsername = async () => {
     const finalName = tempUsername.trim() || "User"
     setTempUsername(finalName)
-    await updateProfile(finalName, profileImage)
+    await applyProfile(finalName)
     setIsEditingName(false)
   }
 
@@ -216,6 +170,7 @@ function ProfileEditor({ editMode, setEditMode, setIsCropping }) {
         </div>
       </div>
 
+      {error && <div role="alert" className={styles.ProfileError}>{error}</div>}
       <div className={styles.EditContainerButton}>
         <span className={styles.EditButton} onClick={() => setEditMode((prev) => !prev)}>
           {editMode ? "✖" : "✎"}

@@ -1,59 +1,58 @@
 import React, { useState, useEffect} from 'react';
 import { Upload, Download, Bug, ShieldOff, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import BackgroundCover from "@components/background-cover/BackgroundCover"
-import { LoginPageBackground } from "@utils/dispatchers/Pictures"
 import { supabase } from "@services/supabase/Client"
 import styles from "../Settings.module.css"
 import { TbLogin2, TbLogout2 } from "react-icons/tb";
 import { AiOutlineDatabase } from "react-icons/ai";
 import { FaDev } from "react-icons/fa";
+
 export const Profile = () => {
-    const [isDev, setIsDev] = useState(() => {
-       return localStorage.getItem('dev') == 'false'; 
-    });
-    const [isDevVisible, setIsDevVisible] = useState(() => {
-      return localStorage.getItem('devUnlocked') == 'true';
-    });
-    const [session, setSession] = useState(null);
-    useEffect(() => {
-      if (isDev && isDevVisible) {
-        window.electron.ipcRenderer.send('open-devtools');
-      } else {
-        window.electron.ipcRenderer.send('close-devtools');
-      }
-    }, [isDev]);
-    const toggleDev = () => setIsDev(prev => !prev);
-    const exportData = async () => {
-    const filePath = await window.electron.ipcRenderer.invoke('export-data');
+  const getDev = async (userId) => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("is_dev")
+      .eq("id", userId)
+      .maybeSingle() 
+    if (error) {
+      console.error(`[profile] getDev:`, error)
+      throw new Error(error.message || String(error))
+    }
+    return data.is_dev ?? false
+  }
+  const [isDev, setDev] = useState(false);
+  const [viewDev, setViewDev] = useState(() => sessionStorage.getItem('devTools') === 'false');
+  const [session, setSession] = useState(null);
+  useEffect(() => {
+    window.api.send(viewDev ? 'open-devtools' : 'close-devtools');
+    localStorage.setItem('devTools', String(viewDev));
+  }, [viewDev]);
+  const toggleDev = () => setViewDev(prev => !prev);
+  const exportData = async () => {
+    const filePath = await window.api.invoke('export-data');
     if (filePath) {
       alert(`Données exportées avec succès vers ${filePath}`);
     } else {
       alert('Échec de l\'exportation');
     }
   };
-  async function isUserLoggedIn() {
-    const { data: userData } = await supabase.auth.getUser()
-    return !!userData?.user
-  }
-const importData = async () => {
-  const result = await window.electron.ipcRenderer.invoke('import-data');
-  if(result) {
-    alert(result?.message)
-    if (result?.success && result?.devUnlocked) {
-      setIsDevVisible(true)
-      localStorage.setItem("devUnlocked", "true")
-    }
-  }
-
-};
+  const importData = async () => {
+    const result = await window.api.invoke('import-data');
+    if (result?.message) alert(result.message)
+  };
   const navigate = useNavigate();
   useEffect(() => {
     const loadSession = async () => {
       const {
         data: { session: res },
       } = await supabase.auth.getSession()
-      
+      if (res) {
+        const is_dev = await getDev(res.user.id);
+        setDev(is_dev)
+        if (!is_dev) {
+          setViewDev(false)
+        }
+      }
       setSession(res)
     }
 
@@ -120,7 +119,7 @@ const importData = async () => {
           </div>
           
 
-          {isDevVisible && (
+          {isDev && (
             <div className={styles.Item}>
               <div className={styles.ItemContainer}>
                 <div><FaDev className={styles.ItemIcon}/></div>
@@ -130,7 +129,7 @@ const importData = async () => {
                 </div>
               </div>
               <label className={styles.Switch}>
-                <input type="checkbox" checked={isDev} onChange={toggleDev} />
+                <input type="checkbox" checked={viewDev} onChange={toggleDev} />
                 <span className={styles.Slider}><span className={styles.Icon}/></span>
               </label>
             </div>

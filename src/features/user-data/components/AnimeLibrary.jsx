@@ -1,10 +1,12 @@
+import { animeData } from "@services/data/animeRepository"
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './AnimeLibrary.module.css';
 import {LoginPageBackground} from "@utils/dispatchers/Pictures"
 import BackgroundCover from "@components/background-cover/BackgroundCover"
 import ContentsCarousel from '@components/contents-carousel/ContentsCarousel';
-import { useLoader, Loader } from "@utils/dispatchers/Page"
+import { useLoader } from "@context/loader-context/LoaderContext"
+import { Loader } from "@features/loader/Loader"
 export const AnimeLibrary = ({
   storageKey,           
   title,
@@ -14,19 +16,20 @@ export const AnimeLibrary = ({
   const [animeList, setAnimeList] = useState([]);
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState("")
-  const { loading, setLoading } = useLoader()
+  const { loading, withLoading } = useLoader()
   const loadAnimeList = async () => {
-    setLoading(true)
-    const all = await animeData.loadAll(storageKey);  
-    if (!all) return;
-    let animes = Object.entries(all).map(([key, data]) => ({ key, ...data }));
-    animes.sort((a, b) => a.animeTitle.localeCompare(b.animeTitle));
-    if (sort) {
-      animes = animes.filter((anime, index, self) => index === 0 || anime.animeTitle !== self[index - 1].animeTitle);
+    try {
+      await withLoading(async () => {
+        const all = (await animeData.loadAll(storageKey)) ?? {}
+        let animes = Object.entries(all).map(([key, data]) => ({ key, ...data }))
+        animes.sort((a, b) => (a.animeTitle ?? "").localeCompare(b.animeTitle ?? ""))
+        if (sort) animes = animes.filter((an, i, arr) => i === 0 || an.animeTitle !== arr[i - 1].animeTitle)
+        setAnimeList(animes)
+      })
+    } catch (e) {
+      console.error("[library]", e) 
     }
-    setAnimeList(animes);
-    setLoading(false)
-  }; 
+  }
   useEffect(() => {
     loadAnimeList();
   }, []);

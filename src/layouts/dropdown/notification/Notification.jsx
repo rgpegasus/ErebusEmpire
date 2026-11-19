@@ -1,6 +1,7 @@
+import { animeData } from "@services/data/animeRepository"
 import React, { useEffect, useState, useRef, useContext } from 'react';
 import { getRealEpisodeName } from '@utils/functions/getRealEpisodeName';
-import { useLoader } from '@utils/dispatchers/Page';
+import { useLoader } from "@context/loader-context/LoaderContext"
 import { useNavigate } from 'react-router-dom';
 import ImgLoader from '@components/img-loader/ImgLoader';
 import styles from './Notification.module.css';
@@ -23,7 +24,7 @@ const NotificationDropdown = ({ icon }) => {
   const [notifiedEpisodes, setNotifiedEpisodes] = useState([]);
   const notifVisibleRef = useRef(notifVisible);
   const notifiedEpisodesRef = useRef(null);
-  const { setLoading } = useLoader();
+  const { withLoading } = useLoader();
   const iconRef = useRef(null);
   const navigate = useNavigate();
   const [show, setShow] = useState(false);
@@ -74,36 +75,34 @@ const NotificationDropdown = ({ icon }) => {
 
   const handleEpisodeClick = async (episode) => {
     try {
-      setLoading(true);
-      const { path, matchedEmbed, embedData, animeId, seasonId, seasonTitle } = await getRealEpisodeName(episode);
-      setNotifVisible(false);
-      const episodes = { [episode.language]: embedData };
-      if (path) {
-        navigate(path, {
+      await withLoading(async () => {
+        const found = await getRealEpisodeName(episode)
+        if (!found) return
+        setNotifVisible(false)
+        navigate(found.path, {
           state: {
-            episodeTitle: matchedEmbed.title,
-            episodes: episodes,
-            animeId,
-            seasonId,
+            episodeTitle: found.matchedEmbed.title,
+            episodes: { [episode.language]: found.embedData },
+            animeId: found.animeId,
+            seasonId: found.seasonId,
             animeTitle: episode.title,
-            seasonTitle,
+            seasonTitle: found.seasonTitle,
             animeCover: episode.cover,
             seasonUrl: episode.url,
             availableLanguages: [episode.language],
-            selectedLanguage: episode.language
+            selectedLanguage: episode.language,
           },
-        });
-      }
-      setLoading(false);
+        })
+      })
     } catch (err) {
-      console.error("Erreur lors de la navigation :", err);
+      console.error("Erreur lors de la navigation :", err)
     }
-  };
+  }
 
   return (
     <>
       <div ref={iconRef} onClick={toggleNotifiedEpisodes} className={styles.ContainerButton}>
-        {icon && React.cloneElement(icon)}
+        {icon}
       </div>
 
       {notifVisible && notif === "on" ? (
@@ -144,7 +143,7 @@ const NotificationDropdown = ({ icon }) => {
             <div
               className="AFK"
               onClick={() => {
-                navigate("/erebus-empire/profile/settings")
+                navigate("/erebus-empire/settings")
                 setNotifVisible(false)
               }}
             >

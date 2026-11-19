@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <title>Erebus Empire</title>
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src * data: blob: erebus-media:; media-src * blob: erebus-media:; connect-src * blob:; font-src * data:" />
   </head>
   <body>
     <div id="root"></div>
-   <script type="module" src="./main.jsx"></script>
+    <div id="overlay-root"></div>
+   <script type="module" src="./renderer.jsx"></script>
   </body>
-  <div id="overlay-root"></div>
+  
 </html>

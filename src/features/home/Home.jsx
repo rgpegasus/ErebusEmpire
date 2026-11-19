@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react"
 import styles from "./Home.module.css"
-import { useLoader } from "@utils/dispatchers/Page"
+import { useLoader } from "@context/loader-context/LoaderContext"
 import BackgroundCover from "@components/background-cover/BackgroundCover"
 import LatestReleases from "./components/LatestReleases"
 import WatchHistory from "./components/WatchHistory"
@@ -10,7 +10,7 @@ export const Home = () => {
   const { favoriteLanguage } = useContext(UserContext);
   const [coverInfo, setCoverInfo] = useState(null)
   const [latestReleases, setLatestReleases] = useState([])
-  const { setLoading } = useLoader()
+  const { withLoading } = useLoader()
   const [contentType, setContentType] = useState("anime")
   const [availableContentTypes, setAvailableContentTypes] = useState({
     hasAnime: false,
@@ -20,91 +20,41 @@ export const Home = () => {
   const [latestScans, setLatestScans] = useState([])
   const [availableLanguages, setAvailableLanguages] = useState([])
   const [selectedLanguage, setSelectedLanguage] = useState("")
-  const filterValidUrls = async (items) => {
-    const results = await Promise.all(
-      items.map(async (item) => {
-        try {
-          const res = await fetch(item.url, { method: "HEAD" })
-          return res.ok ? item : null
-        } catch {
-          return null
-        }
-      }),
-    )
-    return results.filter(Boolean)
+  const groupByLanguage = (episodes) => {
+    const byLang = {}
+    for (const ep of episodes) (byLang[ep.language?.toLowerCase() || "vf"] ??= []).push(ep)
+    const langs = Object.keys(byLang).sort((a, b) =>
+      a === favoriteLanguage ? -1 : b === favoriteLanguage ? 1 : byLang[b].length - byLang[a].length)
+    return { byLang, langs }
   }
-  
+
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true)
-
-      try {
-        let animeData = null
-        if (!animeData) {
-          const randomAnime = await window.electron.ipcRenderer.invoke("random-anime")
-          const animeInfo = await window.electron.ipcRenderer.invoke("info-anime", randomAnime.url)
-          animeCover.save(animeInfo)
-          setCoverInfo(animeInfo)
-          setCoverInfo({ ...animeInfo, url: randomAnime.url })
-        } else {
-          setCoverInfo(animeData)
-        }
-
-        const episodes = await window.electron.ipcRenderer.invoke("get-latest-episode")
-        const filteredEpisodes = await filterValidUrls(episodes)
-
-        const tempEpisodes = {}
-        const tempLanguages = []
-
-        for (const episode of filteredEpisodes) {
-          const lang = episode.language?.toLowerCase() || "vf"
-
-          if (!tempLanguages.includes(lang)) {
-            tempLanguages.push(lang)
-          }
-
-          tempEpisodes[lang] ??= []
-          tempEpisodes[lang].push(episode)
-        }
-        tempLanguages.sort((a, b) => {
-          if (favoriteLanguage) {
-            if (a === favoriteLanguage) return -1
-            if (b === favoriteLanguage) return 1
-          }
-
-          return tempEpisodes[b].length - tempEpisodes[a].length
-        })
-
-        setAvailableLanguages(tempLanguages)
-
-        if (tempLanguages.length > 0) {
-          setSelectedLanguage(tempLanguages[0])
-        }
-
-        const scans = await window.electron.ipcRenderer.invoke("get-latest-scans")     
-        const filteredScans = await filterValidUrls(scans)
-
-        if (tempLanguages.length > 0) {
-          setLatestReleases(tempEpisodes[tempLanguages[0]])
-        } else {
-          setLatestReleases(filteredScans)
-        }
-        setLatestEpisodes(tempEpisodes)
-        setLatestScans(filteredScans)
-        setAvailableContentTypes({
-          hasAnime: filteredEpisodes.length > 0,
-          hasManga: filteredScans.length > 0,
-        })
-      } catch (err) {
-        console.error("Erreur lors du chargement:", err)
-      } finally {
-        setLoading(false)
-
-      }
+    let cancelled = false
+    const loadCover = async () => {
+      const random = await window.api.invoke("random-anime")
+      if (!random?.url) return
+      const info = await window.api.invoke("info-anime", random.url)
+      if (!cancelled && info?.title) setCoverInfo({ ...info, url: random.url })
     }
+    const loadReleases = async () => {
+      const [episodes, scans] = await Promise.all([
+        window.api.invoke("get-latest-episode"),
+        window.api.invoke("get-latest-scans"),
+      ])
+      if (cancelled) return
+      const { byLang, langs } = groupByLanguage(episodes)
+      setAvailableLanguages(langs)
+      setSelectedLanguage(langs[0] ?? "")
+      setLatestEpisodes(byLang)
+      setLatestScans(scans)
+      setLatestReleases(langs.length ? byLang[langs[0]] : scans)
+      setAvailableContentTypes({ hasAnime: episodes.length > 0, hasManga: scans.length > 0 })
+    }
+    withLoading(() => loadReleases()).catch((e) => console.error("[home] sorties :", e))
+    loadCover().catch((e) => console.error("[home] cover :", e))
 
-    fetchData()
-  }, []) 
+    return () => { cancelled = true }
+  }, [])
 
   const handleContentTypeChange = (newType) => {
     setContentType(newType)

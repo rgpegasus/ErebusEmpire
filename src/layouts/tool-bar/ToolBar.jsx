@@ -92,12 +92,12 @@ const handleUrlSubmit = (e) => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  const minimize = () => window.electronAPI.minimize();
+  const minimize = () => window.api.window.minimize();
   const toggleFullScreen = () => {
-    window.electronAPI.toggleFullScreen();
+    window.api.window.toggleFullScreen();
     setIsFullScreen(!isFullScreen);
   };
-  const close = () => window.electronAPI.close();
+  const close = () => window.api.window.close();
 
   return (
     <div className={`${styles.Container} ${show || toolBar ? styles.visible : ''}`} style={{ WebkitAppRegion: 'drag' }}>

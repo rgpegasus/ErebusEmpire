@@ -45,21 +45,21 @@ const SearchAnime = () => {
       handleCardClick(results[0])
     }
   }
-  let debounceTimeout
+  const debounceTimeout = useRef(null) 
 
   const handleInputChange = (event) => {
     const newValue = event.target.value
     setInputValue(newValue)
-    clearTimeout(debounceTimeout)
+    clearTimeout(debounceTimeout.current)
 
-    debounceTimeout = setTimeout(async () => {
+    debounceTimeout.current = setTimeout(async () => {
       if (!newValue.trim()) {
         setResults([])
         return
       }
 
       try {
-        const data = await window.electron.ipcRenderer.invoke("search-anime", newValue, 5)
+        const data = await window.api.invoke("search-anime", newValue, 5)
         setResults(data)
       } catch (err) {
         console.error("Erreur recherche anime :", err)

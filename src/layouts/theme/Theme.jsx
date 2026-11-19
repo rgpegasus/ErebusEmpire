@@ -19,9 +19,8 @@ export default function Theme({ visible = false, onClose }) {
   const location = useLocation()
   const [themeColor, setThemeColor] = useState(colorTheme || "#0B0C10")
   const [inputValue, setInputValue] = useState(themeColor)
-  const [intensity, setIntensity] = useState(1) // 0 à 1, 1 = comportement actuel (100%)
+  const [intensity, setIntensity] = useState(1) 
 
-  // --- Drag state ---
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const dragRef = useRef({ dragging: false, startX: 0, startY: 0, originX: 0, originY: 0 })
 
@@ -62,7 +61,6 @@ export default function Theme({ visible = false, onClose }) {
     setMenuVisible(visible)
   }, [visible])
 
-  // Reset la position chaque fois que le panneau se réaffiche (optionnel, à retirer si tu veux garder la position)
   useEffect(() => {
     if (visible) setPosition({ x: 0, y: 0 })
   }, [visible])

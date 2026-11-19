@@ -1,4 +1,3 @@
-// electron.vite.config.mjs
 import { fileURLToPath } from "url";
 import { dirname, resolve } from "path";
 import { defineConfig, externalizeDepsPlugin } from "electron-vite";
@@ -15,7 +14,6 @@ var electron_vite_config_default = defineConfig({
       rollupOptions: {
         input: {
           main: resolve(__dirname, "src/electron/main.js"),
-          // background: resolve(__dirname, "src/electron/background/background.js")
         },
         output: {
           entryFileNames: (chunk) => {

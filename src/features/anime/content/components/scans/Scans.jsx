@@ -1,6 +1,8 @@
+import { toSlug } from "@utils/functions/toSlug"
 import React, { useState, useEffect, useRef } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
-import { useLoader, Loader } from "@utils/dispatchers/Page"
+import { useLoader } from "@context/loader-context/LoaderContext"
+import { Loader } from "@features/loader/Loader"
 import styles from "./Scans.module.css"
 import { ArrowIcon } from "@utils/dispatchers/Icons"
 
@@ -68,7 +70,7 @@ export const Scans = ({
         if (!availableLanguages || (Array.isArray(availableLanguages) && availableLanguages.length === 0)) {
           getAvailableLanguages([selectedLanguage])
         }
-        const chapterTempLink = await window.electron.ipcRenderer.invoke(
+        const chapterTempLink = await window.api.invoke(
           "get-scans-chapter",
           seasonUrl,
         )
@@ -78,7 +80,7 @@ export const Scans = ({
           title: chap.title,
         }))
         const currentChapter = chapterLink.find((ep) => {
-          return ep?.title?.toLowerCase().replace(/\s+/g, "-") === location.pathname.split("/")[4]
+          return toSlug(ep.title) === location.pathname.split("/")[4]
         })
 
         getContents({ [selectedLanguage]: chapterLink })
@@ -101,7 +103,7 @@ export const Scans = ({
 
         getEpisodeTitle(currentChapter?.title)
         setChapterId(currentChapter?.id)
-        const scansImg = await window.electron.ipcRenderer.invoke(
+        const scansImg = await window.api.invoke(
           "get-scans-img",
           seasonUrl,
           currentChapter?.id,
@@ -173,7 +175,7 @@ export const Scans = ({
   const handleChapterNavigation = (chapter, newIndex) => {
     getEpisodeTitle(chapter.title)
     getEpisodeIndex(newIndex)
-    const chapterId = chapter.title?.toLowerCase().replace(/\s+/g, "-")
+    const chapterId = toSlug(chapter.title)
     setImgScans([])
     navigate(`/erebus-empire/${animeId}/${seasonId}/${chapterId}`, {
       state: {
@@ -186,7 +188,7 @@ export const Scans = ({
   }
 
   const updatePresence = (title, episodeNumber, cover) => {
-    window.electron.ipcRenderer.send("scan-discord-presence", {
+    window.api.send("scan-discord-presence", {
       anime: title,
       episode: episodeNumber,
       cover,
@@ -194,7 +196,7 @@ export const Scans = ({
   }
   useEffect(() => {
     return () => {
-      window.electron.ipcRenderer.send("defaul-rich-presence")
+      window.api.send("default-rich-presence")
     }
   }, [])
   if (loading) {

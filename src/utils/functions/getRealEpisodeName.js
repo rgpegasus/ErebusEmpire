@@ -1,82 +1,41 @@
-import { toSlug } from '@utils/functions/toSlug'
-import { sanitizeName } from '@utils/functions/sanitizeName'
+import { toSlug } from "@utils/functions/toSlug"
+import { sanitizeName } from "@utils/functions/sanitizeName"
 
-async function getRealEpisodeName (episodeInfo) {
-    let { url: animeUrl, episode } = episodeInfo;
-    
-    let embedData = [];
-    let seasonTitle = "null"; 
-    if (animeUrl.startsWith("/catalogue")) {
-      animeUrl = BASE_URL + animeUrl
-    }  
-    const animeId = animeUrl.split("/").slice(4, 5).join("/");
-    try {
-      const { animeInfo, episodes } = await window.electron.ipcRenderer.invoke(
-        "get-episodes",
-        animeUrl,
-        true,
-        true,
-      )
-      embedData = episodes
-      seasonTitle = animeInfo.seasonTitle
-    } catch (err) {
-      console.error("Erreur récupération embed:", err);
-    }
+const EP_RE = /e(?:pisode)?\s*(\d+)/i
 
-    
-   
-    if (!embedData || embedData.length === 0) return null;
-    const seasonId = animeUrl.split("/").slice(5, 6).join("/");
-    const episodeFakeName = sanitizeName(episode);
-    const episodeMatch = episodeFakeName.match(/episode(\d+)/i);
-    const episodeNumber = episodeMatch ? episodeMatch[1] : null;
-  
-    let typeToSearch = 'episode';
-    if (episodeFakeName.includes('oav') || episodeFakeName.includes('ova')) typeToSearch = 'oav';
-    else if (episodeFakeName.includes('film')) typeToSearch = 'film';
-    else if (episodeFakeName.includes('spécial') || episodeFakeName.includes('special')) typeToSearch = 'special';
-  
-    let matchedEmbed = null;
-  
-    matchedEmbed = embedData.find(e => toSlug(e.title) === toSlug(episode));
-  
-    if (!matchedEmbed && episodeNumber) {
-      matchedEmbed = embedData.find(e => {
-        const title = e.title.toLowerCase();
-        return title.includes(typeToSearch) && title.match(/e(pisode)?\s*(\d+)/i)?.[2] === episodeNumber;
-      });
-    }
-  
-    if (!matchedEmbed && episodeNumber) {
-      matchedEmbed = embedData.find(e => {
-        const title = e.title.toLowerCase();
-        const match = title.match(/e(pisode)?\s*(\d+)/i);
-        return title.includes(typeToSearch) && match && match[2] === episodeNumber;
-      });
-    }
-    
-  
-    if (!matchedEmbed) {
-      matchedEmbed = embedData.find(e => toSlug(e.title).includes(toSlug(episode)) || toSlug(episode).includes(toSlug(e.title)));
-    }
+export async function getRealEpisodeName(episodeInfo) {
+  let { url: animeUrl, episode } = episodeInfo
+  if (!animeUrl || !episode) return null
 
-    if (!matchedEmbed) {
-      matchedEmbed = embedData[0];
-    }
-  
-    const episodeSlug = matchedEmbed ? toSlug(matchedEmbed.title) : null;
-    const finalPath = episodeSlug
-      ? `/erebus-empire/${animeId}/${seasonId}/${episodeSlug}`
-      : `/erebus-empire/${animeId}/${seasonId}`;
-  
-    return {
-      path: finalPath,
-      embedData,
-      matchedEmbed,
-      animeId,
-      seasonId, 
-      seasonTitle,
-    };
-  };
-  
-  export { getRealEpisodeName }
+  if (animeUrl.startsWith("/catalogue")) {
+    const base = await window.api.invoke("get-working-url")
+    animeUrl = base + animeUrl
+  }
+  const parts = animeUrl.split("/")
+  const animeId = parts[4]
+  const seasonId = parts[5]
+
+  const res = await window.api.invoke("get-episodes", animeUrl, true, true)
+  const embedData = res?.episodes ?? []
+  if (embedData.length === 0) return null
+
+  const fake = sanitizeName(episode)
+  const number = fake.match(/episode(\d+)/i)?.[1] ?? null
+  const type = /oa?v/i.test(fake) ? "oav" : /film/i.test(fake) ? "film" : /sp[ée]cial/i.test(fake) ? "special" : "episode"
+  const slug = toSlug(episode)
+
+  const matchedEmbed =
+    embedData.find((e) => toSlug(e.title) === slug) ??
+    (number && embedData.find((e) => e.title.toLowerCase().includes(type) && e.title.match(EP_RE)?.[1] === number)) ??
+    embedData.find((e) => toSlug(e.title).includes(slug) || slug.includes(toSlug(e.title))) ??
+    embedData[0]
+
+  return {
+    path: `/erebus-empire/${animeId}/${seasonId}/${toSlug(matchedEmbed.title)}`,
+    embedData,
+    matchedEmbed,
+    animeId,
+    seasonId,
+    seasonTitle: res.animeInfo?.seasonTitle ?? null,
+  }
+}

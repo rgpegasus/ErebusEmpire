@@ -1,339 +1,152 @@
-import { app, shell, session, BrowserWindow, ipcMain } from "electron"
+import { app, shell, session, protocol, net, BrowserWindow, ipcMain } from "electron"
 import { join } from "path"
 import path from "path"
-import { electronApp, optimizer, is } from "@electron-toolkit/utils"
-import { ErebusIcon } from "@utils/dispatchers/Pictures"
-// import { AnimeScraper } from 'better-ani-scraped';
-import { AnimeScraper } from "../../../../BOT/better-ani-scraped/index.js"
-import fsExtra from "fs-extra"
 import fs from "fs"
-import { Client } from "@xhayper/discord-rpc"
-const clientId = "1366193765701783604"
-const rpc = new Client({ transport: { type: "ipc" }, clientId })
-const scraper = new AnimeScraper("animesama")
+import { pathToFileURL } from "url"
+import { electronApp, optimizer, is } from "@electron-toolkit/utils"
+import { AnimeScraper } from "better-ani-scraped"
+import { ErebusIcon } from "@utils/dispatchers/Pictures"
+import { registerScraperHandlers } from "./ipc/scraper"
+import { registerLocalData } from "./ipc/localData"
+import { registerDownloadHandlers, downloadsRoot, isInside } from "./ipc/downloads"
+import { initPresence } from "./presence"
 
-import {
-  SearchAnime,
-  RandomAnime,
-  InfoAnime,
-  SeasonsAnime,
-  EpisodesSeason,
-  UrlEpisode,
-  LatestEpisodes,
-  LatestScans,
-  CatalogAnime,
-  DownloadEpisode,
-  DownloadList,
-  DeleteDownloadEpisode,
-  ExportData,
-  AvailableLanguages,
-  ScansChapter,
-  ScansImg,
-  WorkingUrl,
-  Session,
-} from "@utils/dispatchers/IpcHandler"
-import { AnimeCoverTemp, AnimeData, ImportData} from "@utils/dispatchers/ServicesData"
-import { spawn } from "child_process"
+const PROTOCOL = "erebusempire"
+const MEDIA_SCHEME = "erebus-media"
 
-function launchBackgroundScript() {
-  const scriptPath = join(__dirname, "background", "background.js")
+protocol.registerSchemesAsPrivileged([
+  { scheme: MEDIA_SCHEME, privileges: { standard: true, secure: true, stream: true, supportFetchAPI: true } },
+])
 
-  const subprocess = spawn(process.execPath, [scriptPath], {
-    detached: false,
-    stdio: "ignore",
-  })
-
-  subprocess.unref()
+if (!app.requestSingleInstanceLock()) {
+  app.quit()
+  process.exit(0)
 }
 
-launchBackgroundScript()
-const sessionStorage = join(app.getPath("appData"), "Erebus Empire", "userData", "sessionStorage")
-
-let startTimestamp = null
 let mainWindow = null
-let deeplinkingUrl = null
+let pendingDeepLink = process.argv.find((a) => a.startsWith(`${PROTOCOL}://`)) ?? null
 
-async function setActivity(details = "Dans la liste d'animés", state = "Sur Erebus Empire") {
-  if (!rpc) return
-  if (!startTimestamp) startTimestamp = new Date()
-
-  rpc.user.setActivity({
-    details,
-    state,
-    startTimestamp,
-    largeImageKey: "icon",
-    largeImageText: "Erebus Empire",
-    instance: false,
-    type: 3,
-    buttons: [
-      { label: "Discord", url: "https://discord.gg/Mj9cYRQTcU" },
-      { label: "Installer", url: "https://github.com/rgpegasus/ErebusEmpire/releases/latest" },
-    ],
-  })
+const routeFromDeepLink = (url) => {
+  const route = url.replace(`${PROTOCOL}://`, "")
+  return /^[\w\-./%]+$/.test(route) && !route.includes("..") ? `/${route.replace(/^\/+/, "")}` : "/"
 }
 
-rpc.on("ready", () => {
-  setActivity()
-})
-
-rpc.login({ clientId }).catch(console.error)
-function handleDeepLink(url) {
-  if (mainWindow) {
-    if (mainWindow.webContents.isLoading()) {
-      mainWindow.webContents.once("did-finish-load", () => {
-        mainWindow.webContents.send("deep-link", url)
-      })
-    } else {
-      mainWindow.webContents.send("deep-link", url)
-    }
-  }
+function sendDeepLink(url) {
+  if (!mainWindow) { pendingDeepLink = url; return }
+  const send = () => mainWindow?.webContents.send("deep-link", routeFromDeepLink(url))
+  mainWindow.webContents.isLoading() ? mainWindow.webContents.once("did-finish-load", send) : send()
 }
+
 function createWindow(route = "/") {
   mainWindow = new BrowserWindow({
-    width: 1500,
-    height: 1000,
-    minWidth: 960,
-    minHeight: 540,
-    show: false,
-    autoHideMenuBar: false,
-    frame: false,
-    titleBarStyle: "hidden",
-    fullscreen: false,
+    width: 1500, height: 1000, minWidth: 960, minHeight: 540,
+    show: false, frame: false, titleBarStyle: "hidden",
     ...(process.platform === "linux" ? { icon: ErebusIcon } : {}),
     webPreferences: {
-      webSecurity: false,
       preload: join(__dirname, "../preload/preload.js"),
-      sandbox: false,
-      nodeIntegration: true,
-      contextIsolation: false,
+      contextIsolation: true,
+      nodeIntegration: false,
+      webSecurity: true,
+      sandbox: true,
     },
   })
 
-  if (process.defaultApp) {
-    if (process.argv.length >= 2) {
-      app.setAsDefaultProtocolClient("erebusempire", process.execPath, [
-        path.resolve(process.argv[1]),
-      ])
-    }
-  } else {
-    app.setAsDefaultProtocolClient("erebusempire")
-  }
-  const logToRenderer = (msg) => {
-    if (mainWindow) mainWindow.webContents.send("log-from-main", msg)
-  }
+  mainWindow.on("ready-to-show", () => { mainWindow.maximize(); mainWindow.show() })
 
-  const originalStdoutWrite = process.stdout.write.bind(process.stdout)
-  process.stdout.write = (chunk, encoding, callback) => {
-    logToRenderer(chunk.toString())
-    originalStdoutWrite(chunk, encoding, callback)
-  }
-
-  mainWindow.on("ready-to-show", () => {
-    if (mainWindow) {
-      mainWindow.maximize()
-      mainWindow.show()
-    }
-  })
-
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (/^https:\/\//i.test(url)) shell.openExternal(url) 
     return { action: "deny" }
   })
+  mainWindow.webContents.on("will-navigate", (e, url) => {
+    const own = is.dev && process.env.ELECTRON_RENDERER_URL && url.startsWith(process.env.ELECTRON_RENDERER_URL)
+    if (!own && !url.startsWith("file://")) e.preventDefault()
+  })
 
-  if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
-    mainWindow.loadURL(process.env["ELECTRON_RENDERER_URL"] + "#" + route)
-  } else {
-    mainWindow.loadFile(join(__dirname, "../renderer/index.html"), { hash: route })
-  }
+  if (is.dev && process.env.ELECTRON_RENDERER_URL) mainWindow.loadURL(`${process.env.ELECTRON_RENDERER_URL}#${route}`)
+  else mainWindow.loadFile(join(__dirname, "../renderer/index.html"), { hash: route })
 
-  mainWindow.on("closed", () => {
-    try {
-      if (fs.existsSync(sessionStorage)) {
-        fsExtra.removeSync(sessionStorage)
-      }
-    } catch (error) {
-      console.error("Erreur suppression sessionStorage :", error)
+  mainWindow.on("closed", () => { mainWindow = null })
+}
+
+const HEADER_RULES = [
+  { match: /(^|\.)uqload\.(vc|com|to)$/i, referer: "https://uqload.vc/" },
+]
+const DEFAULT_MEDIA_REFERER = "https://vidmoly.net/"
+const OWN_HOSTS = /(^|\.)(supabase\.co|supabase\.in|localhost|127\.0\.0\.1|discord\.com|github\.com|anime-sama\.[a-z]+)$/i
+
+function setupNetworkRules() {
+  const ses = session.defaultSession
+  ses.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+
+  ses.webRequest.onBeforeSendHeaders({ urls: ["http://*/*", "https://*/*"] }, (details, cb) => {
+    const { hostname } = new URL(details.url)
+    const h = details.requestHeaders
+    const rule = HEADER_RULES.find((r) => r.match.test(hostname))
+    if (rule) {
+      h["Referer"] = rule.referer
+      h["Origin"] = new URL(rule.referer).origin
+    } else if (!OWN_HOSTS.test(hostname) && ["media", "xhr", "other"].includes(details.resourceType)) {
+      h["Referer"] = DEFAULT_MEDIA_REFERER
+      h["Origin"] = new URL(DEFAULT_MEDIA_REFERER).origin
     }
+    cb({ requestHeaders: h })
+  })
 
-    mainWindow = null
+  ses.webRequest.onHeadersReceived({ urls: ["http://*/*", "https://*/*"] }, (details, cb) => {
+    const { hostname } = new URL(details.url)
+    if (OWN_HOSTS.test(hostname) || !["media", "xhr", "other"].includes(details.resourceType)) return cb({})
+    const headers = Object.fromEntries(
+      Object.entries(details.responseHeaders ?? {}).filter(([k]) => !k.toLowerCase().startsWith("access-control-")),
+    )
+    headers["Access-Control-Allow-Origin"] = ["*"]
+    headers["Access-Control-Allow-Headers"] = ["*"]
+    cb({ responseHeaders: headers })
   })
 }
 
-module.exports = {
-  getMainWindow: () => mainWindow,
+function setupMediaProtocol() {
+  protocol.handle(MEDIA_SCHEME, (request) => {
+    const abs = decodeURIComponent(new URL(request.url).pathname.slice(1))
+    if (!isInside(downloadsRoot(), abs) || !fs.existsSync(abs)) return new Response("Not found", { status: 404 })
+    return net.fetch(pathToFileURL(abs).toString(), { headers: request.headers })
+  })
 }
-app.on("open-url", (event, url) => {
-  event.preventDefault()
-  deeplinkingUrl = url
-  handleDeepLink(url)
+
+function registerWindowHandlers() {
+  const win = () => mainWindow
+  ipcMain.on("window-minimize", () => win()?.minimize())
+  ipcMain.on("window-toggle-fullscreen", () => (win()?.isMaximized() ? win().unmaximize() : win()?.maximize()))
+  ipcMain.on("window-close", () => app.quit())
+  ipcMain.on("open-devtools", () => win()?.webContents.openDevTools({ mode: "detach" }))
+  ipcMain.on("close-devtools", () => win()?.webContents.closeDevTools())
+  ipcMain.handle("get-install-date", async () => (await fs.promises.stat(app.getPath("userData"))).birthtime.toISOString())
+}
+
+app.on("second-instance", (_e, argv) => {
+  const url = argv.find((a) => a.startsWith(`${PROTOCOL}://`))
+  if (url) sendDeepLink(url)
+  if (mainWindow) { if (mainWindow.isMinimized()) mainWindow.restore(); mainWindow.focus() }
 })
+app.on("open-url", (e, url) => { e.preventDefault(); sendDeepLink(url) })
+app.on("window-all-closed", () => { if (process.platform !== "darwin") app.quit() })
+app.on("activate", () => { if (BrowserWindow.getAllWindows().length === 0) createWindow() })
 
-if (process.platform === "win32") {
-  const url = process.argv.find((arg) => arg.startsWith("erebusempire://"))
-  if (url) {
-    deeplinkingUrl = url
-  }
-}
+if (process.defaultApp && process.argv.length >= 2) app.setAsDefaultProtocolClient(PROTOCOL, process.execPath, [path.resolve(process.argv[1])])
+else app.setAsDefaultProtocolClient(PROTOCOL)
 
-const gotTheLock = app.requestSingleInstanceLock()
+app.whenReady().then(() => {
+  electronApp.setAppUserModelId("com.erebus-empire.app")
+  app.on("browser-window-created", (_e, w) => optimizer.watchWindowShortcuts(w))
 
-if (!gotTheLock) {
-  app.quit()
-} else {
-  app.on("second-instance", (event, argv) => {
-    const url = argv.find((arg) => arg.startsWith("erebusempire://"))
-    if (url) {
-      deeplinkingUrl = url
-      if (mainWindow) {
-        mainWindow.webContents.send("deep-link", deeplinkingUrl)
-      }
-    }
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore()
-      mainWindow.focus()
-    }
-  })
-  app.whenReady().then(async () => {
-    session.defaultSession.setUserAgent(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
-    )
-    session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
-      details.requestHeaders["Referer"] = "https://vidmoly.net/"
-      details.requestHeaders["Origin"] = "https://vidmoly.net"
-      callback({ requestHeaders: details.requestHeaders })
-    })
-    electronApp.setAppUserModelId("com.erebus-empire.app")
-    app.on("browser-window-created", (_, window) => {
-      optimizer.watchWindowShortcuts(window)
-    })
-    const route = deeplinkingUrl ? deeplinkingUrl.replace("erebusempire://", "") : "/"
-    createWindow(route)
+  setupNetworkRules()
+  setupMediaProtocol()
 
-    ipcMain.on(
-      "update-rich-presence",
-      (event, { anime, episode, cover, startTimestamp, endTimestamp }) => {
-        if (!rpc || !rpc.user || typeof rpc.user.setActivity !== "function") {
-          console.warn("Rich Presence non prêt : rpc ou rpc.user non défini")
-          return
-        }
-        rpc.user.setActivity({
-          details: `Regarde ${anime}`,
-          state: `${episode}`,
-          startTimestamp: startTimestamp ? new Date(startTimestamp) : new Date(),
-          endTimestamp: endTimestamp ? new Date(endTimestamp) : undefined,
-          largeImageKey: `${cover}`,
-          largeImageText: `${anime}`,
-          instance: false,
-          type: 3,
-          buttons: [
-            { label: "Discord", url: "https://discord.gg/Mj9cYRQTcU" },
-            {
-              label: "Installer",
-              url: "https://github.com/rgpegasus/ErebusEmpire/releases/latest",
-            },
-          ],
-        })
-      },
-    )
-    ipcMain.on("scan-discord-presence", (event, { anime, episode, cover }) => {
-      if (!rpc || !rpc.user || typeof rpc.user.setActivity !== "function") {
-        console.warn("Rich Presence non prêt : rpc ou rpc.user non défini")
-        return
-      }
-      rpc.user.setActivity({
-        details: `Lit ${anime}`,
-        state: `${episode}`,
-        largeImageKey: `${cover}`,
-        largeImageText: `${anime}`,
-        instance: false,
-        type: 3,
-        buttons: [
-          { label: "Discord", url: "https://discord.gg/Mj9cYRQTcU" },
-          {
-            label: "Installer",
-            url: "https://github.com/rgpegasus/ErebusEmpire/releases/latest",
-          },
-        ],
-      })
-    })
+  const scraper = new AnimeScraper("animesama")
+  registerScraperHandlers(scraper)
+  registerLocalData()
+  registerDownloadHandlers()
+  registerWindowHandlers()
+  initPresence()
 
-    ipcMain.on("defaul-rich-presence", () => {
-      if (!rpc) return
-      if (!startTimestamp) startTimestamp = new Date()
-      setActivity()
-    })
-    ipcMain.handle("get-install-date", () => {
-      const stats = fs.statSync(app.getPath("userData"));
-      return stats.birthtime.toISOString();
-    });
-    SearchAnime(scraper)
-    RandomAnime(scraper)
-    InfoAnime(scraper)
-    SeasonsAnime(scraper)
-    EpisodesSeason(scraper)
-    UrlEpisode()
-    LatestEpisodes(scraper)
-    LatestScans(scraper)
-    CatalogAnime(scraper)
-    AvailableLanguages(scraper)
-    ScansChapter(scraper)
-    ScansImg(scraper)
-    WorkingUrl(scraper)
-    Session()
-    AnimeData()
-    DownloadEpisode()
-    DownloadList()
-    DeleteDownloadEpisode()
-    ExportData()
-    ImportData()
-    AnimeCoverTemp()
-    ipcMain.on("open-devtools", () => {
-      if (mainWindow && !mainWindow.webContents.isDevToolsOpened()) {
-        mainWindow.webContents.openDevTools({ mode: "detach" })
-      }
-    })
-
-    ipcMain.on("close-devtools", () => {
-      if (mainWindow && mainWindow.webContents.isDevToolsOpened()) {
-        mainWindow.webContents.closeDevTools()
-      }
-    })
-
-    app.on("activate", () => {
-      if (BrowserWindow.getAllWindows().length === 0) createWindow()
-    })
-  session.defaultSession.webRequest.onBeforeSendHeaders(
-    { urls: ['*://*.uqload.vc/*', '*://*.uqload.com/*', '*://*.uqload.to/*'] },
-    (details, callback) => {
-      // 1. On force le Referer vers le domaine officiel d'Uqload
-      details.requestHeaders['Referer'] = 'https://uqload.vc/';
-      details.requestHeaders['Origin'] = 'https://uqload.vc';
-      
-      // 2. On imite un navigateur standard
-      details.requestHeaders['User-Agent'] = 
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
-
-      callback({ requestHeaders: details.requestHeaders });
-    }
-  );
-  })
-  app.on("window-all-closed", () => {
-    if (process.platform !== "darwin") {
-      app.quit()
-    }
-  })
-  ipcMain.on("window-minimize", () => mainWindow.minimize())
-
-  ipcMain.on("window-toggle-fullscreen", () => {
-    if (mainWindow.isMaximized()) {
-      mainWindow.unmaximize()
-    } else {
-      mainWindow.maximize()
-    }
-  })
-
-  ipcMain.on("window-close", () => {
-    mainWindow = null
-    app.quit()
-  })
-}
+  createWindow(pendingDeepLink ? routeFromDeepLink(pendingDeepLink) : "/")
+})

@@ -1,7 +1,10 @@
+import { toSlug } from "@utils/functions/toSlug"
+import { animeData } from "@services/data/animeRepository"
 import React, { useState, useEffect, useRef } from "react"
 import { useLocation, useParams } from "react-router-dom"
-import { useLoader, Episode, Scans } from "@utils/dispatchers/Page"
-import { supabase } from "@services/supabase/Client"
+import { useLoader } from "@context/loader-context/LoaderContext"
+import { Episode } from "@features/anime/content/components/episode/Episode"
+import { Scans } from "@features/anime/content/components/scans/Scans"
 
 export const Dispatcher = () => {
   const location = useLocation()
@@ -27,7 +30,7 @@ export const Dispatcher = () => {
 
   const [restored, setRestored] = useState(false)
   const episodesObj = contents?.[selectedLanguage] || {}
-  const normalizedCurrent = episodeTitle?.toLowerCase().replace(/\s+/g, "-")
+  const normalizedCurrent = toSlug(episodeTitle)
   const [episodeIndex, setEpisodeIndex] = useState(location.state?.chapterId || -1)
 
   const storageKey = episodeId ? `/erebus-empire/${animeId}/${seasonId}/${episodeId}` : null
@@ -39,8 +42,7 @@ export const Dispatcher = () => {
     if (!episodesObj?.length) return
 
     const index = episodesObj.findIndex((ep) => {
-      const normalizedEp = ep.title?.toLowerCase().replace(/\s+/g, "-")
-
+      const normalizedEp = toSlug(ep.title)
       return normalizedEp === normalizedCurrent
     })
     setEpisodeIndex(index)
@@ -49,10 +51,10 @@ export const Dispatcher = () => {
     const fetchMissingData = async () => {
       try {
         setLoading(true)
-        const BASE_URL = await window.electron.ipcRenderer.invoke("get-working-url")
+        const BASE_URL = await window.api.invoke("get-working-url")
 
         if (!animeTitle || !animeCover) {
-          const info = await window.electron.ipcRenderer.invoke(
+          const info = await window.api.invoke(
             "info-anime",
             `${BASE_URL}/catalogue/${animeId}/`,
           )
@@ -61,7 +63,7 @@ export const Dispatcher = () => {
         }
         let currentSeason
         if (!seasonTitle || !seasonUrl) {
-          const result = await window.electron.ipcRenderer.invoke(
+          const result = await window.api.invoke(
             "get-seasons",
             `${BASE_URL}/catalogue/${animeId}/`,
           )

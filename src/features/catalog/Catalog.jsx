@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
-import { useLoader } from "@utils/dispatchers/Page"
+import { useLoader } from "@context/loader-context/LoaderContext"
 import styles from "./Catalog.module.css"
 import { LoginPageBackground } from "@utils/dispatchers/Pictures"
 import BackgroundCover from "@components/background-cover/BackgroundCover"
@@ -23,34 +23,21 @@ export const Catalog = () => {
       const functionName = isSearching ? "search-anime" : "get-all-anime"
       const functionArgs = isSearching ? [searchQuery, 50] : []
 
-      const [currentPage, nextPage] = await Promise.all([
-        window.electron.ipcRenderer.invoke(functionName, ...functionArgs, startPage),
-        window.electron.ipcRenderer.invoke(functionName, ...functionArgs, startPage + 1),
-      ])
-
+      const results = await window.api.invoke(functionName, ...functionArgs, startPage)
       document.querySelector(".MainPage")?.scrollTo({ top: 0, behavior: "auto" })
-      setAnimeList(currentPage ?? [])
-      setHasNext((nextPage ?? []).length > 0)
+      setAnimeList(results ?? [])
+      setHasNext((results ?? []).length > 0)
     } catch (error) {
       console.error("Erreur lors du chargement des données :", error)
     } finally {
       setLoading(false)
     }
   }
-
+  const query = searchParams.get("q") ?? ""
   useEffect(() => {
-    if (!inputValue) {
-      setSearchParams((prev) => {
-        const params = new URLSearchParams(prev)
-        params.set("page", 1)
-        return params
-      })
-      fetchData(1, inputValue)
-    }
-  }, [inputValue])
-  useEffect(() => {
-    fetchData(page, inputValue)
-  }, [page])
+    setInputValue(query)
+    fetchData(page, query)
+  }, [page, query])
 
   const handleSearchKeyDown = (e) => {
     if (e.key !== "Enter") {
@@ -69,8 +56,6 @@ export const Catalog = () => {
 
       return params
     })
-    fetchData(page, inputValue.trim())
-
     setInputValue(inputValue.trim())
   }
 

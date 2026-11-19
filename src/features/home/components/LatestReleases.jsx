@@ -1,8 +1,8 @@
-import {React, useState} from "react"
+import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { getRealEpisodeName } from "@utils/functions/getRealEpisodeName"
 import { getRealChapterName } from "@utils/functions/getRealChapterName"
-import { useLoader } from "@utils/dispatchers/Page"
+import { useLoader } from "@context/loader-context/LoaderContext"
 import ContentsCarousel from "@components/contents-carousel/ContentsCarousel"
 
 const LatestReleases = ({
@@ -15,71 +15,67 @@ const LatestReleases = ({
   handleLanguageChange,
 }) => {
   const navigate = useNavigate()
-  const { setLoading } = useLoader()
+  const { withLoading } = useLoader()
+  const [error, setError] = useState(null)
   const [searchValue, setSearchValue] = useState("")
-  const handleReleasesClick = async (releases) => {
+  const handleReleasesClick = async (release) => {
     try {
-      setLoading(true)
-      if (contentType == "anime") {
-        const { path, matchedEmbed, embedData, animeId, seasonId, seasonTitle } =
-          await getRealEpisodeName(releases)
-        const episodes = { [releases.language]: embedData }
-        if (path) {
-          navigate(path, {
+      await withLoading(async () => {
+        const common = {
+          animeTitle: release.title,
+          animeCover: release.cover,
+          seasonUrl: release.url,
+          availableLanguages: [release.language],
+          selectedLanguage: release.language,
+        }
+        if (contentType === "anime") {
+          const found = await getRealEpisodeName(release)
+          if (!found) return setError("Épisode introuvable pour le moment.")
+          navigate(found.path, {
             state: {
-              episodeTitle: matchedEmbed.title,
-              episodes: episodes,
-              animeId,
-              seasonId,
-              animeTitle: releases.title,
-              seasonTitle,
-              animeCover: releases.cover,
-              seasonUrl: releases.url,
-              availableLanguages: [releases.language],
-              selectedLanguage: releases.language,
+              ...common,
+              episodeTitle: found.matchedEmbed.title,
+              episodes: { [release.language]: found.embedData },
+              animeId: found.animeId,
+              seasonId: found.seasonId,
+              seasonTitle: found.seasonTitle,
+            },
+          })
+        } else {
+          const found = await getRealChapterName(release)
+          if (!found) return setError("Chapitre introuvable pour le moment.")
+          const scans = await window.api.invoke(
+            "get-scans-img", release.url, found.matchedChapter.id,
+            found.matchedChapter.numberImg, found.encodedTitle,
+          )
+          navigate(found.path, {
+            state: {
+              ...common,
+              episodeTitle: found.matchedChapter.title,
+              chapterId: found.matchedChapter.id,
+              scans,
+              animeId: found.animeId,
+              seasonId: found.seasonId,
+              seasonTitle: found.seasonTitle,
             },
           })
         }
-      } else {
-        const { path, ChapterName, matchedEmbed, animeId, seasonId, seasonTitle } =
-          await getRealChapterName(releases)
-        const scansImg = await window.electron.ipcRenderer.invoke(
-          "get-scans-img",
-          releases.url,
-          matchedEmbed,
-        )
-
-        if (path) {
-          navigate(path, {
-            state: {
-              episodeTitle: matchedEmbed,
-              scans: scansImg,
-              animeId,
-              seasonId,
-              animeTitle: releases.title,
-              seasonTitle,
-              animeCover: releases.cover,
-              seasonUrl: releases.url,
-              availableLanguages: [releases.language],
-              selectedLanguage: releases.language,
-            },
-          })
-        }
-      }
+      })
     } catch (err) {
       console.error("Erreur lors de la navigation :", err)
-    } finally {
-      setLoading(false)
+      setError("Impossible d'ouvrir cette sortie.")
     }
   }
 
   return (
+    <>
+    {error && <div role="alert" className="InlineError" onClick={() => setError(null)}>{error}</div>}
     <ContentsCarousel
       data={latestReleases}
       title="Dernières sorties"
       availableLanguageKey={"language"}
       onClickEpisode={handleReleasesClick}
-      getEpisodeCover={(ep) => (ep.cover.startsWith("http") ? ep.cover : `http://${ep.cover}`)}
+      getEpisodeCover={(ep) => (ep.cover?.startsWith("http") ? ep.cover : `https://${ep.cover}`)}
       getAnimeTitle={(ep) => ep.title}
       getEpisodeSubTitle={(ep) => ep.episode || ep.chapter}
       getAnimeUrl={(ep) => ep.url}
@@ -93,6 +89,7 @@ const LatestReleases = ({
       searchValue={searchValue}
       setSearchValue={setSearchValue}
     />
+    </>
   )
 }
 

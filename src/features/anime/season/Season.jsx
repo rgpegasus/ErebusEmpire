@@ -2,7 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import styles from "./Season.module.css"
 import useEmblaCarousel from "embla-carousel-react";
 import { useParams, useNavigate } from 'react-router-dom';
-import { useLoader, Loader } from '@utils/dispatchers/Page';
+import { useLoader } from "@context/loader-context/LoaderContext"
+import { Loader } from "@features/loader/Loader"
 import { toSlug } from '@utils/functions/toSlug'
 import BackgroundCover from "@components/background-cover/BackgroundCover"
 import ContentsCarousel from '@components/contents-carousel/ContentsCarousel';
@@ -38,7 +39,7 @@ export const Season = () => {
   useEffect(() => {
     const fetchBaseUrl = async () => {
       try {
-        const url = await window.electron.ipcRenderer.invoke("get-working-url")
+        const url = await window.api.invoke("get-working-url")
         setAnimeUrl(`${url}/catalogue/${animeId}/`)
         setSeasons([])
       } catch (err) {
@@ -53,7 +54,7 @@ export const Season = () => {
     if (!animeUrl) return
     const fetchAnimeInfo = async () => {
       try {
-        const info = await window.electron.ipcRenderer.invoke("info-anime", animeUrl)
+        const info = await window.api.invoke("info-anime", animeUrl)
         if (!info?.title) {
           return
         }
@@ -75,7 +76,7 @@ export const Season = () => {
         setLoading(true)
         let result = []
         if (seasons.length == 0) {
-          result = await window.electron.ipcRenderer.invoke("get-seasons", animeUrl)
+          result = await window.api.invoke("get-seasons", animeUrl)
           if (result?.length === 0) {
             console.warn("Aucune saison trouvée ou erreur:", result?.error)
             setSeasons([])
@@ -122,16 +123,17 @@ export const Season = () => {
     const fetchEpisodes = async () => {
       setLoading(true)
       try {
-        let languages = await window.electron.ipcRenderer.invoke(
+        let languages = await window.api.invoke(
           "get-available-languages",
           selectedSeason,
         )
         languages = languages.map((lang) => lang.toLowerCase())
-        const currentLanguage = selectedLanguage && selectedLanguage.length > 0 
-        ? selectedLanguage : 
-        languages.includes(favoriteLanguage.toLowerCase())
-        ? favoriteLanguage.toLowerCase()
-        : languages[0].toLowerCase()
+        if (languages.length === 0) { 
+          setEpisodes([]); 
+          return 
+        }
+        const fav = favoriteLanguage.toLowerCase()
+        const currentLanguage = selectedLanguage || (languages.includes(fav) ? fav : languages[0])
         setSelectedLanguage(currentLanguage);
         if (episodeCache[selectedSeason]?.[currentLanguage]) {
           setEpisodes(episodeCache[selectedSeason][currentLanguage])
@@ -140,12 +142,12 @@ export const Season = () => {
         const seasonLangUrl = `${selectedSeason}/${currentLanguage}`
 
         const sortedLanguages = [...languages].sort((a, b) => {
-          if (a.toLowerCase() === favoriteLanguage) return -1
-          if (b.toLowerCase() === favoriteLanguage) return 1
+          if (a === fav) return -1
+          if (b === fav) return 1
           return 0
         })
         setAvailableLanguages(sortedLanguages)
-        const episodeLinks = await window.electron.ipcRenderer.invoke(
+        const episodeLinks = await window.api.invoke(
           "get-episodes",
           seasonLangUrl,
           true,
@@ -155,7 +157,7 @@ export const Season = () => {
           ...prevCache,
           [selectedSeason]: {
             ...(prevCache[selectedSeason] || {}),
-            [selectedLanguage]: episodeLinks,
+            [currentLanguage]: episodeLinks, 
           },
         }))
       } catch (error) {
@@ -177,7 +179,7 @@ export const Season = () => {
           setEpisodes(episodeCache[selectedSeason][currentLanguage])
           return
         }
-        const chapterTempLink = await window.electron.ipcRenderer.invoke(
+        const chapterTempLink = await window.api.invoke(
           "get-scans-chapter",
           `${selectedSeason}/${selectedLanguage}`,
         )
@@ -243,20 +245,7 @@ export const Season = () => {
     
     try {
       if (contentType === "anime") {
-        const currentCache = episodeCache[selectedSeason] || {}
-        const missingLangs = availableLanguages?.filter((lang) => !currentCache[lang.toLowerCase()])
-
-        const missingEpisodes = await Promise.all(
-          missingLangs.map(async (lang) => {
-            const langUrl = `${selectedSeason}/${lang.toLowerCase()}`
-            const eps = await window.electron.ipcRenderer.invoke("get-episodes", langUrl, true)
-            return [lang.toLowerCase(), eps]
-          }),
-        )
-        const updatedCache = {
-          ...currentCache,
-          ...Object.fromEntries(missingEpisodes),
-        }
+       const updatedCache = episodeCache[selectedSeason] || {}
         navigate(path, {
           state: {
             episodeTitle: episode.title,
@@ -273,7 +262,7 @@ export const Season = () => {
         })
       } else if (contentType === "manga") {
         const langUrl = `${selectedSeason}/${selectedLanguage.toLowerCase()}`
-        const scansImg = await window.electron.ipcRenderer.invoke(
+        const scansImg = await window.api.invoke(
           "get-scans-img",
           langUrl,
           episode.id,

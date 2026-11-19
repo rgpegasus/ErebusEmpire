@@ -1,8 +1,9 @@
+import { animeData } from "@services/data/animeRepository"
 import React, { useState, useRef, useEffect} from "react";
 import styles from "./BackgroundCover.module.css"
 import { PlayIcon, AddIcon, ArrowIcon } from "@utils/dispatchers/Icons"
 import { useNavigate } from "react-router-dom";
-import { useLoader } from '@utils/dispatchers/Page';
+import { useLoader } from "@context/loader-context/LoaderContext"
 import ScrollTitle from '@components/scroll-title/ScrollTitle';
 import { toSlug } from '@utils/functions/toSlug'
 const BackgroundCover = ({ coverInfo, whileWatching = false, isAnime = true}) => {
@@ -46,14 +47,10 @@ const BackgroundCover = ({ coverInfo, whileWatching = false, isAnime = true}) =>
     useEffect(() => {
         if (!animeId) return;
         const loadAllStatuses = async () => {
-            const statusObj = { ...animeStatus };
-            for (const key of Object.keys(statusObj)) {
-                const storageName = statusStorageMap[key];
-                const storageKey = animeId ? `/erebus-empire/${animeId}` : null;
-                const value = await animeData.load(storageName, storageKey);
-                statusObj[key] = !!value; 
-            }
-            setAnimeStatus(statusObj);
+            const storageKey = `/erebus-empire/${animeId}`;
+            const keys = Object.keys(statusStorageMap);
+            const values = await Promise.all(keys.map((key) => animeData.load(statusStorageMap[key], storageKey)));
+            setAnimeStatus(Object.fromEntries(keys.map((key, i) => [key, !!values[i]])));
         };
         loadAllStatuses();
     }, [animeId]);
@@ -61,6 +58,7 @@ const BackgroundCover = ({ coverInfo, whileWatching = false, isAnime = true}) =>
         animeId,
         animeTitle:coverInfo.title,
         animeCover: coverInfo?.banner ?? coverInfo.cover,
+        timestamp: Date.now(), 
       });
     const toggleStatus = async (key) => {
       const isActive = animeStatus[key];
@@ -81,18 +79,18 @@ const BackgroundCover = ({ coverInfo, whileWatching = false, isAnime = true}) =>
         let episodesData = {};
         try {
             setLoading(true);
-            const result = await window.electron.ipcRenderer.invoke('get-seasons', coverInfo.url);
+            const result = await window.api.invoke('get-seasons', coverInfo.url);
             if (!result || result.error || result?.length === 0) {
                 console.warn("Aucune saison trouvée ou erreur:", result?.error);
                 setLoading(false);
                 return;
             }
-            const languages = await window.electron.ipcRenderer.invoke('get-available-languages', result[0].url);
+            const languages = await window.api.invoke('get-available-languages', result[0].url);
             const selectedLanguage = result[0].url.split("/").slice(6,7)[0]
             
             for (const lang of languages ) {
                 const saisonUrl = `${result[0].url.split("/").slice(0,6).join("/")}/${lang.toLowerCase()}`
-                const episodeLinks = await window.electron.ipcRenderer.invoke('get-episodes', saisonUrl, true);
+                const episodeLinks = await window.api.invoke('get-episodes', saisonUrl, true);
                 episodesData[lang.toLowerCase()] = episodeLinks;
             }
             

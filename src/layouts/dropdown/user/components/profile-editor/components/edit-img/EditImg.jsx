@@ -49,7 +49,7 @@ useEffect(() => {
         croppedAreaPixels.height
       );
   
-      return canvas.toDataURL('image/jpeg');
+      return canvas.toDataURL('image/jpeg', 0.9);
     };
     
   const showCroppedImage = useCallback(async () => {
@@ -92,7 +92,7 @@ useEffect(() => {
               max={3}
               step={0.1}
               value={zoom}
-              onChange={(e) => setZoom(e.target.value)}
+              onChange={(e) => setZoom(Number(e.target.value))}
             />
           </div>
           <div className={styles.BottomContainer}>

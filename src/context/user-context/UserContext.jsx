@@ -1,82 +1,55 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useCallback, useEffect, useMemo, useState } from "react"
+import { supabase, getUserId } from "@services/supabase/Client"
 
-export const UserContext = createContext();
+export const UserContext = createContext(null)
+
+const read = (key, fallback) => {
+  try { return localStorage.getItem(key) ?? fallback } catch { return fallback }
+}
+const write = (key, value) => {
+  try { value == null ? localStorage.removeItem(key) : localStorage.setItem(key, String(value)) } catch {}
+}
 
 export const UserProvider = ({ children }) => {
-  const [username, setUsername] = useState("User");
-  const [profileImage, setProfileImage] = useState(null);
-  const [theme, setTheme] = useState("dark");
-  const [colorTheme, setColorTheme] = useState("");
-  const [toolBar, setToolBar] = useState(false);
-  const [favoriteLanguage, setFavoriteLanguage] = useState("vostfr");
+  const [username, setUsername] = useState(() => read("username", "").trim() || "User")
+  const [profileImage, setProfileImage] = useState(() => read("croppedProfileImage", null))
+  const [theme, setTheme] = useState(() => read("theme", "dark"))
+  const [colorTheme, setColorTheme] = useState(() => read("colorTheme", ""))
+  const [toolBar, setToolBar] = useState(() => read("toolBar", "false") === "true")
+  const [favoriteLanguage, setFavoriteLanguage] = useState(() => read("favoriteLanguage", "vostfr"))
+
+  const updateUser = useCallback((name, image) => {
+    const finalName = name?.trim() || "User"
+    setUsername(finalName); setProfileImage(image ?? null)
+    write("username", finalName); write("croppedProfileImage", image ?? null)
+  }, [])
+  const updateTheme = useCallback((v) => { setTheme(v); write("theme", v) }, [])
+  const updateColorTheme = useCallback((v) => { setColorTheme(v); write("colorTheme", v) }, [])
+  const updateToolBar = useCallback((v) => { setToolBar(!!v); write("toolBar", !!v) }, [])
+  const updateFavoriteLanguage = useCallback((v) => { setFavoriteLanguage(v); write("favoriteLanguage", v) }, [])
 
   useEffect(() => {
-    const savedName = localStorage.getItem("username");
-    const savedImage = localStorage.getItem("croppedProfileImage");
-    const savedTheme = localStorage.getItem("theme");
-    const savedColorTheme = localStorage.getItem("colorTheme") || "";
-    const savedToolBar = localStorage.getItem("toolBar") || "";
-    const savedFavoriteLanguage = localStorage.getItem("favoriteLanguage")
-    if (savedName?.trim()) setUsername(savedName);
-    if (savedImage) setProfileImage(savedImage);
-    if (savedTheme?.trim()) setTheme(savedTheme);
-    
-    if (savedColorTheme?.trim()) setColorTheme(savedColorTheme);
-    if (savedToolBar !== null) {
-      setToolBar(savedToolBar === "true"); 
+    let cancelled = false
+    const pull = async () => {
+      const uid = await getUserId()
+      if (!uid) return
+      const { data, error } = await supabase.from("profiles").select("username, avatar_url").eq("id", uid).maybeSingle()
+      if (cancelled || error || !data) return
+      updateUser(data.username, data.avatar_url)
     }
-    if (savedFavoriteLanguage) {
-      setFavoriteLanguage(savedFavoriteLanguage)
-    }
-  }, []);
+    pull()
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN") pull()
+      if (event === "SIGNED_OUT") updateUser("User", null)
+    })
+    return () => { cancelled = true; sub.subscription.unsubscribe() }
+  }, [updateUser])
 
-  const updateUser = (name, image) => {
-    const finalName = name?.trim() || "User";
-    setUsername(finalName);
-    setProfileImage(image);
-
-    localStorage.setItem("username", finalName);
-    if (image) {
-      localStorage.setItem("croppedProfileImage", image);
-    } else {
-      localStorage.removeItem("croppedProfileImage");
-    }
-  };
-
-  const updateTheme = (newTheme) => {
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-  };
-
-  const updateColorTheme = (newColor) => {
-    setColorTheme(newColor);
-    localStorage.setItem("colorTheme", newColor);
-  };
-  const updateToolBar = (statePin) => {
-    setToolBar(statePin);
-    localStorage.setItem("toolBar", statePin);
-  };
-const updateFavoriteLanguage = (newLanguage) => {
-    setFavoriteLanguage(newLanguage);
-    localStorage.setItem("favoriteLanguage", newLanguage);
-  };
-  return (
-    <UserContext.Provider
-      value={{
-        username,
-        profileImage,
-        theme,
-        colorTheme,
-        toolBar,
-        favoriteLanguage,
-        updateUser,
-        updateTheme,
-        updateColorTheme,
-        updateToolBar,
-        updateFavoriteLanguage
-      }}
-    >
-      {children}
-    </UserContext.Provider>
-  );
-};
+  const value = useMemo(
+    () => ({ username, profileImage, theme, colorTheme, toolBar, favoriteLanguage,
+             updateUser, updateTheme, updateColorTheme, updateToolBar, updateFavoriteLanguage }),
+    [username, profileImage, theme, colorTheme, toolBar, favoriteLanguage,
+     updateUser, updateTheme, updateColorTheme, updateToolBar, updateFavoriteLanguage],
+  )
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>
+}

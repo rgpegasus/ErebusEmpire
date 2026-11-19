@@ -1,57 +1,34 @@
-import { toSlug } from '@utils/functions/toSlug'
-import { sanitizeName } from '@utils/functions/sanitizeName'
+import { toSlug } from "@utils/functions/toSlug"
+import { sanitizeName } from "@utils/functions/sanitizeName"
 
-async function getRealChapterName(chapterInfo) {
-  const animeId = chapterInfo.url.split("/").slice(4, 5).join("/")
-  let ChapterName = []
-  try {
-    ChapterName = await window.electron.ipcRenderer.invoke("get-scans-chapter", chapterInfo.url)
-  } catch (err) {
-    console.error("Erreur récupération embed:", err)
-  }
-  if (!ChapterName || ChapterName.length === 0) return null
-  const seasonId = chapterInfo.url.split("/").slice(5, 6).join("/")
-  const chapterFakeName = sanitizeName(chapterInfo.chapter)
-  const chapterNumber = chapterFakeName.match(/(?:chapitre|tome|volume)\s*(\d+)/i)[1] || null
-  let matchedEmbed = null
-  
-  matchedEmbed = Object.values(ChapterName).find((e) => toSlug(e) === toSlug(chapterInfo.chapter))
-  if (!matchedEmbed && chapterNumber) {
-    matchedEmbed = Object.values(ChapterName).find((e) => {
-      const tempChapterNumber = e.title.toLowerCase().match(/(?:chapitre|tome|volume)\s*(\d+)/i)?.[1] || null
-      if (tempChapterNumber){
-        return tempChapterNumber === chapterNumber
-      }
-    }).title
-  }
-  if (!matchedEmbed && chapterNumber) {
-    matchedEmbed = Object.values(ChapterName).find((e) => {
-      const title = e.title.toLowerCase()
-      const match = title.match(/chapitre?\s*(\d+)/i)
-      return title.includes(typeToSearch) && match && match[2] === chapterNumber
-    })
-  }
-  if (!matchedEmbed) {
-    matchedEmbed = ChapterName.find(
-      (e) =>
-        toSlug(e.title).includes(toSlug(chapterInfo.title)) ||
-        toSlug(chapterInfo.title).includes(toSlug(e.title)),
-    )
-  }
-  if (!matchedEmbed) {
-    matchedEmbed = ChapterName[0]
-  }
-  const finalPath = matchedEmbed
-    ? `/erebus-empire/${animeId}/${seasonId}/${toSlug(matchedEmbed)}`
-    : `/erebus-empire/${animeId}/${seasonId}`
+const NUM_RE = /(?:chapitre|tome|volume)\s*(\d+)/i
+
+export async function getRealChapterName(chapterInfo) {
+  const { url, chapter } = chapterInfo
+  if (!url || !chapter) return null
+  const parts = url.split("/")
+  const animeId = parts[4]
+  const seasonId = parts[5]
+
+  const data = await window.api.invoke("get-scans-chapter", url)
+  const chapters = (data?.scans ?? []).map((c, id) => ({ ...c, id }))
+  if (chapters.length === 0) return null
+
+  const wantedNumber = sanitizeName(chapter).match(NUM_RE)?.[1] ?? null
+  const slug = toSlug(chapter)
+  const matched =
+    chapters.find((c) => toSlug(c.title) === slug) ??
+    (wantedNumber && chapters.find((c) => c.title?.match(NUM_RE)?.[1] === wantedNumber)) ??
+    chapters.find((c) => toSlug(c.title).includes(slug) || slug.includes(toSlug(c.title))) ??
+    chapters[0]
+
   return {
-    path: finalPath,
-    ChapterName,
-    matchedEmbed,
+    path: `/erebus-empire/${animeId}/${seasonId}/${toSlug(matched.title)}`,
+    chapters,
+    matchedChapter: matched, 
+    encodedTitle: data.encodedTitle,
     animeId,
     seasonId,
     seasonTitle: chapterInfo.seasonTitle,
   }
-};
-  
-export { getRealChapterName }
+}

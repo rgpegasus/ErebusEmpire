@@ -14,13 +14,9 @@ export default defineConfig({
       rollupOptions: {
         input: {
           main: resolve(__dirname, 'src/electron/main.js'),
-          background: resolve(__dirname, 'src/electron/background/background.js'),
         },
         output: {
-          entryFileNames: chunk => {
-            if (chunk.name === 'background') return 'background/background.js';
-            return '[name].js';
-          }
+          entryFileNames: '[name].js'
         },
         external: ['auto-launch', 'fs-extra', 'fs', 'path', 'electron', 'discord-rpc'],
       },
@@ -30,7 +26,6 @@ export default defineConfig({
         '@src': resolve(__dirname, 'src'),
         '@utils': resolve(__dirname, 'src/utils'),
         '@resources': resolve(__dirname, 'resources'),
-        '@ipcHandlers': resolve(__dirname, 'src/electron/ipcHandlers'),
         '@services': resolve(__dirname, 'src/services'),
         '@context': resolve(__dirname, 'src/context'),
       },
@@ -67,7 +62,6 @@ export default defineConfig({
         '@src': resolve(__dirname, 'src'),
         '@resources': resolve(__dirname, 'resources'),
         '@electron': resolve(__dirname, 'src/electron'),
-        '@ipcHandlers': resolve(__dirname, 'src/electron/ipcHandlers'),
         '@services': resolve(__dirname, 'src/services'),
         '@utils': resolve(__dirname, 'src/utils'),
         '@pages': resolve(__dirname, 'src/pages'),
@@ -76,6 +70,7 @@ export default defineConfig({
         '@layouts': resolve(__dirname, 'src/layouts'),
         '@components': resolve(__dirname, 'src/components'),
         '@context': resolve(__dirname, 'src/context'),
+        '@hooks': resolve(__dirname, 'src/hooks'),
       },
     },
     plugins: [react(),svgr()],

@@ -151,7 +151,7 @@ const handleVolumeChange = (direction) => {
     if (videoRef.current) {
       setPlaying(!playing);
       if (videoRef.current.paused) {
-        videoRef.current.play();
+        videoRef.current.play()?.catch(() => {});
       } else {
         videoRef.current.pause();
       }
@@ -165,7 +165,7 @@ const handleVolumeChange = (direction) => {
         videoRef.current.currentTime = videoRef.current.duration - 30;
         if (autoPlay) {
           setPlaying(true);
-          videoRef.current.play();
+          videoRef.current.play()?.catch(() => {});
         } else {
           setPlaying(false);
         }
@@ -218,7 +218,7 @@ const handleVolumeChange = (direction) => {
           setStarted(true);
           setPlaying(false);
           if (autoPlay) {
-            videoRef.current.play();
+            videoRef.current.play()?.catch(() => {});
             setPlaying(!videoRef.current.paused);
           }
         }
@@ -227,8 +227,10 @@ const handleVolumeChange = (direction) => {
       }
     }
   };
-
   const errorVideo = () => {
+    const urls = sources?.map((s) => s.url) ?? [];
+    const next = urls[urls.indexOf(currentSource) + 1];
+    if (next) { setCurrentSource(next); return; }
     if (onErrorVideo) onErrorVideo();
     setError("Erreur de lecture");
   };
@@ -308,9 +310,10 @@ const handleControlClick = (e) => {
   timerRef.current = setTimeout(controllScreenTimeOut, 2500);
 };
   const getKeyBoardInteration = (e) => {
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName) || e.target?.isContentEditable) return;
     if (e.key === ' ' && videoRef.current) {
       if (videoRef.current.paused) {
-        videoRef.current.play();
+        videoRef.current.play()?.catch(() => {});
         setPlaying(true);
         hoverScreen();
       } else {
@@ -371,7 +374,6 @@ const handleControlClick = (e) => {
 
   useEffect(() => {
     if (currentSource && videoRef.current) {
-      videoRef.current.currentTime = startPosition;
       setProgress(0);
       setDuration(0);
       setVideoReady(false);
@@ -409,35 +411,48 @@ const handleControlClick = (e) => {
   }, []);
 
   useEffect(() => {
-    setStateFullScreen();
-  }, [document.fullscreenElement]);
+    const video = videoRef.current;
+    if (!video || !currentSource) return;
 
-  useEffect(() => {
-  if (videoRef.current && currentSource) {
-    const isHLS = currentSource.includes(".m3u8");
+    const tryPlay = () => {
+      if (!autoPlay) return;
+      video.play().catch((e) => { if (e.name !== 'AbortError') console.warn('play():', e.message); });
+    };
+    const resume = () => {
+      if (startPosition > 0 && video.currentTime < 1) video.currentTime = startPosition;
+    };
+    video.addEventListener('loadedmetadata', resume, { once: true });
 
-    if (isHLS) {
-      if (Hls.isSupported()) {
-        const hls = new Hls(); 
-        
-        hls.loadSource(currentSource);
-        hls.attachMedia(videoRef.current);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          if (autoPlay) videoRef.current?.play();
-        });
-        return () => hls.destroy();
-      } else if (videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
-        videoRef.current.src = currentSource;
-        if (autoPlay) videoRef.current.play();
-      } else {
-        setError("Format HLS non supporté par votre navigateur.");
-      }
+    const isHLS = /\.m3u8(\?|$)/i.test(currentSource);
+    let hls = null;
+
+    if (isHLS && Hls.isSupported()) {
+      hls = new Hls({ startPosition: startPosition > 0 ? startPosition : -1, enableWorker: true });
+      hls.on(Hls.Events.MANIFEST_PARSED, tryPlay);
+      hls.on(Hls.Events.ERROR, (_e, data) => {
+        if (!data.fatal) return;
+        if (data.type === Hls.ErrorTypes.NETWORK_ERROR) hls.startLoad();
+        else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) hls.recoverMediaError();
+        else errorVideo();
+      });
+      hls.loadSource(currentSource);
+      hls.attachMedia(video);
+    } else if (isHLS && video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = currentSource;
+      tryPlay();
+    } else if (isHLS) {
+      setError('Format HLS non supporté.');
     } else {
-      videoRef.current.src = currentSource;
-      if (autoPlay) videoRef.current.play();
+      video.src = currentSource;
+      tryPlay();
     }
-  }
-}, [currentSource]);
+
+    return () => {
+      video.removeEventListener('loadedmetadata', resume);
+      if (hls) hls.destroy();
+      else { video.removeAttribute('src'); video.load(); }
+    };
+  }, [currentSource]);
 
 
   const renderLoading = () => (
@@ -550,7 +565,7 @@ const handleClick = () => {
                 className="close-button"
                 onClick={() => {
                   setShowSettingsMenu(false)
-                  videoRef.current.play()
+                  videoRef.current.play()?.catch(() => {})
                 }}
               >
                 <FiX />

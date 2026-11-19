@@ -1,4 +1,3 @@
-// electron.vite.config.mjs
 import { fileURLToPath } from "url";
 import { dirname, resolve } from "path";
 import { defineConfig, externalizeDepsPlugin } from "electron-vite";

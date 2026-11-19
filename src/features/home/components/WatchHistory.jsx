@@ -1,6 +1,8 @@
+import { toSlug } from "@utils/functions/toSlug"
+import { animeData } from "@services/data/animeRepository"
 import React, { useRef, useEffect, useState, useContext } from "react"
 import { useNavigate } from "react-router-dom"
-import { useLoader } from "@utils/dispatchers/Page"
+import { useLoader } from "@context/loader-context/LoaderContext"
 import "swiper/css"
 import "swiper/css/navigation"
 import "swiper/css/effect-coverflow"
@@ -50,12 +52,9 @@ const WatchHistory = () => {
       }
     }
     tempLanguages.sort((a, b) => {
-      if (favoriteLanguage) {
-        if (a === favoriteLanguage) return -1
-        if (b === favoriteLanguage) return 1
-      
-        return tempEpisodes[b].length - tempEpisodes[a].length
-      }
+      if (a === favoriteLanguage) return -1
+      if (b === favoriteLanguage) return 1
+      return tempEpisodes[b].length - tempEpisodes[a].length
     })
     setEpisodes(tempEpisodes)
     setScans(tempScans)
@@ -100,7 +99,7 @@ const WatchHistory = () => {
         languageResults = await Promise.all(
           episode?.availableLanguages.map(async (lang) => {
             const langUrl = `${baseUrl}/${lang.toLowerCase()}`
-            const data = await window.electron.ipcRenderer.invoke("get-episodes", langUrl, true)
+            const data = await window.api.invoke("get-episodes", langUrl, true)
             if (data === null) {
               return null
             }
@@ -108,7 +107,7 @@ const WatchHistory = () => {
           }),
         )
       } else {
-        const episodeLinks = await window.electron.ipcRenderer.invoke(
+        const episodeLinks = await window.api.invoke(
           "get-scans-chapter",
           episode.seasonUrl,
         )
@@ -138,12 +137,7 @@ const WatchHistory = () => {
       setLoading(false)
       return
     }
-    const episodeId = episode.episodeTitle
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "")
+    const episodeId = toSlug(episode.episodeTitle)
     if (episode.contentType === "anime") {
       navigate(`/erebus-empire/${episode.animeId}/${episode.seasonId}/${episodeId}`, {
         state: {
