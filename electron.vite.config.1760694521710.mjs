@@ -15,7 +15,7 @@ var electron_vite_config_default = defineConfig({
       rollupOptions: {
         input: {
           main: resolve(__dirname, "src/electron/main.js"),
-          background: resolve(__dirname, "src/electron/background/background.js")
+          // background: resolve(__dirname, "src/electron/background/background.js")
         },
         output: {
           entryFileNames: (chunk) => {

@@ -363,7 +363,7 @@ export const Season = () => {
           <ContentsCarousel
             data={episodes}
             onClickEpisode={handleEpisodeClick}
-            getEpisodeCover={() => animeInfo?.cover}
+            getEpisodeCover={() => animeInfo?.banner}
             getAnimeTitle={() => animeInfo?.title}
             getEpisodeSubTitle={(ep) => {
               const seasonTitle = seasons.find((season) =>

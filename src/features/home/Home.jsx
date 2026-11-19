@@ -18,7 +18,6 @@ export const Home = () => {
   })
   const [latestEpisodes, setLatestEpisodes] = useState([])
   const [latestScans, setLatestScans] = useState([])
-  const [latestEpisodesByLanguage, setLatestEpisodesByLanguage] = useState({})
   const [availableLanguages, setAvailableLanguages] = useState([])
   const [selectedLanguage, setSelectedLanguage] = useState("")
   const filterValidUrls = async (items) => {
@@ -42,9 +41,11 @@ export const Home = () => {
       try {
         let animeData = null
         if (!animeData) {
-          const animeInfo = await window.electron.ipcRenderer.invoke("random-anime")
+          const randomAnime = await window.electron.ipcRenderer.invoke("random-anime")
+          const animeInfo = await window.electron.ipcRenderer.invoke("info-anime", randomAnime.url)
           animeCover.save(animeInfo)
           setCoverInfo(animeInfo)
+          setCoverInfo({ ...animeInfo, url: randomAnime.url })
         } else {
           setCoverInfo(animeData)
         }
@@ -74,7 +75,6 @@ export const Home = () => {
           return tempEpisodes[b].length - tempEpisodes[a].length
         })
 
-        setLatestEpisodesByLanguage(tempEpisodes)
         setAvailableLanguages(tempLanguages)
 
         if (tempLanguages.length > 0) {

@@ -60,7 +60,7 @@ const BackgroundCover = ({ coverInfo, whileWatching = false, isAnime = true}) =>
     const buildAnimeData = () => ({
         animeId,
         animeTitle:coverInfo.title,
-        animeCover: coverInfo.cover,
+        animeCover: coverInfo?.banner ?? coverInfo.cover,
       });
     const toggleStatus = async (key) => {
       const isActive = animeStatus[key];
@@ -113,7 +113,7 @@ const BackgroundCover = ({ coverInfo, whileWatching = false, isAnime = true}) =>
                 seasonId,
                 animeTitle: coverInfo.title,
                 seasonTitle: result[0].title,
-                animeCover: coverInfo.cover,
+                animeCover: coverInfo?.banner ?? coverInfo.cover,
                 seasonUrl: result[0].url,
                 availableLanguages:languages,
                 selectedLanguage
@@ -138,7 +138,7 @@ const BackgroundCover = ({ coverInfo, whileWatching = false, isAnime = true}) =>
             <div className={`${isAnime? styles.CoverMask : ""}`}>
                 {isAnime ? (
                     <img 
-                        src={coverInfo?.cover}
+                        src={coverInfo?.banner ?? coverInfo?.cover}
                         className={`${styles.Cover} ${styles.IsAnime}`}
                         alt={coverInfo?.title}
                         draggable="false"

@@ -534,6 +534,7 @@ const handleClick = () => {
         onTimeUpdate={timeUpdate}
         onError={errorVideo}
         onEnded={onEndedFunction}
+        referrerPolicy="no-referrer"
       />
       {showSettingsMenu && (
         <>

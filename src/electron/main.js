@@ -3,8 +3,8 @@ import { join } from "path"
 import path from "path"
 import { electronApp, optimizer, is } from "@electron-toolkit/utils"
 import { ErebusIcon } from "@utils/dispatchers/Pictures"
-import { AnimeScraper } from 'better-ani-scraped';
-// import { AnimeScraper } from "../../../../BOT/better-ani-scraped/index.js"
+// import { AnimeScraper } from 'better-ani-scraped';
+import { AnimeScraper } from "../../../../BOT/better-ani-scraped/index.js"
 import fsExtra from "fs-extra"
 import fs from "fs"
 import { Client } from "@xhayper/discord-rpc"
@@ -302,6 +302,20 @@ if (!gotTheLock) {
     app.on("activate", () => {
       if (BrowserWindow.getAllWindows().length === 0) createWindow()
     })
+  session.defaultSession.webRequest.onBeforeSendHeaders(
+    { urls: ['*://*.uqload.vc/*', '*://*.uqload.com/*', '*://*.uqload.to/*'] },
+    (details, callback) => {
+      // 1. On force le Referer vers le domaine officiel d'Uqload
+      details.requestHeaders['Referer'] = 'https://uqload.vc/';
+      details.requestHeaders['Origin'] = 'https://uqload.vc';
+      
+      // 2. On imite un navigateur standard
+      details.requestHeaders['User-Agent'] = 
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+
+      callback({ requestHeaders: details.requestHeaders });
+    }
+  );
   })
   app.on("window-all-closed", () => {
     if (process.platform !== "darwin") {

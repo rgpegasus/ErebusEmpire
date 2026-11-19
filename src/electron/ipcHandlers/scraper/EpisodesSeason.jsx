@@ -9,7 +9,7 @@ function EpisodesSeason(scraper) {
     try {
       return await scraper.getEmbed(
         seasonUrl,
-        ["vidmoly", "sibnet", "sendvid", "smoothpre", "embed4me"],
+        ["vidmoly", "sibnet", "smoothpre", "embed4me", "ansembed", "uqload"],
         allHost,
         includeInfo,
       )
