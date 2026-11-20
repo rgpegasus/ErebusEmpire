@@ -27,6 +27,22 @@ const BackgroundCover = ({ coverInfo, whileWatching = false, isAnime = true}) =>
       attente: "animeOnHold",
       dejaVu: "animeAlreadySeen",
     };
+    const [copied, setCopied] = useState(false)
+
+    const handleTitleClick = async () => {
+        if (!whileWatching) {
+            navigate(`/erebus-empire/${getAnimeId(coverInfo?.url)}/`)
+            return
+        }
+
+        if (coverInfo?.title) { 
+            await navigator.clipboard.writeText(coverInfo.title)
+            setCopied(true)
+            setTimeout(() => setCopied(false), 1800)
+        }
+    }
+
+
     const getAnimeId = (url) => {
         const cleanUrl = new URL(url);
         const pathname = cleanUrl.pathname.replace(/\/$/, '');
@@ -88,11 +104,13 @@ const BackgroundCover = ({ coverInfo, whileWatching = false, isAnime = true}) =>
             const languages = await window.api.invoke('get-available-languages', result[0].url);
             const selectedLanguage = result[0].url.split("/").slice(6,7)[0]
             
-            for (const lang of languages ) {
-                const saisonUrl = `${result[0].url.split("/").slice(0,6).join("/")}/${lang.toLowerCase()}`
-                const episodeLinks = await window.api.invoke('get-episodes', saisonUrl, true);
-                episodesData[lang.toLowerCase()] = episodeLinks;
-            }
+            const base = result[0].url.split("/").slice(0, 6).join("/")
+            const episodesData = Object.fromEntries(await Promise.all(
+            languages.map(async (lang) => {
+                const l = lang.toLowerCase()
+                return [l, await window.api.invoke("get-episodes", `${base}/${l}`, true)]
+            })
+            ))
             
             
             if (!episodesData || episodesData.length === 0) {
@@ -107,7 +125,8 @@ const BackgroundCover = ({ coverInfo, whileWatching = false, isAnime = true}) =>
             state: {
                 episodeTitle: episodesData[selectedLanguage][0].title,
                 animeId,
-                episodes:episodesData,
+                contents: episodesData,
+                contentType: "anime",  
                 seasonId,
                 animeTitle: coverInfo.title,
                 seasonTitle: result[0].title,
@@ -155,9 +174,19 @@ const BackgroundCover = ({ coverInfo, whileWatching = false, isAnime = true}) =>
                     {whileWatching && (
                         <h2 className={styles.WhileWatching}>En train de regarder</h2>
                     )}
-                    <div className={`${styles.AnimeTitle} ${!whileWatching? styles.TitleHover : ""}`} onClick={()=> {if (!whileWatching) {navigate(`/erebus-empire/${getAnimeId(coverInfo?.url)}/`)}}}>
-                        <ScrollTitle title={coverInfo?.title}/>
-                    </div>
+                    <div
+                        className={`${styles.AnimeTitle} ${!whileWatching ? styles.TitleHover : ""}`}
+                        onClick={handleTitleClick}
+                        title={whileWatching ? "Cliquer pour copier le titre" : undefined}
+                        >
+                        <ScrollTitle title={coverInfo?.title} />
+
+                        {copied && (
+                            <span className={styles.CopiedPopup}>
+                            Copié !
+                            </span>
+                        )}
+                        </div>
                     <h2 className={styles.AltTitles}>{coverInfo?.altTitles?.slice(0, 1).join(', ')}</h2>
                     <div className={styles.Buttons}>
                         <div className={styles.SeeContainer} onClick={()=> navigateToEpisode(coverInfo)}>

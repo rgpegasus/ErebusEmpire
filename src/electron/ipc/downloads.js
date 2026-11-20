@@ -5,8 +5,7 @@ import fs from "fs"
 import { spawn } from "child_process"
 import { sanitizeName } from "../../utils/functions/sanitizeName"
 
-export const downloadsRoot = () =>
-  path.join(app.getPath("appData"), "Erebus Empire", "userData", "localStorage", "animeDownload")
+export const downloadsRoot = () => path.join(app.getPath("userData"), "userData", "localStorage", "animeDownload")
 
 const bin = (name) =>
   is.dev

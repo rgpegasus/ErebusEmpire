@@ -54,8 +54,47 @@
     overflow: hidden;
     white-space: nowrap;   
     transform: scaleY(0.9); 
+    cursor: pointer;
 }
 
+
+.CopiedPopup {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #1e1e24;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+    animation: toastAnim 1.8s ease forwards;
+}
+
+@keyframes toastAnim {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, 10px);
+    }
+    15% {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+    85% {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, 10px);
+    }
+}
 .AnimeTitle h2 {
     font-family: var(--font-family-main);
     font-size: 90px;

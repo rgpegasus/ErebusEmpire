@@ -3,7 +3,7 @@ import fs from "fs"
 import path from "path"
 import JSZip from "jszip"
 
-export const userDataRoot = () => path.join(app.getPath("appData"), "Erebus Empire", "userData")
+export const userDataRoot = () => path.join(app.getPath("userData"), "userData")
 const animeDir = () => path.join(userDataRoot(), "localStorage", "anime")
 
 const COLLECTIONS = new Set([

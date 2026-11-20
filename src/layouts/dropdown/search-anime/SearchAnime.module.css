@@ -16,6 +16,7 @@
   justify-content: center;
   transition: all ease 0.3s;
   cursor: pointer;
+  backdrop-filter: blur(1.5px);
 }
 .LogoContainer.Open {
   width: 450px;

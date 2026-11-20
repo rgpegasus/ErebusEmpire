@@ -1,13 +1,12 @@
 .Container {
   position: fixed;
   top: 0;
-  width: 100%;
+  width: calc(100% - 12px);
   padding: 25px 50px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   z-index: 100;
-  backdrop-filter: blur(1.5px);
   -webkit-backdrop-filter: blur(1.5px);
   transition: ease all 0.3s;
 }
@@ -51,16 +50,19 @@
 
 @media (max-width: 1920px) {
   .Container {
+    width: calc(100% - 11x);
     padding: calc(25px * 0.75) calc(50px * 0.75);
   }
 }
 @media (max-width: 1300px) {
   .Container {
+    width: calc(100% - 9px);
     padding: calc(25px * 0.6) calc(50px * 0.6);
   }
 }
 @media (max-width: 960px) {
   .Container {
+    width: calc(100% - 8px);
     padding: calc(25px * 0.5) calc(50px * 0.5);
   }
 }

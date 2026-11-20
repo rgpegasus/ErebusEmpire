@@ -1,4 +1,4 @@
-import { ipcMain } from "electron"
+import { ipcMain, BrowserWindow } from "electron"
 
 export const MIN = 60_000
 export const LANGS = ["vostfr", "vf", "va"]
@@ -33,3 +33,4 @@ export function handle(channel, fn, fallback) {
     }
   })
 }
+

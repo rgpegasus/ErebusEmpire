@@ -57,7 +57,6 @@ export default function App() {
           {Object.entries(LIBRARIES).map(([path, props]) => (
             <Route key={path} path={`/erebus-empire/${path}`} element={<AnimeLibrary {...props} />} />
           ))}
-          {/* Routes dynamiques EN DERNIER : /erebus-empire/:animeId ne doit pas avaler /settings, /login... */}
           <Route path="/erebus-empire/:animeId/:seasonId?" element={<Season />} />
           <Route
             path="/erebus-empire/:animeId/:seasonId/:episodeId"

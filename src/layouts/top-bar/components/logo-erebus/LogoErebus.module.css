@@ -3,6 +3,7 @@
     height: auto;
     cursor: pointer;
     transition: all ease 0.3s;
+    backdrop-filter: blur(1.5px);
 }
 .Logo:hover {
     opacity: 0.7;

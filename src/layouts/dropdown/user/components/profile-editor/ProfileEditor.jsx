@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react"
+import React, { useState, useContext, useEffect } from "react"
 import { supabase } from "@services/supabase/Client" 
 import { ProfileIcon, SmallErebusIcon } from "@utils/dispatchers/Icons"
 import { UserContext } from "@context/user-context/UserContext"
@@ -15,13 +15,38 @@ function ProfileEditor({ editMode, setEditMode, setIsCropping }) {
   const [isEditingName, setIsEditingName] = useState(false)
   const [imageError, setImageError] = useState(false);
   const [error, setError] = useState(null)
+  const [isDev, setDev] = useState(false);
+  useEffect(() => {
+      const loadSession = async () => {
+        const {
+          data: { session: res },
+        } = await supabase.auth.getSession()
+        if (res) {
+          const is_dev = await getDev(res.user.id);
+          setDev(is_dev)
+        }
+      }
+  
+      loadSession()
+    }, [])
   const handleProfileClick = () => {
     if (editMode) {
       setShowOptions(!showOptions)
       setIsCropping(false)
     }
   }
-
+  const getDev = async (userId) => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("is_dev")
+      .eq("id", userId)
+      .maybeSingle() 
+    if (error) {
+      console.error(`[profile] getDev:`, error)
+      throw new Error(error.message || String(error))
+    }
+    return data.is_dev ?? false
+  }
   const onFileChange = (e) => {
     if (e.target.files?.[0]) {
       const reader = new FileReader()
@@ -37,8 +62,23 @@ function ProfileEditor({ editMode, setEditMode, setIsCropping }) {
   }
   const avatarPath = (uid) => `${uid}/avatar.jpg`
 
-  const uploadAvatar = async (userId, dataUrl) => {
-    const blob = await (await fetch(dataUrl)).blob()
+  const dataURLToBlob = (dataUrl) => {
+    const [header, base64Data] = dataUrl.split(",")
+    const mimeMatch = header.match(/:(.*?);/)
+    const mimeType = mimeMatch ? mimeMatch[1] : "image/jpeg"
+
+    const byteCharacters = atob(base64Data)
+    const byteNumbers = new Array(byteCharacters.length)
+
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i)
+    }
+
+    return new Blob([new Uint8Array(byteNumbers)], { type: mimeType })
+  }
+
+  const uploadAvatar = async (userId, imageData) => {
+    const blob = imageData instanceof Blob ? imageData : dataURLToBlob(imageData)
     const path = avatarPath(userId)
     const { error } = await supabase.storage
       .from("avatars")
@@ -51,7 +91,7 @@ function ProfileEditor({ editMode, setEditMode, setIsCropping }) {
   const saveProfile = async (userId, name, avatarUrl) => {
     const { error } = await supabase
       .from("profiles")
-      .upsert({ id: userId, username: name, avatar_url: avatarUrl, updated_at: new Date().toISOString(), is_dev: false })
+      .upsert({ id: userId, username: name, avatar_url: avatarUrl, updated_at: new Date().toISOString()})
     if (error) throw error
   }
 
@@ -165,7 +205,7 @@ function ProfileEditor({ editMode, setEditMode, setIsCropping }) {
 
           <div className={styles.AppContainer}>
             <SmallErebusIcon className={styles.AppLogo} />
-            <h1 className={styles.AppTitle}>Erebus Empire</h1>
+            <h1 className={styles.AppTitle}>{`Erebus Empire${isDev ? " dev" : ""}`}</h1>
           </div>
         </div>
       </div>

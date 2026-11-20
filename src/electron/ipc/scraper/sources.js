@@ -21,7 +21,6 @@ export function registerSourceHandlers(scraper) {
   handle("resolve-sources", async ({ url = [], host = [] } = {}) => {
     const urls = [].concat(url)
     const hosts = [].concat(host)
-    console.log("caca", scraper)
     const real = await Promise.all(
       urls.map((u, i) =>
         /\/api\/lien\.php/.test(u) ? scraper.resolveLienUrl(u).catch((e) => (console.warn("[lien]", e.message), null)) : isHttp(u) ? u : null,

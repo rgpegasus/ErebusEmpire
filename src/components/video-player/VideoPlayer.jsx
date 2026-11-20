@@ -250,43 +250,35 @@ const handleVolumeChange = (direction) => {
     }
   };
 
-  const exitFullScreen = () => {
-    if (document.fullscreenElement) {
-      if (document.exitFullscreen) document.exitFullscreen();
-      setFullScreen(false);
+ const enterFullScreen = () => {
+    if (window.api?.setFullscreen) {
+      window.api.setFullscreen(true)
+      setFullScreen(true)
+      return
     }
-  };
+    playerElement.current?.requestFullscreen?.().catch(() => {})
+    setFullScreen(true)
+  }
 
-  const enterFullScreen = () => {
-    if (playerElement.current) {
-      if (playerElement.current.requestFullscreen) {
-        playerElement.current.requestFullscreen();
-        setFullScreen(true);
-      }
+  const exitFullScreen = () => {
+    if (window.api?.setFullscreen) {
+      window.api.setFullscreen(false)
+      setFullScreen(false)
+      return
     }
-  };
+    if (document.fullscreenElement) document.exitFullscreen?.()
+    setFullScreen(false)
+  }
 
   const chooseFullScreen = () => {
-    if (playerElement.current) {
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-        return;
-      }
-      if (playerElement.current.requestFullscreen) {
-        playerElement.current.requestFullscreen();
-      }
-      setFullScreen(true);
+    if (fullScreen) {
+      exitFullScreen()
+    } else {
+      enterFullScreen()
     }
-  };
+  }
 
-  const setStateFullScreen = () => {
-    if (!document.fullscreenElement) {
-      setFullScreen(false);
-      return;
-    }
-    setFullScreen(true);
-  };
-
+const setStateFullScreen = () => setFullScreen(Boolean(document.fullscreenElement))
 
 const controllScreenTimeOut = () => {
   if (showReproductionList) {
@@ -367,7 +359,16 @@ const handleControlClick = (e) => {
       console.error('PiP error:', err);
     }
   };
-  
+  useEffect(() => {
+    if (!fullPlayer) return
+
+    window.api?.setFullscreen?.(true)
+    setFullScreen(true)
+
+    return () => {
+      window.api?.setFullscreen?.(false)
+    }
+  }, [fullPlayer])
   useEffect(() => {
     if (showReproductionList) scrollToSelected();
   }, [showReproductionList]);
@@ -381,9 +382,6 @@ const handleControlClick = (e) => {
       setShowReproductionList(false);
       setShowDataNext(false);
       setPlaying(autoPlay);
-    }
-    if (fullPlayer) {
-      enterFullScreen()
     }
   }, [currentSource]);
   useEffect(() => {
@@ -525,7 +523,7 @@ const handleClick = () => {
 
   return (
     <div
-      className={`container ${error ? "hide-video" : ""}`}
+      className={`container ${error ? "hide-video" : ""} ${fullScreen ? "pseudo-fullscreen" : ""}`}
       onMouseMove={hoverScreen}
       ref={playerElement}
       onClick={handleClick}

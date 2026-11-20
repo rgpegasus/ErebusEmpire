@@ -10,7 +10,7 @@ const INVOKE = new Set([
 ])
 const SEND = new Set([
   "update-rich-presence", "scan-discord-presence", "default-rich-presence",
-  "open-devtools", "close-devtools",
+  "open-devtools", "close-devtools", "set-fullscreen",
   "window-minimize", "window-toggle-fullscreen", "window-close",
 ])
 const LISTEN = new Set(["download-progress", "deep-link"])
@@ -28,6 +28,7 @@ contextBridge.exposeInMainWorld("api", {
     ipcRenderer.on(channel, handler)
     return () => ipcRenderer.removeListener(channel, handler)
   },
+  setFullscreen: (v) => ipcRenderer.send("set-fullscreen", v),
   localData: {
     save: (c, k, v) => ipcRenderer.invoke("local:save", c, k, v),
     load: (c, k) => ipcRenderer.invoke("local:load", c, k),

@@ -98,27 +98,6 @@ export const Profile = () => {
               <span/>
             </div>
           )}
-          <div className={`${styles.Item} ${styles.Theme}`}>
-            <div className={styles.ItemContainer}>
-              <div><AiOutlineDatabase className={styles.ItemIcon}/></div>
-              <div className={styles.ItemInfo}>
-                <span className={styles.ItemTitle}>Données</span>
-                <span className={styles.ItemSubTitle}>Exportez ou importez vos données</span>
-              </div>
-            </div>
-            <div className={styles.ButtonsWrapper}>
-              <button className={styles.DataButton} onClick={exportData}>
-                <Upload size={16} />
-                Exporter
-              </button>
-              <button className={styles.DataButton} onClick={importData}>
-                <Download size={16} />
-                Importer
-              </button>
-            </div>
-          </div>
-          
-
           {isDev && (
             <div className={styles.Item}>
               <div className={styles.ItemContainer}>

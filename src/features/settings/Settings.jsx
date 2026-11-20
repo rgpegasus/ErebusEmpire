@@ -2,10 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import styles from "./Settings.module.css"
 import { UserContext } from '@context/user-context/UserContext';
 import { useNavigate } from 'react-router-dom';
-import { PinIcon, UnpinIcon, ProfileIcon, ColorPaletteIcon } from '@utils/dispatchers/Icons';
-import { ChevronRight, ChevronDown, Rocket, BatteryLow, Bell, LucideBellOff } from 'lucide-react';
-import BackgroundCover from "@components/background-cover/BackgroundCover"
-import { LoginPageBackground } from "@utils/dispatchers/Pictures"
+import { PinIcon, ProfileIcon, ColorPaletteIcon, ArrowIcon } from '@utils/dispatchers/Icons';
+import { ChevronRight, ChevronDown, Bell } from 'lucide-react';
 import { GrLanguage } from "react-icons/gr";
 import { FaInfoCircle } from "react-icons/fa";
 import { FlagDispatcher } from "@utils/dispatchers/Flags"
@@ -87,7 +85,6 @@ export const Settings = ({ openTheme }) => {
   }
   return (
     <div className="MainPage">
-      {/* <BackgroundCover coverInfo={LoginPageBackground} whileWatching={false} isAnime={false} /> */}
       <div className={styles.Container}>
         <div className={styles.Title}>Paramètres</div>
         <div className={styles.SubTitle}>Gérez votre compte et personalisez votre expérience.</div>
@@ -120,9 +117,7 @@ export const Settings = ({ openTheme }) => {
                 <span className={styles.UsageTimeTitle}>Temps d'utilisation</span>
                 <span className={styles.UsageTimeTime}>{convertSecondsToTime(usageTime)}</span>
               </div>
-              <span>
-                <ChevronRight className={styles.ChevronIcon} />
-              </span>
+              <ArrowIcon className={styles.ArrowIcon} />
             </div>
           </div>
         </div>
@@ -141,9 +136,7 @@ export const Settings = ({ openTheme }) => {
                 </span>
               </div>
             </div>
-            <span>
-              <ChevronRight className={styles.ChevronIcon} />
-            </span>
+            <ArrowIcon className={styles.ArrowIcon} />
           </div>
           <div className={styles.Item}>
             <div className={styles.ItemContainer}>

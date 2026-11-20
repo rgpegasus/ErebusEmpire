@@ -51,7 +51,7 @@ export const Home = () => {
       setAvailableContentTypes({ hasAnime: episodes.length > 0, hasManga: scans.length > 0 })
     }
     withLoading(() => loadReleases()).catch((e) => console.error("[home] sorties :", e))
-    loadCover().catch((e) => console.error("[home] cover :", e))
+    withLoading(() => loadCover().catch((e) => console.error("[home] cover :", e)))
 
     return () => { cancelled = true }
   }, [])

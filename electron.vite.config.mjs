@@ -51,10 +51,6 @@ export default defineConfig({
       outDir: 'out/renderer',
       rollupOptions: {
         input: resolve(__dirname, 'src/electron/index.html'),
-        output: {
-          format: 'cjs',
-          entryFileNames: 'renderer.js'
-        }
       },
     },
     resolve: {

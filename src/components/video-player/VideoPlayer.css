@@ -6,6 +6,17 @@
   background: var(--color-surface);
   overflow: hidden;
   user-select: none;
+  
+}
+.container.pseudo-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999; 
+  margin: 0;
+  padding: 0;
 }
 .skipOpening {
   display: flex;
@@ -596,7 +607,6 @@ video {
   overflow: auto;
 }
 
-/* Scrollbar styles */
 .item-list-reproduction-container .list-list-reproduction::-webkit-scrollbar-track {
   background-color: var(--color-secondary);
 }

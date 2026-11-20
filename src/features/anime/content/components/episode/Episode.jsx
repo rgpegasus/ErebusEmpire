@@ -38,7 +38,7 @@ export const Episode = ({
   const [videoTime, setVideoTime] = useState(0)
   const lastPresenceUpdateRef = useRef(0)
   const [availableLanguagesEpisode, setAvailableLanguagesEpisode] = useState(undefined)
-
+  const [resolveFailed, setResolveFailed] = useState(false)
   const newEpisodeId = toSlug(episodeTitle)
   const intervalRef = useRef(null)
 
@@ -104,6 +104,7 @@ export const Episode = ({
     animeCover,
     seasonUrl,
     videoTime,
+    videoDuration,
     availableLanguages,
     selectedLanguage,
   ])
@@ -256,7 +257,8 @@ export const Episode = ({
     if (!episodeSources?.url || !episodeSources?.host) return
     let cancelled = false
     ;(async () => {
-      setLoading(true)
+      setLoading(true); 
+      setResolveFailed(false)
       try {
         const resolved = await window.api.invoke("resolve-sources", {
           url: episodeSources.url,
@@ -271,7 +273,10 @@ export const Episode = ({
         })
         setEpisodeUrl(resolved[0]?.url ?? null)
       } catch (err) {
-        if (!cancelled) console.error("Erreur lors de la résolution des sources :", err)
+        if (!cancelled) {
+          console.error("Erreur lors de la résolution des sources :", err)
+          setResolveFailed(true)
+        }
       } finally {
         setLoading(false)
       }
@@ -338,7 +343,7 @@ export const Episode = ({
     })
   }, [storageKey])
 
-  if (loading || !restored) {
+  if (!restored || (!episodeUrl && !resolveFailed)) {
     return <Loader />
   }
   return (

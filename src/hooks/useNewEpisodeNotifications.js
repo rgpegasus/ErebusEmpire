@@ -16,7 +16,7 @@ export function useNewEpisodeNotifications(enabled) {
           animeData.loadAll("notifiedEpisodes"),
         ])
         if (stopped || !latest?.length) return
-        const watched = new Map(Object.values(onHold ?? {}).map((a) => [a.animeTitle.toLowerCase(), a]))
+        const watched = new Map(Object.values(onHold ?? {}).map((a) => [a.animeTitle?.toLowerCase(), a]))
          const known = Array.isArray(notified) ? notified : Object.values(notified ?? {})
         const seen = new Set(known.map((n) => `${n.title}|${n.episode}|${n.language}`))
 

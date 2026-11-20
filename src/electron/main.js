@@ -120,6 +120,7 @@ function registerWindowHandlers() {
   ipcMain.on("open-devtools", () => win()?.webContents.openDevTools({ mode: "detach" }))
   ipcMain.on("close-devtools", () => win()?.webContents.closeDevTools())
   ipcMain.handle("get-install-date", async () => (await fs.promises.stat(app.getPath("userData"))).birthtime.toISOString())
+  ipcMain.on("set-fullscreen", (_e, v) => win()?.setFullScreen(Boolean(v)))
 }
 
 app.on("second-instance", (_e, argv) => {
