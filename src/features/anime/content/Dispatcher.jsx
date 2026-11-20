@@ -21,6 +21,7 @@ export const Dispatcher = () => {
   const [animeCover, setAnimeCover] = useState(
     location.state?.animeInfo?.cover || location.state?.animeCover || "",
   )
+  const [animeMal, setAnimeMal] = useState(location.state?.animeInfo?.malUrl || location.state?.malUrl || "")
   const [contentType, setContentType] = useState(location.state?.contentType || "")
   const [contents, setContents] = useState(location.state?.contents || {})
   const [availableLanguages, setAvailableLanguages] = useState(
@@ -60,6 +61,7 @@ export const Dispatcher = () => {
           )
           setAnimeTitle(info?.title)
           setAnimeCover(info?.cover)
+          setAnimeMal(info?.malUrl)
         }
         let currentSeason
         if (!seasonTitle || !seasonUrl) {
@@ -191,6 +193,7 @@ export const Dispatcher = () => {
         selectedLanguage={selectedLanguage}
         contents={contents}
         availableLanguages={availableLanguages}
+        animeMalId={animeMal?.split("/")[4]}
         restored={restored}
         getEpisodeTitle={getEpisodeTitle}
         getWatchDataRef={getWatchDataRef}

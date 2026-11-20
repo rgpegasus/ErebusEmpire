@@ -5,7 +5,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { useLoader } from "@context/loader-context/LoaderContext"
 import { Loader } from "@features/loader/Loader"
 import { ErebusPlayer } from "@components/video-player/VideoPlayer"
-
+import { getSkipTimes } from "@utils/functions/getSkipTimes"
 export const Episode = ({
   animeId,
   seasonId,
@@ -17,6 +17,7 @@ export const Episode = ({
   episodeTitle,
   episodeIndex,
   availableLanguages,
+  animeMalId,
   getEpisodeTitle,
   getWatchDataRef,
   getContents,
@@ -32,7 +33,7 @@ export const Episode = ({
   const [videoDuration, setVideoDuration] = useState(0)
   const [episodeUrl, setEpisodeUrl] = useState(undefined)
   const [resolvedSources, setResolvedSources] = useState([])
-  const { loading, setLoading } = useLoader()
+  const { setLoading } = useLoader()
   const [openingTime, setOpeningTime] = useState([0, 0])
   const [episodeSources, setEpisodeSources] = useState(null)
   const [videoTime, setVideoTime] = useState(0)
@@ -108,6 +109,14 @@ export const Episode = ({
     availableLanguages,
     selectedLanguage,
   ])
+  useEffect(() => {
+    const getOpeningTime  = async () => {const skipTimes = await getSkipTimes(animeMalId, seasonId, episodeId, videoDuration)
+    const op = skipTimes?.find(s => s.skipType === "op" || s.skipType === "mixed-op")?.interval
+    setOpeningTime(op ? [op.startTime, op.endTime] : [0, 0])
+    }
+    if(videoDuration == 0) return
+    getOpeningTime()
+  }, [videoDuration])
   const EndEpisodeNext = async (episode) => {
     if (!episode) return
     await animeData.save("animeWatchHistory", storageKey, buildWatchData())
@@ -265,7 +274,6 @@ export const Episode = ({
           host: episodeSources.host,
         })
         if (cancelled) return
-        setOpeningTime(resolved.find((r) => r.openingTime)?.openingTime ?? [0, 0])
         setResolvedSources({
           ...episodeSources,
           url: resolved.map((r) => r.url),
